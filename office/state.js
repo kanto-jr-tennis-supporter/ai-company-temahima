@@ -41,9 +41,27 @@
 //   links     : 会社の資料・リンク集 [{ title, url, type }]
 //   activity  : 最近の動き [{ time, who, text }]（新しいものを上に。電光掲示板に流れる）
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
+//   addone    : 業務委託先「add one」のSlackから拾った指示・依頼の管理（テマヒマ・ラボの社員タスクとは別枠）
+//               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
   updatedAt: "2026-07-07T17:50:00+09:00",
+
+  addone: {
+    company: "add one",
+    contact: "Shingo Tezuka",
+    tasks: [
+      {
+        id: "A1",
+        source: "Slack DM（Shingo Tezukaさん）",
+        text: "テレアポシートのハイライト（条件付き書式）が効かなくなっている。修正してほしい。",
+        url: "https://docs.google.com/spreadsheets/d/1oQpq8VukdjWfcKqv_YCZTlLUQHPPkqRTcvyqfAny3YU/edit?gid=405482077",
+        receivedAt: "7/7 09:51",
+        status: "open",
+        note: "テマヒマ社内のT3（コール数集計の修正）と同一スプレッドシート。同時に見るのが効率的。同日16:30のWEB会議で解決済みの可能性あり、社長に確認要"
+      }
+    ]
+  },
 
   setup: {
     completed: true,
