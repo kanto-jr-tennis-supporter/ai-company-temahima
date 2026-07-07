@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T15:30:00+09:00",
+  updatedAt: "2026-07-07T15:45:00+09:00",
 
   setup: {
     completed: true,
@@ -74,26 +74,30 @@ window.AI_STATE = {
       id: "T9",
       title: "クラウドワークス6案件の精査（社長にできるか判定）",
       owner: "リサ",
-      status: "doing",
-      progress: 70,
+      status: "done",
+      progress: 100,
       hint: "",
-      cmd: "T9の判定結果を見せて",
+      cmd: "",
       log: [
         { time: "15:00", text: "社長指定の6案件URLを1件ずつ精査開始" },
         { time: "15:05", text: "この環境からクラウドワークスへの接続がブロックされ本文を取得できず。判定保留。社長に本文の貼り付けを依頼中" },
-        { time: "15:30", text: "社長から6案件の本文を受領。リサが◎○×の判定を再開" }
+        { time: "15:30", text: "社長から6案件の本文を受領。リサが◎○×の判定を再開" },
+        { time: "15:45", text: "判定完了。応募推奨は①データ集計効率化のみ（○条件付きGO）。③⑤は条件不一致、②④は時間の切り売り、⑥はスパム加担リスクで×" }
       ],
-      deliverables: [{ title: "T9_クラウドワークス6件精査.md（5分チェックリスト付き）", type: "ドキュメント", at: "7/7", path: "logs/T9_クラウドワークス6件精査.md", app: "Visual Studio Code" }]
+      deliverables: [{ title: "T9_クラウドワークス6件精査.md（判定完了版）", type: "ドキュメント", at: "7/7", path: "logs/T9_クラウドワークス6件精査.md", app: "Visual Studio Code" }]
     },
     {
       id: "T10",
       title: "精査でGOになった案件の応募文作成",
       owner: "コトハ",
-      status: "todo",
-      progress: 0,
+      status: "doing",
+      progress: 20,
       hint: "",
-      cmd: "T10の応募文を見せて",
-      log: [{ time: "15:00", text: "T9（リサの精査）の結果待ち。GO案件が決まり次第着手" }],
+      cmd: "T10の途中経過を見せて",
+      log: [
+        { time: "15:00", text: "T9（リサの精査）の結果待ち。GO案件が決まり次第着手" },
+        { time: "15:45", text: "GO案件は①データ集計効率化の1件。コトハが応募文の執筆を開始" }
+      ],
       deliverables: []
     },
     {
@@ -213,8 +217,8 @@ window.AI_STATE = {
   ],
 
   employees: [
-    { name: "リサ", status: "working", taskId: "T9" },
-    { name: "コトハ", status: "idle", taskId: "" },
+    { name: "リサ", status: "idle", taskId: "" },
+    { name: "コトハ", status: "working", taskId: "T10" },
     { name: "サトル", status: "idle", taskId: "" },
     { name: "ハック", status: "working", taskId: "T3" },
   ],
@@ -228,6 +232,8 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "15:45", who: "リサ", text: "T9：判定完了！応募推奨は①データ集計効率化の1件。⑥は危険案件として見送り推奨🔍" },
+    { time: "15:45", who: "コトハ", text: "T10：①の応募文を書き始めました。テレアポシート実績を武器にします✍️" },
     { time: "15:30", who: "サトル", text: "T11：商品設計書v1が完成！社長の論点3つの回答待ちです🧭" },
     { time: "15:30", who: "リサ", text: "T9：社長から6案件の本文を受領。判定を再開しました🔍" },
     { time: "15:15", who: "アイ", text: "T8決裁！最初の商品は「部活動まるごと管理キット」に決定🎉 サトルが商品設計に着手（T11）" },
