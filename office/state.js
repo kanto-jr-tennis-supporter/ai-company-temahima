@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T15:45:00+09:00",
+  updatedAt: "2026-07-07T16:00:00+09:00",
 
   setup: {
     completed: true,
@@ -90,15 +90,16 @@ window.AI_STATE = {
       id: "T10",
       title: "精査でGOになった案件の応募文作成",
       owner: "コトハ",
-      status: "doing",
-      progress: 20,
-      hint: "",
-      cmd: "T10の途中経過を見せて",
+      status: "review",
+      progress: 90,
+      hint: "応募文を確認してOKか修正指示を出すだけ。OKなら応募は社長の手で（今日〜明日推奨）",
+      cmd: "T10の応募文OK。このまま応募する",
       log: [
         { time: "15:00", text: "T9（リサの精査）の結果待ち。GO案件が決まり次第着手" },
-        { time: "15:45", text: "GO案件は①データ集計効率化の1件。コトハが応募文の執筆を開始" }
+        { time: "15:45", text: "GO案件は①データ集計効率化の1件。コトハが応募文の執筆を開始" },
+        { time: "16:00", text: "応募文完成。テレアポシート実績を冒頭に、稼働条件を正直に明示。社長の承認待ち" }
       ],
-      deliverables: []
+      deliverables: [{ title: "T10_応募文_データ集計効率化.md（応募前チェックメモ付き）", type: "ドキュメント", at: "7/7", path: "logs/T10_応募文_データ集計効率化.md", app: "Visual Studio Code" }]
     },
     {
       id: "T11",
@@ -218,7 +219,7 @@ window.AI_STATE = {
 
   employees: [
     { name: "リサ", status: "idle", taskId: "" },
-    { name: "コトハ", status: "working", taskId: "T10" },
+    { name: "コトハ", status: "idle", taskId: "" },
     { name: "サトル", status: "idle", taskId: "" },
     { name: "ハック", status: "working", taskId: "T3" },
   ],
@@ -232,6 +233,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "16:00", who: "コトハ", text: "T10：応募文が完成！決裁トレイに上げました。社長のOK待ちです📥" },
     { time: "15:45", who: "リサ", text: "T9：判定完了！応募推奨は①データ集計効率化の1件。⑥は危険案件として見送り推奨🔍" },
     { time: "15:45", who: "コトハ", text: "T10：①の応募文を書き始めました。テレアポシート実績を武器にします✍️" },
     { time: "15:30", who: "サトル", text: "T11：商品設計書v1が完成！社長の論点3つの回答待ちです🧭" },
