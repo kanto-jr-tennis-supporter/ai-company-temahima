@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T17:35:00+09:00",
+  updatedAt: "2026-07-07T17:50:00+09:00",
 
   setup: {
     completed: true,
@@ -205,15 +205,16 @@ window.AI_STATE = {
       id: "T3",
       title: "テレアポシート③：コール数集計の修正",
       owner: "ハック",
-      status: "doing",
-      progress: 10,
-      hint: "",
-      cmd: "T3の状況を教えて",
+      status: "review",
+      progress: 60,
+      hint: "診断レポートの確認3問に答えるだけ（特に：集計の数字は多い？少ない？）",
+      cmd: "T3の答え：数字は◯◯。集計は◯◯シートがおかしい",
       log: [
         { time: "7/2", text: "着手。シートの構成確認中" },
-        { time: "17:10", text: "既存GAS（GAS_ToGList_v3.js）の集計ロジックを解析し、修正方針と社長への確認事項を整理中" }
+        { time: "17:10", text: "既存GAS（GAS_ToGList_v3.js）の集計ロジックを解析し、修正方針と社長への確認事項を整理中" },
+        { time: "17:50", text: "診断完了。バグ候補6件を特定（最有力：1コールが最大4行に重複記録＝数字が2〜4倍に膨らむ）。社長の3問回答後、修正版v4を即日作成可" }
       ],
-      deliverables: []
+      deliverables: [{ title: "T3_コール数集計_診断レポート.md", type: "ドキュメント", at: "7/7", path: "logs/T3_コール数集計_診断レポート.md", app: "Visual Studio Code" }]
     },
     {
       id: "T4",
@@ -230,16 +231,17 @@ window.AI_STATE = {
       id: "T5",
       title: "部活動出欠確認シート：今年のメンバーに更新・修正",
       owner: "ハック",
-      status: "doing",
-      progress: 30,
+      status: "review",
+      progress: 60,
       hint: "",
       cmd: "T5を始めて",
       log: [
         { time: "今日", text: "着手方針が決定。社長の準備（今年のメンバー情報など）が整い次第、開始" },
         { time: "15:05", text: "社長から今年の女子メンバー20名（1年8名・2年12名）を受領。logs/T5_2026年度メンバー_女子.csv に保存。男子リスト待ち" },
-        { time: "17:10", text: "女子分から先行着手：シートに貼るだけの更新データ＋手順書を作成中（男子は届き次第追加）" }
+        { time: "17:10", text: "女子分から先行着手：シートに貼るだけの更新データ＋手順書を作成中（男子は届き次第追加）" },
+        { time: "17:50", text: "女子分の貼り付けデータ＋13アクションの手順書が完成。社長の貼り付け作業と名前4名の確認待ち。男子リストも待ち" }
       ],
-      deliverables: []
+      deliverables: [{ title: "T5_更新手順_女子分.md（貼るだけデータ付き）", type: "ドキュメント", at: "7/7", path: "logs/T5_更新手順_女子分.md", app: "Visual Studio Code" }]
     },
   ],
   proposals: [
@@ -252,7 +254,7 @@ window.AI_STATE = {
     { name: "リサ", status: "idle", taskId: "" },
     { name: "コトハ", status: "idle", taskId: "" },
     { name: "サトル", status: "idle", taskId: "" },
-    { name: "ハック", status: "working", taskId: "T3" },
+    { name: "ハック", status: "idle", taskId: "" },
   ],
 
   links: [
@@ -264,6 +266,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "17:50", who: "ハック", text: "T3：集計バグの診断完了（候補6件）＆T5：女子分の貼るだけ更新パック完成⚙️" },
     { time: "17:35", who: "リサ", text: "T7：毎朝5分の案件パトロール手順書が完成！URL動作確認を1本だけお願いします🔍" },
     { time: "17:25", who: "コトハ", text: "T6：提案文テンプレv2が完成！次の応募からこの型が使えます✍️" },
     { time: "17:10", who: "アイ", text: "リサ・コトハ・ハックが同時に動き始めました（T7・T6・T3+T5の並列進行）💨" },
