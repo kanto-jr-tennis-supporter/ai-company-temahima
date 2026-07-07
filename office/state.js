@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T13:00:00+09:00",
+  updatedAt: "2026-07-07T14:00:00+09:00",
 
   setup: {
     completed: true,
@@ -176,6 +176,7 @@ window.AI_STATE = {
   ],
 
   links: [
+    { title: "テマヒマGitHubリポジトリ（スマホ連携の本体）", url: "https://github.com/kanto-jr-tennis-supporter/ai-company-temahima", type: "リンク" },
     { title: "テレアポシート（コールログ・転記元）", url: "https://docs.google.com/spreadsheets/d/1oQpq8VukdjWfcKqv_YCZTlLUQHPPkqRTcvyqfAny3YU/edit", type: "スプレッドシート" },
     { title: "テレアポシート（コール数集計）", url: "https://docs.google.com/spreadsheets/d/1NqLmQez1G--M8A6vDCnXLnwy-oBy1wutr9NC84ZO1Gs/edit?gid=1036168354", type: "スプレッドシート" },
     { title: "入札申請書＋メール作成アプリ", url: "https://script.google.com/macros/s/AKfycbycvMzYrtTti87O_FQ7th8zsT-KSfa5z4a3g8rlumgdsZyuaLJ5Ic5043IH6yN8oC3J5A/exec", type: "アプリ" },
@@ -183,6 +184,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "今日", who: "アイ", text: "スマホ連携の土台が完成！会社一式をGitHub（Private）にアップロードしました📱" },
     { time: "今日", who: "リサ", text: "T8：リサーチ完了！ココナラの教員向けGASは空白地帯。商品候補トップ3を提案しました📊" },
     { time: "今日", who: "リサ", text: "T8：教員向けテンプレ商品の市場リサーチを開始しました🔍" },
     { time: "今日", who: "アイ", text: "売上目標を更新：7月6.5万円→安定月16.5万円。作戦を提案箱に投函しました💡" },
