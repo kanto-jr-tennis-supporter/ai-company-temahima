@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T16:00:00+09:00",
+  updatedAt: "2026-07-07T16:15:00+09:00",
 
   setup: {
     completed: true,
@@ -70,6 +70,17 @@ window.AI_STATE = {
   },
 
   tasks: [
+    {
+      id: "T12",
+      title: "部活キット製造・工程2：出欠管理シートの実装（ハック）",
+      owner: "ハック",
+      status: "doing",
+      progress: 10,
+      hint: "",
+      cmd: "T12の途中経過を見せて",
+      log: [{ time: "16:15", text: "社長の決裁（区分は欠席・遅刻・早退・遅早／匿名販売）を受けて実装開始。ワンペーストで全シートを自動生成するGAS方式" }],
+      deliverables: []
+    },
     {
       id: "T9",
       title: "クラウドワークス6案件の精査（社長にできるか判定）",
@@ -105,13 +116,14 @@ window.AI_STATE = {
       id: "T11",
       title: "部活動まるごと管理キット：商品設計書v1（機能・構成・価格）",
       owner: "サトル",
-      status: "review",
+      status: "done",
       progress: 100,
-      hint: "論点3つに答えるだけ（会計の版切り分け・出欠区分・販売名義）",
-      cmd: "T11の論点1は賛成。区分は◯◯を使ってる。名義は◯◯で",
+      hint: "",
+      cmd: "",
       log: [
         { time: "15:15", text: "社長が第1候補「部活動まるごと管理キット」を採択。T8のリサーチをもとに商品設計を開始" },
-        { time: "15:30", text: "設計書v1完成。基本版¥1,980／完全版¥3,980／カスタム¥5,000〜の3段構成。実装可能な粒度で機能要件を定義。社長の論点3つを提示" }
+        { time: "15:30", text: "設計書v1完成。基本版¥1,980／完全版¥3,980／カスタム¥5,000〜の3段構成。実装可能な粒度で機能要件を定義。社長の論点3つを提示" },
+        { time: "16:15", text: "社長決裁：①会計は完全版のみ ②区分は欠席・遅刻・早退・遅早（空欄=出席） ③匿名ペンネーム販売。設計書に反映し工程2（T12）へ" }
       ],
       deliverables: [{ title: "T11_部活動まるごと管理キット_商品設計書v1.md", type: "ドキュメント", at: "7/7", path: "logs/T11_部活動まるごと管理キット_商品設計書v1.md", app: "Visual Studio Code" }]
     },
@@ -221,7 +233,7 @@ window.AI_STATE = {
     { name: "リサ", status: "idle", taskId: "" },
     { name: "コトハ", status: "idle", taskId: "" },
     { name: "サトル", status: "idle", taskId: "" },
-    { name: "ハック", status: "working", taskId: "T3" },
+    { name: "ハック", status: "working", taskId: "T12" },
   ],
 
   links: [
@@ -233,6 +245,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "16:15", who: "アイ", text: "T11決裁完了！区分4つ・匿名販売で確定。ハックが出欠シートの製造を開始（T12）⚙️" },
     { time: "16:00", who: "コトハ", text: "T10：応募文が完成！決裁トレイに上げました。社長のOK待ちです📥" },
     { time: "15:45", who: "リサ", text: "T9：判定完了！応募推奨は①データ集計効率化の1件。⑥は危険案件として見送り推奨🔍" },
     { time: "15:45", who: "コトハ", text: "T10：①の応募文を書き始めました。テレアポシート実績を武器にします✍️" },
