@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>あなたの AI 会社 — オフィス</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="bar">
+    <b class="brand" id="brandName">🏢 あなたのAI会社</b>
+  </div>
+
+  <div id="game"></div>
+
+  <div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
+
+  <div class="founding" id="founding">
+    <div class="confetti-layer" id="foundConfetti"></div>
+    <div class="founding-inner">
+      <div class="bldg">🏢</div>
+      <div class="fname" id="foundName">あなたのAI会社</div>
+      <div class="fslogan" id="foundSlogan"></div>
+      <div class="stamp">設立</div>
+    </div>
+  </div>
+
+  <div class="inaug" id="inaug">
+    <div class="confetti-layer" id="confettiLayer"></div>
+    <div class="inaug-card">
+      <div class="crown">👑</div>
+      <h2>就任、おめでとうございます！</h2>
+      <p id="inaugName">本日から <b>あなた</b> が <b>社長</b> です。</p>
+      <button class="mbtn alt" id="inaugBtn">就任する 🎉</button>
+    </div>
+  </div>
+
+<!-- ▼ 社員名簿のフォールバック：company.template.js を先に読み、既定の社員名簿を入れておく。
+     これで company.js が未生成（セットアップ未完）・読み込み失敗（構文エラー等）でも
+     「社員が誰もいない」状態を防ぐ。company.js があれば下の行で上書きされる。 -->
+<script src="company.template.js"></script>
+<script>window.__DEFAULT_COMPANY = window.COMPANY || null;</script>
+<script src="company.js"></script>
+<script src="presets.js"></script>
+<script src="config.js"></script>
+<script>
+  // ▼ ブラウザ記憶（localStorage）をクローン（=生徒さん）ごとに隔離する。
+  //   同じポート（localhost:3000）を使い回しても、前のデモの会社情報が混ざらない。
+  //   instanceId は config.js が持つ（デモ起動スクリプトがクローン時に固有値を刻む）。
+  //   無ければ "default"（単独利用は1台1人なので衝突しない）。
+  var __LS_NS = "ai_company:" + (((window.AI_CONFIG || {}).instanceId) || "default") + ":";
+  function lsGet(k) { try { return localStorage.getItem(__LS_NS + k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(__LS_NS + k, v); } catch (e) {} }
+
+  // セッション中のライブ設定（セットアップパネルで立ち上げた会社）を復元
+  try {
+    var saved = lsGet("live");
+    if (saved) window.COMPANY = JSON.parse(saved);
+  } catch (e) {}
+
+  // 社名は上部バー（ブランド表示）＋オフィス内（壁のロゴ）に表示される
+  function applyHeader() {
+    var c = window.COMPANY || {};
+    document.title = (c.name || "あなたのAI会社") + " — オフィス";
+    var bn = document.getElementById("brandName");
+    if (bn) bn.textContent = "🏢 " + (c.name || "あなたのAI会社");
+  }
+  applyHeader();
+
+  var overlay = document.getElementById("overlay");
+  var modal = document.getElementById("modal");
+  window.__talkOpen = false;
+
+  function openPanel(html) {
+    modal.innerHTML = html;
+    overlay.classList.add("open");
+    window.__talkOpen = true;
+    var c = modal.querySelector("[data-close]");
+    if (c) c.onclick = closePanel;
+  }
+  function closePanel() { overlay.classList.remove("open"); window.__talkOpen = false; }
+  window.closePanel = closePanel;
+  overlay.addEventListener("click", function (e) { if (e.target === overlay) closePanel(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closePanel(); });
+
+  // state.js のライブ情報を社員名で引く
+  function liveEmp(name) {
+    var s = window.AI_STATE || {};
+    var found = null;
+    (s.employees || []).forEach(function (e) { if (e && e.name === name) found = e; });
+    return found || {};
+  }
+  function empLog(name) {
+    var s = window.AI_STATE || {};
+    return (s.activity || []).filter(function (a) { return a && a.who === name; });
+  }
+
+  // ===== タスク（v2：仕事の中心）のヘルパー =====
+  function allTasks() { return ((window.AI_STATE || {}).tasks || []); }
+  function taskById(id) {
+    var found = null;
+    allTasks().forEach(function (t) { if (t && t.id === id) found = t; });
+    return found;
+  }
+  function tasksOf(name) {
+    return allTasks().filter(function (t) { return t && t.owner === name; });
+  }
+  function reviewTasks() {
+    return allTasks().filter(function (t) { return t && t.status === "review"; });
+  }
+  // 社員のリング色（game.js の RING と同じ並び）
+  var OWNER_PALETTE = ["#23b3a3", "#e87fb0", "#5aa95b", "#e0913a", "#5b8def", "#c0a93f"];
+  function ownerColor(name) {
+    var emps = (window.COMPANY || {}).employees || [];
+    for (var i = 0; i < emps.length; i++) {
+      if (emps[i] && emps[i].name === name) return OWNER_PALETTE[i % OWNER_PALETTE.length];
+    }
+    return "#8a7ff0"; // 不明（アイ等）
+  }
+
+  // 種類・リンクからアイコンを決める
+  function iconFor(type, url) {
+    var t = (type || "") + "";
+    if (/スプレッド|sheet|シート/i.test(t)) return "📊";
+    if (/ドキュメント|doc|文書/i.test(t)) return "📝";
+    if (/フォルダ|drive|ドライブ/i.test(t)) return "📁";
+    if (/コード|code|スクリプト/i.test(t)) return "💻";
+    if (/スライド|slide/i.test(t)) return "📑";
+    if (/画像|image|図/i.test(t)) return "🖼";
+    if (/リンク|link|url/i.test(t)) return "🔗";
+    if (url) return "🔗";
+    return "📄";
+  }
+  function escAttr(s) { return String(s == null ? "" : s).replace(/"/g, "%22"); }
+  // 外部URLを新規タブで開く（埋め込みブラウザ用のフォールバック）
+  function openUrlFallback(url) {
+    if (!url) return;
+    var a = document.createElement("a");
+    a.href = url; a.target = "_blank"; a.rel = "noopener";
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { if (a.parentNode) a.parentNode.removeChild(a); }, 0);
+  }
+  // 外部URLを開く：本体（server）経由でPCの標準ブラウザに渡せるなら渡す
+  // （プレビューペインは localhost 以外を開けないため）。無理なら新規タブにフォールバック。
+  function openUrl(url) {
+    if (!url) return;
+    var base = (window.AI_CONFIG || {}).apiBase || (location.protocol.indexOf("http") === 0 ? location.origin : "");
+    if (base && /^https?:\/\/(localhost|127\.0\.0\.1)/.test(base)) {
+      fetch(base.replace(/\/$/, "") + "/api/open-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: url }),
+      }).then(function (r) { return r.json(); })
+        .then(function (j) { if (!(j && j.ok)) openUrlFallback(url); })
+        .catch(function () { openUrlFallback(url); });
+      return;
+    }
+    openUrlFallback(url);
+  }
+  // 資料棚・成果物などの素の <a href="http..."> クリックを横取りして、本体経由でPCのブラウザで開く。
+  // （プレビューペインの "Preview only supports localhost URLs" ブロック対策）
+  document.addEventListener("click", function (ev) {
+    var a = ev.target && ev.target.closest ? ev.target.closest('a[href^="http"]') : null;
+    if (!a) return;
+    var href = a.getAttribute("href") || "";
+    if (/^https?:\/\/(localhost|127\.0\.0\.1)/.test(href)) return; // ローカルはそのまま
+    ev.preventDefault();
+    openUrl(href);
+  }, true);
+
+  // ローカルファイルを「コンピューター上で」開く（server/ 経由でOSの標準アプリが起動）
+  // ローカルの本体が必要。成功すれば true、無理なら false を返す。
+  function openLocalFile(path, app) {
+    var base = (window.AI_CONFIG || {}).apiBase || (location.protocol.indexOf("http") === 0 ? location.origin : "");
+    if (!base || !/^https?:\/\/(localhost|127\.0\.0\.1)/.test(base)) return Promise.resolve(false);
+    return fetch(base.replace(/\/$/, "") + "/api/open-file", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: path, app: app || "" }),
+    }).then(function (r) { return r.json(); })
+      .then(function (j) { return !!(j && j.ok); })
+      .catch(function () { return false; });
+  }
+
+  // クリック時の挙動：url → 新規タブで開く ／ path → コンピューター上で開く ／ 無理ならビューア
+  function openDeliverableSmart(d) {
+    if (!d) return;
+    if (d.url) { openUrl(d.url); return; }
+    if (d.path) {
+      openLocalFile(d.path, d.app).then(function (ok) {
+        if (!ok) openDeliverable(d); // 本体未起動などはビューアでパス表示＋コピー
+      });
+      return;
+    }
+    openDeliverable(d); // テキスト本文のみはビューアで
+  }
+
+  // 成果物ビューア（中身＋リンク／ファイルを開く）
+  function openDeliverable(d) {
+    if (!d) return;
+    var meta = [d.who, d.at, d.type].filter(Boolean).map(esc).join(" ・ ");
+    var html = '<div class="app-title">' + iconFor(d.type, d.url) + ' ' + esc(d.title || "成果物") + '</div>' +
+      (meta ? '<div class="app-note">' + meta + '</div>' : '');
+
+    // 外部リンク（スプレッドシート / ドキュメント / Drive 等）
+    if (d.url) {
+      html += '<a class="submit-btn" href="' + escAttr(d.url) + '" target="_blank" rel="noopener" ' +
+        'style="display:block;text-align:center;text-decoration:none;margin-top:6px">🔗 開く ↗</a>' +
+        '<div class="form-hint" style="word-break:break-all;margin-bottom:4px">' + esc(d.url) + '</div>';
+    }
+    // ローカルファイルのパス
+    if (d.path) {
+      html += '<button class="submit-btn" data-openfile style="margin-top:6px">📂 コンピューターで開く</button>' +
+        '<div class="plabel">📁 ファイルの場所</div>' +
+        '<div class="prompt-box"><span style="word-break:break-all">' + esc(d.path) + '</span>' +
+        '<button class="copy-btn" data-copypath>コピー</button></div>';
+    }
+    // テキスト本文（あれば）
+    if (d.body) {
+      html += '<div class="qcode" style="display:block;width:auto;margin-top:10px">' +
+        '<div class="qcode-top"><span class="qcode-label">▼ 内容</span>' +
+        '<button class="qcopy" data-copy>コピー</button></div>' +
+        '<pre>' + esc(d.body) + '</pre></div>';
+    }
+    if (!d.url && !d.path && !d.body) {
+      html += '<div class="app-note" style="margin-top:8px">（中身はまだありません）</div>';
+    }
+    html += '<button class="close" data-close>閉じる</button>';
+    openPanel(html);
+
+    var ofb = modal.querySelector("[data-openfile]");
+    if (ofb) ofb.onclick = function () {
+      ofb.textContent = "開いています…";
+      openLocalFile(d.path, d.app).then(function (ok) {
+        ofb.textContent = ok ? "開きました ✓" : "ここからは開けません。チャットで「" + (d.title || "この成果物") + "を開いて」と頼んでください";
+        setTimeout(function () { ofb.textContent = "📂 コンピューターで開く"; }, 3500);
+      });
+    };
+    var cb = modal.querySelector("[data-copy]");
+    if (cb) cb.onclick = function () {
+      copyText(d.body || "").then(function (ok) {
+        cb.textContent = ok ? "コピー済み✓" : "⌘C でコピー";
+        setTimeout(function () { cb.textContent = "コピー"; }, ok ? 1500 : 2500);
+      });
+    };
+    var cp = modal.querySelector("[data-copypath]");
+    if (cp) cp.onclick = function () {
+      copyText(d.path || "").then(function (ok) {
+        cp.textContent = ok ? "コピー済み✓" : "⌘C でコピー";
+        setTimeout(function () { cp.textContent = "コピー"; }, ok ? 1500 : 2500);
+      });
+    };
+  }
+  window.openDeliverable = openDeliverable;
+
+  // 🔗 リンク・資料棚（本棚クリック / ダッシュボードから）
+  window.openLinks = function () {
+    var links = (window.AI_STATE && window.AI_STATE.links) || [];
+    var body = links.length
+      ? links.map(function (l) {
+          return '<a class="row link-row" href="' + escAttr(l.url) + '" target="_blank" rel="noopener">' +
+            '<div class="ic">' + iconFor(l.type, l.url) + '</div><div class="tx"><div class="tt">' + esc(l.title) + '</div>' +
+            '<div class="sub" style="word-break:break-all">' + esc(l.type || l.url || "") + '</div></div>' +
+            '<div class="time">開く ↗</div></a>';
+        }).join("")
+      : '<div class="app-note">まだ登録された資料はありません。<br>Claude Code に「このスプレッドシートを資料棚に追加して」と頼むと、ここに並びます。</div>';
+    openPanel('<div class="app-title">🔗 資料棚（リンク・資料）</div>' +
+      '<div class="app-note">資料室の本棚。会社のスプレッドシート・ドキュメント・Driveなど。クリックで開きます。</div>' +
+      body + '<button class="close" data-close>閉じる</button>');
+  };
+
+  window.openTalk = function (e) {
+    var le = liveEmp(e.name);
+    var status = le.status || "idle";
+    var m = STT[status] || STT.idle;
+    // v2：いまのタスク・進捗・成果物は tasks から引く
+    var curTask = le.taskId ? taskById(le.taskId) : null;
+    var task = curTask ? (curTask.id + " " + curTask.title) : (le.task || "");
+    var prog = Math.max(0, Math.min(100, (curTask ? Number(curTask.progress) : le.progress) || 0));
+    var dels = [];
+    tasksOf(e.name).forEach(function (t) {
+      (t.deliverables || []).forEach(function (d) { dels.push(d); });
+    });
+    if (le.deliverables) dels = dels.concat(le.deliverables); // 旧形式の保険
+    var logs = empLog(e.name).slice(0, 5);
+    window.__talkDels = dels;
+    // この社員からの提案（あれば詳細内に「提案を見る」ボタンを出す）
+    var myProps = ((window.AI_STATE || {}).proposals || []).filter(function (p) { return p && p.from === e.name; });
+    var empIdx = ((window.COMPANY || {}).employees || []).map(function (x) { return x.name; }).indexOf(e.name);
+
+    var html =
+      '<span class="big">' + e.emoji + '</span>' +
+      '<h2>' + esc(e.name) + '</h2><div class="mrole">' + esc(e.role) + '</div>' +
+      '<div class="emp-status"><span class="stt ' + m[1] + '">' + m[0] + '</span>' +
+      (task ? '<span class="emp-task">' + esc(task) + '</span>' : '') + '</div>' +
+      ((status === "working" || prog > 0)
+        ? '<div class="pbar"><i style="width:' + prog + '%"></i></div><div class="pbar-label">進捗 ' + prog + '%</div>'
+        : '') +
+      '<div class="desc">' + (e.desc || "") + '</div>';
+
+    // 💬 提案を見るボタン（提案がある社員のみ。動く吹き出しを狙わなくても、本人タップ→ここから開ける）
+    if (myProps.length) {
+      html += '<button class="talk-prop-btn" data-talkprop="' + empIdx + '">' +
+        '<span class="tpb-ic">💬</span>提案があります（' + myProps.length + '件）― 見る' +
+        '<span class="tpb-count">' + myProps.length + '</span></button>';
+    }
+
+    if (e.skills && e.skills.length) {
+      html += '<div class="plabel">⚡ できること（専用スキル）</div><ul class="dlist">' +
+        e.skills.map(function (s) {
+          return '<li><span class="dot doing"></span><div style="flex:1">' + esc(s) + '</div></li>';
+        }).join("") + '</ul>';
+    }
+
+    if (dels.length) {
+      html += '<div class="plabel">📦 この社員の成果物（クリックで開く）</div>' +
+        dels.map(function (d, i) {
+          var inner = '<div class="ic">' + iconFor(d.type, d.url) + '</div><div class="tx"><div class="tt">' + esc(d.title) + '</div>' +
+            '<div class="sub">' + [d.type, d.at].filter(Boolean).map(esc).join(" ・ ") + '</div></div>' +
+            '<div class="time">' + (d.url ? "開く ↗" : "開く ›") + '</div>';
+          if (d.url) return '<a class="row del-row" href="' + escAttr(d.url) + '" target="_blank" rel="noopener">' + inner + '</a>';
+          return '<div class="row del-row" data-del="' + i + '" style="cursor:pointer">' + inner + '</div>';
+        }).join("");
+    }
+
+    if (logs.length) {
+      html += '<div class="plabel">🕒 今日の動き</div><ul class="dlist">' +
+        logs.map(function (a) {
+          return '<li><span class="dot"></span><div><div>' + esc(a.text) + '</div>' +
+            '<div class="who">' + esc(a.time || "") + '</div></div></li>';
+        }).join("") + '</ul>';
+    }
+
+    html += '<div class="plabel">▼ この社員への話しかけ方（Claude Code に入力）</div>' +
+      '<div class="prompt-box"><span>' + esc(e.prompt) + '</span>' +
+      '<button class="copy-btn" data-copy>コピー</button></div>' +
+      '<button class="close" data-close>閉じる</button>';
+
+    openPanel(html);
+
+    var tpb = modal.querySelector("[data-talkprop]");
+    if (tpb) tpb.onclick = function () {
+      if (window.openEmployeeProposals) window.openEmployeeProposals(+tpb.getAttribute("data-talkprop"));
+    };
+
+    var cb = modal.querySelector("[data-copy]");
+    if (cb) cb.onclick = function () {
+      copyText(e.prompt).then(function (ok) {
+        cb.textContent = ok ? "コピー済み✓" : "⌘C でコピー";
+        setTimeout(function () { cb.textContent = "コピー"; }, ok ? 1500 : 2500);
+      });
+    };
+    Array.prototype.forEach.call(modal.querySelectorAll(".del-row[data-del]"), function (row) {
+      row.onclick = function () { openDeliverableSmart(window.__talkDels[+row.getAttribute("data-del")]); };
+    });
+  };
+
+  // 壁アプリ：未連携=サンプル / 連携済み(hosted)=実データ
+  var APP_TITLE = { mail: "📧 案件・クライアント関連メール", calendar: "📅 今日の予定", line: "💬 LINE" };
+
+  // サンプルは「いまの社員チーム」に連動させる（勝ち筋を変えると中身も変わる）
+  function empReportLine(role) {
+    var r = role || "";
+    if (/リサーチ|案件|調査|キーワード|企画|ネタ/.test(r)) return "条件に合いそうなネタ・案件を3件ピックしました。";
+    if (/提案|ライ|コピー|本文|営業/.test(r)) return "下書きが完成しています。確認をどうぞ。";
+    if (/要件|定義|ヒアリング|プランナー|設計|ディレク/.test(r)) return "今日の進め方を整理しました。";
+    if (/デザ|ビジュアル|サムネ|画像/.test(r)) return "ビジュアル案ができました。";
+    if (/自動化|エンジ|開発|コーディング|編集|字幕|テロップ/.test(r)) return "作ってみたので、見てもらえますか？";
+    if (/分析|改善/.test(r)) return "先週の数字をまとめました。";
+    return "今日のタスクが進みました。";
+  }
+  function getSample(type) {
+    var c = window.COMPANY || {};
+    var emps = c.employees || [];
+    if (type === "mail") {
+      var rows = emps.slice(0, 2).map(function (e, i) {
+        return { ic: e.emoji || "📨", tt: (e.name || "社員") + "（" + (e.role || "") + "）",
+          sub: empReportLine(e.role), time: i === 0 ? "9:02" : "9:15" };
+      });
+      rows.push({ ic: "📨", tt: "B社 ご担当者様", sub: "お見積もりありがとうございます。一度お打ち合わせを…", time: "10:40" });
+      return rows;
+    }
+    if (type === "calendar") {
+      var cal = [{ ic: "🔔", tt: "AI社員と作戦会議", sub: "今日やることを決める", time: "9:00" }];
+      var e0 = emps[0], e1 = emps[1];
+      if (e0) cal.push({ ic: e0.emoji || "📝", tt: (e0.role || "作業") + "の仕上げ", sub: e0.name + "の成果を確認", time: "11:00" });
+      cal.push({ ic: "🎧", tt: "クライアントMTG", sub: (emps[2] ? emps[2].name + "が準備済み" : "メモ準備済み"), time: "15:00" });
+      if (e1) cal.push({ ic: e1.emoji || "⚙️", tt: (e1.role || "タスク") + "の確認", sub: e1.name + "に任せた件", time: "17:00" });
+      return cal;
+    }
+    // line
+    var helper = (emps[2] && emps[2].name) || (emps[0] && emps[0].name) || "チーム";
+    return [
+      { who: "them", text: "先日の件、めちゃくちゃ助かりました🙏 もう1つお願いしたいことが…" },
+      { who: "me", text: "ありがとうございます！詳しく聞かせてください。" + helper + "と一緒に整理します。" },
+      { who: "them", text: "では来週、30分だけお時間いただけますか？" },
+      { who: "me", text: "もちろんです。候補日をお送りしますね📅" },
+    ];
+  }
+
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>]/g, function (m) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[m]; }); }
+  function renderRows(items) {
+    return (items || []).map(function (r) {
+      // 既読/未読バッジ（メールのみ。read が真偽値で来る）
+      var badge = "";
+      if (typeof r.read === "boolean") {
+        badge = r.read
+          ? '<span class="mail-read">既読済み</span>'
+          : '<span class="mail-unread">未読</span>';
+      }
+      var rowCls = (typeof r.read === "boolean" && r.read) ? "row is-read" : "row";
+      var inner = '<div class="ic">' + esc(r.ic || "•") + '</div>' +
+        '<div class="tx"><div class="tt">' + badge + esc(r.tt || r.title || "") + '</div>' +
+        '<div class="sub">' + esc(r.sub || r.snippet || "") + '</div></div>' +
+        '<div class="time">' + esc(r.time || "") + (r.url ? '<div class="row-open">開く ↗</div>' : "") + '</div>';
+      // url があれば行ごとリンク化（クリックで実際のメールをPCブラウザで開く）
+      return r.url
+        ? '<a class="' + rowCls + '" href="' + escAttr(r.url) + '" target="_blank" rel="noopener">' + inner + '</a>'
+        : '<div class="' + rowCls + '">' + inner + '</div>';
+    }).join("");
+  }
+  function renderLineChat(msgs) {
+    return '<div class="chat">' + (msgs || []).map(function (m) {
+      return '<div class="msg ' + (m.who === "me" ? "me" : "them") + '">' + esc(m.text) + '</div>';
+    }).join("") + '</div>';
+  }
+  function renderApp(type, items, live) {
+    var note = live
+      ? '<div class="app-note" style="color:#4D9968">● 連携中（あなたの実データ）</div>'
+      : '<div class="app-note">○ 未連携：サンプル表示です。<b style="color:#4D9968">繋ぐと、ここに本物が出ます。</b></div>';
+    var body = type === "line" ? renderLineChat(items) : renderRows(items);
+    if (type !== "line" && !body) {
+      body = '<div class="app-note" style="margin-top:8px">' +
+        (type === "mail" ? "クライアントワーク関連の新着メールはありませんでした。" : "表示できる項目がありません。") + "</div>";
+    }
+    return '<div class="app-title">' + APP_TITLE[type] + '</div>' + note + body +
+      '<button class="close" data-close>閉じる</button>';
+  }
+
+  window.openApp = function (type) {
+    var base = (window.AI_CONFIG || {}).apiBase;
+    if (!base) { openPanel(renderApp(type, getSample(type), false)); return; }
+    openPanel('<div class="app-title">' + APP_TITLE[type] + '</div><div class="app-note">読み込み中…</div>');
+    fetch(base.replace(/\/$/, "") + "/api/" + type)
+      .then(function (r) { if (!r.ok) throw new Error("bad"); return r.json(); })
+      .then(function (data) {
+        // 本体が未設定（configured:false）ならサンプルにフォールバック
+        if (data && data.configured === false) { openPanel(renderApp(type, getSample(type), false)); return; }
+        var items = (data && (data.items || data.messages || data)) || [];
+        openPanel(renderApp(type, items, true));
+      })
+      .catch(function () {
+        openPanel(renderApp(type, getSample(type), false) +
+          '<div class="app-note" style="margin-top:8px;color:#B5635B">※ 本体に接続できませんでした。サンプルを表示しています。</div>');
+      });
+  };
+
+  // 🔗 外部連携の状況：何が連携済み/未連携かを一覧。連携済みは✓
+  window.openIntegrations = function () {
+    var base = (window.AI_CONFIG || {}).apiBase;
+    var render = function (h) {
+      h = h || {};
+      var rows = [
+        { ic: "📧", name: "Gmail（メール）", on: !!h.google, app: "mail" },
+        { ic: "📅", name: "Google カレンダー", on: !!h.google, app: "calendar" },
+        { ic: "💬", name: "LINE", on: !!h.line, app: "line" },
+      ];
+      var body = '<ul class="dlist">' + rows.map(function (r) {
+        return '<li><span style="font-size:18px;flex-shrink:0">' + r.ic + '</span>' +
+          '<div style="flex:1"><b>' + r.name + '</b><div class="who">' + (r.on ? "連携済み" : "未連携") + '</div></div>' +
+          (r.on ? '<span class="int-ok">✓ 連携済み</span>'
+                : '<button class="qbtn" data-int="' + r.app + '">中身を見る</button>') +
+          '</li>';
+      }).join("") + '</ul>';
+      var allOn = rows.every(function (r) { return r.on; });
+      var note = allOn ? "✅ すべて連携済みです。"
+        : '未連携のものは、チャットで「<b style="color:#4D9968">本物連携をセットアップしたい</b>」と話すと、手順を1つずつご案内します。';
+      openPanel('<div class="app-title">🔗 外部連携の状況</div>' + body +
+        '<div class="app-note" style="margin-top:10px">' + note + '</div>' +
+        '<button class="close" data-close>閉じる</button>');
+      Array.prototype.forEach.call(modal.querySelectorAll("[data-int]"), function (btn) {
+        btn.onclick = function () { if (window.openApp) window.openApp(btn.getAttribute("data-int")); };
+      });
+    };
+    if (!base) { render(window.__lastHealth); return; }
+    openPanel('<div class="app-title">🔗 外部連携の状況</div><div class="app-note">確認中…</div>');
+    fetch(base.replace(/\/$/, "") + "/health")
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (h) { render(h || window.__lastHealth); })
+      .catch(function () { render(window.__lastHealth); });
+  };
+
+  // 今日の予定ウィジェット（売上ボードの右隣・壁）：先頭3件＋残りはトグル
+  window.fillCalBoard = function () {
+    var list = document.querySelector("[data-cal-list]");
+    if (!list) return;
+    var note = document.querySelector("[data-cal-note]");
+    var toggle = document.querySelector("[data-cal-toggle]");
+    function calRow(r) {
+      return '<div class="of-cal-row"><span class="of-cal-t">' + esc(r.time || "") + '</span>' +
+        '<span class="of-cal-tt">' + esc(r.tt || r.title || "") + '</span></div>';
+    }
+    function paint(items, live) {
+      items = items || [];
+      if (note) { note.textContent = live ? "● 連携中" : "○ サンプル"; note.style.color = live ? "#4D9968" : "#9a8f7a"; }
+      if (!items.length) { list.innerHTML = '<div class="of-cal-empty">今日の予定はありません</div>'; if (toggle) toggle.hidden = true; return; }
+      var SHOWN = 3, head = items.slice(0, SHOWN), rest = items.slice(SHOWN);
+      list.innerHTML = head.map(calRow).join("") +
+        '<div class="of-cal-more" data-cal-more hidden>' + rest.map(calRow).join("") + '</div>';
+      if (!toggle) return;
+      if (!rest.length) { toggle.hidden = true; return; }
+      toggle.hidden = false;
+      var open = false;
+      toggle.textContent = "▼ あと" + rest.length + "件";
+      toggle.onclick = function (ev) {
+        ev.stopPropagation();
+        open = !open;
+        var more = list.querySelector("[data-cal-more]");
+        if (more) more.hidden = !open;
+        toggle.textContent = open ? "▲ 閉じる" : "▼ あと" + rest.length + "件";
+      };
+    }
+    var base = (window.AI_CONFIG || {}).apiBase;
+    if (!base) { paint(getSample("calendar"), false); return; }
+    fetch(base.replace(/\/$/, "") + "/api/calendar")
+      .then(function (r) { if (!r.ok) throw new Error("bad"); return r.json(); })
+      .then(function (data) {
+        if (data && data.configured === false) { paint(getSample("calendar"), false); return; }
+        var items = (data && (data.items || data)) || [];
+        paint(items, true);
+      })
+      .catch(function () { paint(getSample("calendar"), false); });
+  };
+
+  // 社員を雇う
+  window.openHire = function () {
+    var p = "新しく『SNS運用担当のミク』を雇って";
+    openPanel('<span class="big">🪑</span><h2>社員を雇う</h2>' +
+      '<div class="desc">空いている席に、新しいAI社員を迎えられます。<br>やり方はかんたん。Claude Code にこう伝えるだけ：</div>' +
+      '<div class="prompt-box"><span>' + p + '</span><button class="copy-btn" data-copy>コピー</button></div>' +
+      '<div class="app-note" style="margin-top:12px">※ 役割・名前は自由。設計図.md に追記され、オフィスに席が増え、<b>社員/ にその人専用のプロジェクトフォルダ（CLAUDE.md＋スキル.md）</b>が作られます。</div>' +
+      '<button class="close" data-close>閉じる</button>');
+    var cb = modal.querySelector("[data-copy]");
+    if (cb) cb.onclick = function () {
+      copyText(p).then(function (ok) {
+        cb.textContent = ok ? "コピー済み✓" : "⌘C でコピー";
+        setTimeout(function () { cb.textContent = "コピー"; }, ok ? 1500 : 2500);
+      });
+    };
+  };
+
+  // 就任式
+  function spawnConfetti() {
+    var layer = document.getElementById("confettiLayer"); layer.innerHTML = "";
+    var colors = ["#ffd166", "#6ea8fe", "#e08bb0", "#4a9d5b", "#e08a3a", "#ffffff"];
+    for (var i = 0; i < 80; i++) {
+      var d = document.createElement("i"); d.className = "conf";
+      d.style.left = Math.random() * 100 + "%";
+      d.style.background = colors[i % colors.length];
+      d.style.animationDelay = (Math.random() * 0.9) + "s";
+      d.style.animationDuration = (2 + Math.random() * 1.6) + "s";
+      layer.appendChild(d);
+    }
+  }
+  window.playInauguration = function () {
+    var inaug = document.getElementById("inaug");
+    var nm = (window.COMPANY && window.COMPANY.ceo && window.COMPANY.ceo.name) || "あなた";
+    document.getElementById("inaugName").innerHTML = "本日から <b>" + nm + "</b> さんが <b>社長</b> です。";
+    inaug.classList.add("open"); spawnConfetti();
+  };
+  document.getElementById("inaugBtn").onclick = function () {
+    document.getElementById("inaug").classList.remove("open");
+    lsSet("inaugurated", "1");
+  };
+
+  // ===== 担当者向け：会社セットアップ（ライブ・パーソナライズ）=====
+  function presetOptions(selectedId) {
+    var list = window.WINNING_PRESETS || [];
+    return list.map(function (p) {
+      return '<option value="' + p.id + '"' + (p.id === selectedId ? ' selected' : '') + '>' + p.label + '</option>';
+    }).join("");
+  }
+
+  window.openSetup = function () {
+    var c = window.COMPANY || {};
+    var ceoName = (c.ceo && c.ceo.name) || "";
+    var curId = c.presetId || (window.WINNING_PRESETS && window.WINNING_PRESETS[0].id);
+    openPanel(
+      '<div class="app-title">⚙️ 会社をセットアップ</div>' +
+      '<div class="app-note">入力して立ち上げると、目の前のオフィスがその人仕様に生まれ変わります。</div>' +
+      '<div class="form-row"><label>👤 社長のお名前</label>' +
+      '<input id="suName" type="text" placeholder="例：田中 健太" value="' + ceoName.replace(/"/g, "&quot;") + '"></div>' +
+      '<div class="form-row"><label>🏢 会社名</label>' +
+      '<input id="suCompany" type="text" placeholder="例：タナカDXワークス" value="' + (c.name || "").replace(/"/g, "&quot;") + '"></div>' +
+      '<div class="form-row"><label>💬 スローガン</label>' +
+      '<input id="suSlogan" type="text" placeholder="未入力なら勝ち筋のおすすめが入ります" value="' + (c.slogan || "").replace(/"/g, "&quot;") + '"></div>' +
+      '<div class="form-row"><label>🎯 勝ち筋（事業の型）</label>' +
+      '<select id="suPreset">' + presetOptions(curId) + '</select>' +
+      '<div class="form-hint">選ぶだけで、社員チームがその業種に最適化されます。</div></div>' +
+      '<div class="form-row"><label>🔗 外部連携</label>' +
+      '<button class="su-sub-btn" id="suIntegrations">連携の状況を見る（Gmail・カレンダー・LINE）</button>' +
+      '<div class="form-hint">何が連携済み／未連携かを確認できます。</div></div>' +
+      '<button class="submit-btn" id="suGo">この内容で会社を立ち上げる 🎉</button>' +
+      '<button class="close" data-close>キャンセル</button>'
+    );
+    var siEl = modal.querySelector("#suIntegrations");
+    if (siEl) siEl.onclick = function () { if (window.openIntegrations) window.openIntegrations(); };
+    var slEl = modal.querySelector("#suSlogan");
+    var prEl = modal.querySelector("#suPreset");
+    function syncPlaceholder() {
+      var p = window.getPreset(prEl.value);
+      slEl.placeholder = p && p.slogan ? p.slogan : "スローガン";
+    }
+    syncPlaceholder();
+    prEl.onchange = syncPlaceholder;
+    modal.querySelector("#suGo").onclick = function () {
+      var preset = window.getPreset(prEl.value);
+      var name = (modal.querySelector("#suName").value || "").trim() || "あなた";
+      var company = (modal.querySelector("#suCompany").value || "").trim() || "あなたのAI会社";
+      var slogan = (slEl.value || "").trim() || (preset && preset.slogan) || "";
+      var built = {
+        name: company,
+        slogan: slogan,
+        presetId: preset.id,
+        winningPath: preset.label,
+        target: preset.target,
+        ceo: { name: name, emoji: "👑", title: "代表取締役 CEO", note: "社長（あなた）。会社の意思決定をする人。" },
+        employees: JSON.parse(JSON.stringify(preset.employees || [])),
+      };
+      window.COMPANY = built;
+      try { localStorage.setItem("ai_company_live", JSON.stringify(built)); } catch (e) {}
+      applyHeader();
+      closePanel();
+      playFounding(built);
+    };
+  };
+
+  // 会社設立アニメ → オフィス再構築
+  function spawnFoundConfetti() {
+    var layer = document.getElementById("foundConfetti"); layer.innerHTML = "";
+    var colors = ["#ffd166", "#6ea8fe", "#e08bb0", "#4a9d5b", "#a78bfa", "#ffffff"];
+    for (var i = 0; i < 70; i++) {
+      var d = document.createElement("i"); d.className = "conf";
+      d.style.left = Math.random() * 100 + "%";
+      d.style.background = colors[i % colors.length];
+      d.style.animationDelay = (Math.random() * 1.1) + "s";
+      d.style.animationDuration = (2 + Math.random() * 1.6) + "s";
+      layer.appendChild(d);
+    }
+  }
+  function playFounding(company) {
+    var f = document.getElementById("founding");
+    document.getElementById("foundName").textContent = company.name || "あなたのAI会社";
+    document.getElementById("foundSlogan").textContent = company.slogan || "";
+    f.classList.add("open");
+    spawnFoundConfetti();
+    // アニメ中に裏でオフィスを作り直し、見せる
+    setTimeout(function () { if (window.AIOffice) window.AIOffice.rebuild(company); }, 1700);
+    setTimeout(function () { f.classList.remove("open"); }, 2600);
+  }
+
+  // ⚙️設定はクイックメニューの「基本設定を確認」から開く（ヘッダーのボタンは廃止）
+  var __setupBtn = document.getElementById("setupBtn");
+  if (__setupBtn) __setupBtn.onclick = function () { window.openSetup(); };
+
+  // ===== ワンタップ指示（オフィス → Claude）=====
+  // ボタンを押すと、指示文をコードブロックで表示＋クリップボードにコピー。
+  // 社長は Claude Code のチャットに ⌘V で貼り付けて送るだけ。
+  // 複数社員に1通で指示するテンプレート（社員名は今の会社に合わせて自動生成）
+  function buildBatchTemplate() {
+    var emps = (window.COMPANY || {}).employees || [];
+    var lines = emps.slice(0, 6).map(function (e) {
+      return "・" + (e.name || "社員") + "（" + (e.role || "") + "）：";
+    });
+    return "以下を同時に進めて（並列で）：\n" + lines.join("\n") +
+      "\n終わったら全員分の成果を番号付きで報告して。";
+  }
+
+  var QUICK_CMDS = [
+    { emoji: "📧", label: "メール確認", text: "メールを確認して、重要なものだけ番号付きで教えて。" },
+    { emoji: "📅", label: "今日の予定", text: "今日の予定を教えて。" },
+    { emoji: "🖐", label: "確認待ち", text: "確認待ちのタスクがあれば見せて。" },
+    { emoji: "📋", label: "タスク一覧", text: "タスクの一覧と状況を見せて。" },
+    { emoji: "▶️", label: "続きをやる", text: "さっきの続きをやって。" },
+    { emoji: "👥", label: "まとめて指示", text: buildBatchTemplate(),
+      hint: "やってほしいことを各社員の行に書き足して送信（使わない行は削除）" },
+  ];
+
+  var qcode = document.getElementById("qcode");
+  var qcodeText = document.getElementById("qcodeText");
+  var qcopyBtn = document.getElementById("qcopyBtn");
+  var __qCurrent = "";
+
+  // file:// や非セキュア文脈では navigator.clipboard が使えないため execCommand でフォールバック
+  function fallbackCopy(text) {
+    try {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed"; ta.style.top = "0"; ta.style.left = "0";
+      ta.style.width = "1px"; ta.style.height = "1px"; ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      var ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch (e) { return false; }
+  }
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
+      return navigator.clipboard.writeText(text).then(function () { return true; })
+        .catch(function () { return fallbackCopy(text); });
+    }
+    return Promise.resolve(fallbackCopy(text));
+  }
+  // コピーできなかったときは、コードブロックの文字列を自動選択して ⌘C を促す
+  function selectCodeText() {
+    try {
+      var range = document.createRange();
+      range.selectNodeContents(qcodeText);
+      var sel = window.getSelection();
+      sel.removeAllRanges(); sel.addRange(range);
+    } catch (e) {}
+  }
+  function flashCopyBtn(ok) {
+    qcopyBtn.textContent = ok ? "コピー済み✓" : "⌘C でコピー";
+    setTimeout(function () { qcopyBtn.textContent = "コピー"; }, ok ? 1500 : 2500);
+  }
+  function copyCurrent() {
+    copyText(__qCurrent).then(function (ok) {
+      if (!ok) selectCodeText();
+      flashCopyBtn(ok);
+    });
+  }
+  if (qcopyBtn) qcopyBtn.onclick = copyCurrent;
+
+  var qcodeLabel = document.querySelector(".qcode-label");
+  function showQuickCode(cmd) {
+    __qCurrent = cmd.text;
+    qcodeText.textContent = cmd.text;
+    qcodeLabel.textContent = cmd.hint
+      ? "▼ " + cmd.hint
+      : "▼ この指示を Claude Code のチャットに貼り付けて送信（⌘V → Enter）";
+    qcode.classList.add("show");
+    copyCurrent(); // 表示と同時に自動コピー（クリックの直後なので execCommand も通る）
+    qcode.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  (function buildQuickBar() {
+    var bar = document.getElementById("qbar");
+    var hint = document.getElementById("qbarHint");
+    if (!bar || !hint) return; // ワンタップ指示バーは撤去済み（オフィスを広く使う）
+    QUICK_CMDS.forEach(function (cmd, i) {
+      var b = document.createElement("button");
+      b.className = "qbtn";
+      b.innerHTML = '<span class="num">' + (i + 1) + "</span>" + cmd.emoji + " " + cmd.label;
+      b.title = cmd.text;
+      b.onclick = function () { showQuickCode(cmd); };
+      bar.insertBefore(b, hint);
+    });
+    hint.textContent = "押すと指示文がコードブロックで出ます（自動コピー）。Claude Codeのチャットに ⌘V → Enter で送信。";
+  })();
+
+  // 就任式は「セットアップ STEP B」または 🎉就任式ボタン／チャットの command で再生する
+  // （初回ロードで勝手に出さない。まずはセットアップのチェックリストを見せる）
+
+  // ===== オフィス内オブジェクトのクリックで開くパネル群 =====
+  var STT = { working: ["稼働中", "working"], meeting: ["会議中", "meeting"], idle: ["待機", "idle"] };
+  function panelEmpty(msg) { return '<div class="app-note">' + msg + '</div>'; }
+
+  // ===== 📋 タスクリスト（Appleメモ風・仕事の中心）=====
+  var TL_ORDER = { review: 0, doing: 1, todo: 2, done: 3 };
+  // 状態の表記はひと目で分かる日本語で統一（未/中/済 のような略語は使わない）
+  var TL_LABEL = { todo: "これから", doing: "作業中", review: "社長の確認待ち", done: "完了" };
+
+  function tlMark(t) {
+    var st = t.status || "todo";
+    if (st === "review") return '<div class="tl-hand">🖐</div>';
+    if (st === "done") return (
+      '<svg width="22" height="22" viewBox="0 0 22 22">' +
+      '<circle cx="11" cy="11" r="10" fill="#6BBF8A"/>' +
+      '<path d="M6.5 11.5l3 3 6-6.5" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+    if (st === "doing") {
+      var p = Math.max(0, Math.min(100, Number(t.progress) || 0));
+      var r = 9, c = 2 * Math.PI * r, on = c * p / 100;
+      return (
+        '<svg width="22" height="22" viewBox="0 0 22 22" style="transform:rotate(-90deg)">' +
+        '<circle cx="11" cy="11" r="9" fill="none" stroke="#EFE9D8" stroke-width="2.6"/>' +
+        '<circle cx="11" cy="11" r="9" fill="none" stroke="#4D9968" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="' + on + ' ' + c + '"/></svg>' +
+        '<span class="tl-pct">' + p + '</span>');
+    }
+    return '<svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="10" fill="none" stroke="#d1d1d6" stroke-width="1.6"/></svg>';
+  }
+
+  // タスクリストを開く。focusId を渡すと、そのタスクを展開した状態で開く
+  window.openTasks = function (focusId) {
+    var tasks = allTasks().slice().sort(function (a, b) {
+      return (TL_ORDER[a.status] != null ? TL_ORDER[a.status] : 2) - (TL_ORDER[b.status] != null ? TL_ORDER[b.status] : 2);
+    });
+    window.__tlTasks = tasks;
+
+    var body;
+    if (!tasks.length) {
+      body = panelEmpty("タスクはまだありません。<br>チャットで「今日やることを決めよう」と話すと、ここに並びます。");
+    } else {
+      body = '<div class="tl">' + tasks.map(function (t, ti) {
+        var st = t.status || "todo";
+        var oc = ownerColor(t.owner);
+        var owner = t.owner
+          ? '<span class="tl-owner" style="background:' + oc + '">' + esc(t.owner) + '</span>'
+          : '<span class="tl-owner none">担当未定</span>';
+        var logs = (t.log || []).map(function (l) {
+          return '<li><span class="tm">' + esc(l.time || "") + '</span>' + esc(l.text || "") + '</li>';
+        }).join("");
+        var dels = (t.deliverables || []).map(function (d, di) {
+          var inner = iconFor(d.type, d.url) + ' ' + esc(d.title || "成果物") +
+            '<span class="om">' + (d.url ? "開く ↗" : "開く ›") + '</span>';
+          if (d.url) return '<a class="tl-del" href="' + escAttr(d.url) + '" target="_blank" rel="noopener">' + inner + '</a>';
+          return '<div class="tl-del" data-tdel="' + ti + ':' + di + '">' + inner + '</div>';
+        }).join("");
+        var cmd = t.cmd || ((t.id ? t.id + "の" : "") + "途中経過を見せて");
+        var action = st === "review"
+          ? '<button class="tl-approve" data-tcmd="' + escAttr(cmd) + '">🖐 ' + esc(t.hint ? "中身を確認 → OKなら指示文をコピー" : "指示文をコピー") + '</button>'
+          : '<div class="tl-ask"><span class="q">💬 ' + esc(cmd) + '</span><button class="tl-copy" data-tcmd="' + escAttr(cmd) + '">コピー</button></div>';
+        return (
+          '<div class="tl-item ' + st + (t.id === focusId ? " open" : "") + '" data-tid="' + escAttr(t.id || "") + '">' +
+            '<div class="tl-row">' +
+              '<div class="tl-mark">' + tlMark(t) + '</div>' +
+              '<div class="tl-ttl"><div class="t"><span class="tl-id">' + esc(t.id || "") + '</span>' + esc(t.title || "") + '</div>' +
+                (st === "review" && t.hint ? '<div class="tl-hint">' + esc(t.hint) + '</div>' : '') +
+              '</div>' +
+              ((t.deliverables || []).length ? '<span class="tl-clip">📎</span>' : '') +
+              '<span class="tl-st st-' + st + '">' + (TL_LABEL[st] || st) + '</span>' +
+              owner + '<span class="tl-chev">›</span>' +
+            '</div>' +
+            '<div class="tl-detail">' +
+              (logs ? '<ul class="tl-log">' + logs + '</ul>' : '<ul class="tl-log"><li>まだ動きはありません</li></ul>') +
+              (dels ? '<div class="tl-dels">' + dels + '</div>' : '') +
+              action +
+            '</div>' +
+          '</div>');
+      }).join("") + '</div>';
+    }
+
+    var nRev = reviewTasks().length;
+    openPanel('<div class="app-title">📋 タスク' +
+      (nRev ? '<span style="margin-left:auto;font-size:12px;color:#A87B24">🖐 確認待ち ' + nRev + '件</span>' : '') + '</div>' +
+      '<div class="app-note">会社の仕事はぜんぶここ。行をタップすると経過と成果物が開きます。</div>' +
+      body + '<button class="close" data-close>閉じる</button>');
+
+    // 行クリックで開閉
+    Array.prototype.forEach.call(modal.querySelectorAll(".tl-row"), function (row) {
+      row.onclick = function () { row.parentElement.classList.toggle("open"); };
+    });
+    // 指示文コピー（承認ボタン・コピーボタン共通）
+    Array.prototype.forEach.call(modal.querySelectorAll("[data-tcmd]"), function (btn) {
+      btn.onclick = function (e) {
+        e.stopPropagation();
+        var text = btn.getAttribute("data-tcmd").replace(/%22/g, '"');
+        copyText(text).then(function (ok) {
+          var old = btn.textContent;
+          btn.textContent = ok ? "コピーしました ✓ チャットに ⌘V" : "⌘C でコピー";
+          setTimeout(function () { btn.textContent = old; }, 1800);
+        });
+      };
+    });
+    // 成果物クリック
+    Array.prototype.forEach.call(modal.querySelectorAll("[data-tdel]"), function (el) {
+      el.onclick = function (e) {
+        e.stopPropagation();
+        var p = el.getAttribute("data-tdel").split(":");
+        var t = window.__tlTasks[+p[0]];
+        if (t && t.deliverables) openDeliverableSmart(t.deliverables[+p[1]]);
+      };
+    });
+    // フォーカス指定があればスクロール
+    if (focusId) {
+      var f = modal.querySelector('.tl-item[data-tid="' + focusId + '"]');
+      if (f) setTimeout(function () { f.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, 60);
+    }
+  };
+
+  // 📥 決裁トレイ：確認待ち（review）のタスクを展開して開く
+  window.openApprovals = function () {
+    var revs = reviewTasks();
+    window.openTasks(revs.length ? revs[0].id : undefined);
+  };
+
+  // ⚡ 電光掲示板：最近の動き
+  window.openActivity = function () {
+    var act = (window.AI_STATE || {}).activity || [];
+    var body = act.length
+      ? '<ul class="dlist">' + act.slice(0, 12).map(function (a) {
+          return '<li><span class="dot"></span><div><div>' + esc(a.text) +
+            '</div><div class="who">' + esc(a.who || "") + (a.time ? " ・ " + esc(a.time) : "") + '</div></div></li>';
+        }).join("") + '</ul>'
+      : panelEmpty("まだ動きはありません。");
+    openPanel('<div class="app-title">⚡ 会社の動き（掲示板の履歴）</div>' + body +
+      '<button class="close" data-close>閉じる</button>');
+  };
+
+  // 📦 納品キャビネット：全社の成果物（v2：tasks の deliverables を集約）
+  window.openCabinet = function () {
+    var flat = [];
+    allTasks().forEach(function (t) {
+      (t.deliverables || []).forEach(function (d) {
+        flat.push({ who: t.owner, title: d.title, type: d.type, at: d.at, body: d.body, url: d.url, path: d.path, app: d.app });
+      });
+    });
+    // 旧形式（employees[].deliverables）の保険
+    ((window.AI_STATE || {}).employees || []).forEach(function (e) {
+      (e.deliverables || []).forEach(function (d) {
+        flat.push({ who: e.name, title: d.title, type: d.type, at: d.at, body: d.body, url: d.url, path: d.path, app: d.app });
+      });
+    });
+    window.__cabFlat = flat;
+    var body = flat.length
+      ? flat.map(function (d, i) {
+          var inner = '<div class="ic">' + iconFor(d.type, d.url) + '</div><div class="tx"><div class="tt">' + esc(d.title) + '</div>' +
+            '<div class="sub">' + [d.who, d.type, d.at].filter(Boolean).map(esc).join(" ・ ") + '</div></div>' +
+            '<div class="time">' + (d.url ? "開く ↗" : "開く ›") + '</div>';
+          if (d.url) return '<a class="row del-row" href="' + escAttr(d.url) + '" target="_blank" rel="noopener">' + inner + '</a>';
+          return '<div class="row del-row" data-cab="' + i + '" style="cursor:pointer">' + inner + '</div>';
+        }).join("")
+      : panelEmpty("まだ成果物はありません。<br>社員に仕事を任せると、ここに納品されます。");
+    openPanel('<div class="app-title">📦 納品BOX（全社の成果物）</div>' +
+      '<div class="app-note">資料室に納品された成果物。クリックで開けます。社員の机の「📄」からも見られます。</div>' +
+      body + '<button class="close" data-close>閉じる</button>');
+    Array.prototype.forEach.call(modal.querySelectorAll("[data-cab]"), function (row) {
+      row.onclick = function () { openDeliverableSmart(window.__cabFlat[+row.getAttribute("data-cab")]); };
+    });
+  };
+
+  // 🚧 壁の看板：セットアップ状況
+  window.openSetupStatus = function () {
+    var setup = (window.AI_STATE || {}).setup || {};
+    var steps = setup.steps || [];
+    var done = steps.filter(function (s) { return s.done; }).length;
+    var currentIdx = -1;
+    steps.some(function (s, i) { if (!s.done) { currentIdx = i; return true; } return false; });
+    var body = steps.length
+      ? '<ul class="dlist">' + steps.map(function (s, i) {
+          var isNext = !setup.completed && i === currentIdx;
+          return '<li><span class="setup-mk' + (s.done ? " ok" : "") + '">' + (s.done ? "✓" : "○") + '</span>' +
+            '<span style="flex:1;' + (s.done ? "color:#9aa0b0" : "") + '">' + esc(s.label) + '</span>' +
+            (isNext ? '<span class="setup-next">▶ 次はここ</span>'
+              : (!s.done ? '<span class="meta">未設定</span>' : "")) + '</li>';
+        }).join("") + '</ul>'
+      : panelEmpty("セットアップ情報がありません。");
+    var hint = done >= steps.length && steps.length
+      ? '<div class="app-note" style="margin-top:10px;color:#4D9968">🎉 すべて完了！会社は営業中です。</div>'
+      : '<div class="app-note" style="margin-top:10px">Claude Code で「<b style="color:#4D9968">セットアップを続けて</b>」と話すと、秘書の' + esc((((window.COMPANY || {}).secretary || {}).name) || "アイ") + 'が続きを案内します。' +
+        (setup.completed ? '<br>残りは「メール連携して」「LINE連携して」「社員ツール連携して」でいつでも再開できます。' : '') + '</div>';
+    openPanel('<div class="app-title">🚀 セットアップ状況 <span style="margin-left:auto;font-size:13px;color:#4D9968">' +
+      done + ' / ' + steps.length + '</span></div>' + body + hint +
+      '<button class="close" data-close>閉じる</button>');
+  };
+
+  // 🎯 売上ボード：目標と営業ファネル
+  window.openBusiness = function () {
+    var b = (window.AI_STATE || {}).business || {};
+    var fmt = function (v) { v = Number(v) || 0; return v >= 10000 ? (Math.round(v / 1000) / 10) + "万円" : v.toLocaleString() + "円"; };
+    var goal = Number(b.goalAmount) || 0, cur = Number(b.current) || 0;
+    var pct = goal > 0 ? Math.min(Math.round(cur / goal * 100), 100) : 0;
+    var bar = goal > 0
+      ? '<div style="margin:8px 0 4px;font-size:13px"><b>' + esc(b.goalLabel || "売上目標") + '</b>' +
+        '<span style="float:right;color:#4D9968;font-weight:700">' + fmt(cur) + ' / ' + fmt(goal) + '（' + pct + '%）</span></div>' +
+        '<div style="height:12px;border-radius:6px;background:#EFE9D8;overflow:hidden">' +
+        '<div style="height:100%;width:' + pct + '%;min-width:' + (cur > 0 ? 4 : 0) + 'px;background:#4D9968;border-radius:6px"></div></div>'
+      : panelEmpty("売上目標が未設定です。チャットで「売上目標を決めよう」と話すと設定できます。");
+    var pipe = (b.pipeline || []);
+    var funnel = pipe.length
+      ? '<div style="margin-top:14px;font-size:13px"><b>営業ファネル</b></div><ul class="dlist">' +
+        pipe.map(function (p) {
+          return '<li><span class="dot ' + ((Number(p.count) || 0) > 0 ? "doing" : "") + '"></span>' +
+            '<div style="flex:1">' + esc(p.label) + '</div><span class="meta"><b>' + (Number(p.count) || 0) + '</b> 件</span></li>';
+        }).join("") + '</ul>'
+      : "";
+    // 関連スプレッドシートへのジャンプボタン（business.sheetLinks があれば表示）
+    var sheetLinks = (b.sheetLinks || []);
+    var sheetBtns = sheetLinks.length
+      ? '<div style="margin-top:14px;font-size:13px"><b>関連シート</b></div>' +
+        '<div style="margin-top:6px;display:flex;flex-direction:column;gap:8px">' +
+        sheetLinks.map(function (s) {
+          return '<a class="submit-btn" href="' + escAttr(s.url) + '" target="_blank" rel="noopener">📊 ' + esc(s.label) + ' を開く ↗</a>';
+        }).join("") + '</div>'
+      : "";
+    openPanel('<div class="app-title">🎯 売上ボード</div>' + bar + funnel + sheetBtns +
+      '<div class="app-note" style="margin-top:10px">' +
+        'このボードはスプレッドシートのデータから自動で集計しています。<br>' +
+        '・<b>応募</b>件数 … <b>案件探索シート</b>の「応募済み」ステータスの数を集計<br>' +
+        '・<b>返信</b>件数 … <b>案件管理ハブ</b>で返信が来た会社数（1社から何通来ても1社）<br>' +
+        '・<b>受注・売上</b> … <b>案件管理ハブ</b>（売上管理タブ）の受注金額と連携<br>' +
+        '毎朝7時に自動更新。チャットで「<b style="color:#4D9968">売上を更新して</b>」と言えば今すぐ反映もできます。' +
+      '</div>' +
+      '<button class="close" data-close>閉じる</button>');
+  };
+
+  // 👥 メンバーの稼働状況ダッシュボード
+  window.openWorkStatus = function () {
+    var s = window.AI_STATE || {};
+    var emps = (window.COMPANY || {}).employees || [];
+    var live = s.employees || [];
+    var tasks = s.tasks || [];
+    function liveOf(name) { for (var i = 0; i < live.length; i++) { if (live[i] && live[i].name === name) return live[i]; } return {}; }
+    function taskOf(id) { for (var i = 0; i < tasks.length; i++) { if (tasks[i] && tasks[i].id === id) return tasks[i]; } return null; }
+    var working = 0, idle = 0;
+    var rows = emps.map(function (e) {
+      var l = liveOf(e.name);
+      var st = l.status || "idle";
+      var tk = l.taskId ? taskOf(l.taskId) : null;
+      var busy = (st === "working" || st === "meeting");
+      if (busy) working++; else idle++;
+      var statusLabel = st === "working" ? "💻 作業中" : st === "meeting" ? "🗣 会議中" : "☕ 待機中";
+      var detail = tk ? (esc(tk.id) + "：" + esc(tk.title) + (tk.progress != null ? "（" + tk.progress + "%）" : "")) : "いまは手が空いています";
+      return '<li><span class="dot ' + (busy ? "doing" : "") + '"></span>' +
+        '<div style="flex:1"><div><b>' + esc((e.emoji || "") + " " + (e.name || "")) + '</b> <span class="who">' + esc(e.role || "") + '</span></div>' +
+        '<div style="font-size:12px;color:#6a6f7d;margin-top:2px">' + detail + '</div></div>' +
+        '<span class="meta" style="white-space:nowrap">' + statusLabel + '</span></li>';
+    }).join("");
+    var summary = '<div class="app-note">いま <b style="color:#4D9968">作業中 ' + working + '人</b> ／ 待機中 ' + idle + '人</div>';
+    var body = emps.length
+      ? summary + '<ul class="dlist">' + rows + '</ul>'
+      : panelEmpty("社員がいません。チャットで「社員を雇って」と話すと増やせます。");
+    openPanel('<div class="app-title">👥 メンバーの稼働状況</div>' + body +
+      '<div class="app-note" style="margin-top:10px">社員に仕事を振ると（チャットで指示）、ここが「作業中」に変わります。</div>' +
+      '<button class="close" data-close>閉じる</button>');
+  };
+
+  // 💬 社員からの提案（社員の頭上の💬吹き出し or 本人タップ→詳細から開く）
+  window.openProposals = function () {
+    var props = (window.AI_STATE || {}).proposals || [];
+    var body = props.length
+      ? '<ul class="dlist">' + props.map(function (p, i) {
+          return '<li><span class="dot todo"></span><div style="flex:1"><div><b>' + esc(p.title) + '</b></div>' +
+            '<div class="who">' + esc(p.from || "") + (p.at ? " ・ " + esc(p.at) : "") + '</div>' +
+            (p.detail ? '<div style="font-size:12px;color:#6a6f7d;margin-top:3px">' + esc(p.detail) + '</div>' : "") +
+            '</div><button class="qbtn" style="flex-shrink:0" data-prop="' + i + '">採用 →</button></li>';
+        }).join("") + '</ul>' +
+        '<div class="app-note" style="margin-top:10px">「採用 →」を押すと指示文をコピーします。チャットに ⌘V → Enter で実行。</div>'
+      : panelEmpty("いまは提案はありません。<br>社員が思いついたら、頭上の💬で知らせます。");
+    openPanel('<div class="app-title">💬 社員からの提案</div>' + body +
+      '<button class="close" data-close>閉じる</button>');
+    Array.prototype.forEach.call(modal.querySelectorAll("[data-prop]"), function (btn) {
+      btn.onclick = function () {
+        var p = props[+btn.getAttribute("data-prop")];
+        var text = (p.from || "社員") + "の提案「" + (p.title || "") + "」を採用して進めて";
+        copyText(text).then(function (ok) {
+          btn.textContent = ok ? "コピーした ✓" : "コピー失敗";
+          setTimeout(function () { btn.textContent = "採用 →"; }, 1600);
+        });
+      };
+    });
+  };
+
+  // 💭 頭上の吹き出しの番号タップ → その社員の1件の提案をポップ
+  window.openProposalOne = function (idx) {
+    var props = (window.AI_STATE || {}).proposals || [];
+    var p = props[idx];
+    if (!p) return;
+    openPanel('<div class="app-title">💡 ' + esc(p.from || "社員") + 'からの提案 #' + (idx + 1) + '</div>' +
+      '<ul class="dlist"><li><span class="dot todo"></span><div style="flex:1">' +
+        '<div><b>' + esc(p.title || "") + '</b></div>' +
+        '<div class="who">' + esc(p.from || "") + (p.at ? " ・ " + esc(p.at) : "") + '</div>' +
+        (p.detail ? '<div style="font-size:12px;color:#6a6f7d;margin-top:3px">' + esc(p.detail) + '</div>' : "") +
+      '</div><button class="qbtn" style="flex-shrink:0" data-prop="' + idx + '">採用 →</button></li></ul>' +
+      '<div class="app-note" style="margin-top:10px">「採用 →」を押すと指示文をコピーします。チャットに ⌘V → Enter で実行。</div>' +
+      '<button class="close" data-close>閉じる</button>');
+    var btn = modal.querySelector('[data-prop="' + idx + '"]');
+    if (btn) btn.onclick = function () {
+      var text = (p.from || "社員") + "の提案「" + (p.title || "") + "」を採用して進めて";
+      copyText(text).then(function (ok) {
+        btn.textContent = ok ? "コピーした ✓" : "コピー失敗";
+        setTimeout(function () { btn.textContent = "採用 →"; }, 1600);
+      });
+    };
+  };
+
+  // 💬 頭上の吹き出しタップ → その社員の提案だけを一覧表示
+  window.openEmployeeProposals = function (empIdx) {
+    var emp = ((window.COMPANY || {}).employees || [])[empIdx];
+    var name = emp ? emp.name : "";
+    var all = (window.AI_STATE || {}).proposals || [];
+    var mine = [];
+    all.forEach(function (p, gi) { if (p && p.from === name) mine.push({ p: p, gi: gi }); });
+    if (!mine.length) return;
+    var body = '<ul class="dlist">' + mine.map(function (o) {
+      var p = o.p;
+      return '<li><span class="dot todo"></span><div style="flex:1"><div><b>' + esc(p.title || "") + '</b></div>' +
+        '<div class="who">' + esc(p.from || "") + (p.at ? " ・ " + esc(p.at) : "") + '</div>' +
+        (p.detail ? '<div style="font-size:12px;color:#6a6f7d;margin-top:3px">' + esc(p.detail) + '</div>' : "") +
+        '</div><div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">' +
+          '<button class="qbtn" data-adopt="' + o.gi + '">採用 →</button>' +
+          '<button class="qbtn qbtn-reject" data-reject="' + o.gi + '">却下</button>' +
+        '</div></li>';
+    }).join("") + '</ul>' +
+      '<div class="app-note" style="margin-top:10px">「採用 →」「却下」を押すと指示文をコピーします。チャットに ⌘V → Enter で実行すると、私が反映します。</div>';
+    openPanel('<div class="app-title">💬 ' + esc(name) + 'からの提案（' + mine.length + '件）</div>' + body +
+      '<button class="close" data-close>閉じる</button>');
+    Array.prototype.forEach.call(modal.querySelectorAll("[data-adopt]"), function (btn) {
+      btn.onclick = function () {
+        var p = all[+btn.getAttribute("data-adopt")];
+        var text = (p.from || "社員") + "の提案「" + (p.title || "") + "」を採用して進めて";
+        copyText(text).then(function (ok) {
+          btn.textContent = ok ? "コピーした ✓" : "コピー失敗";
+          setTimeout(function () { btn.textContent = "採用 →"; }, 1600);
+        });
+      };
+    });
+    Array.prototype.forEach.call(modal.querySelectorAll("[data-reject]"), function (btn) {
+      btn.onclick = function () {
+        var p = all[+btn.getAttribute("data-reject")];
+        var text = (p.from || "社員") + "の提案「" + (p.title || "") + "」を却下して（提案リストから消して）";
+        copyText(text).then(function (ok) {
+          btn.textContent = ok ? "コピーした ✓" : "コピー失敗";
+          setTimeout(function () { btn.textContent = "却下"; }, 1600);
+        });
+      };
+    });
+  };
+
+  // ===== 秘書アイ（ガイド役）：今の状況から「次の一手」を1つだけ決める =====
+  window.computeNextAction = function (s) {
+    s = s || {};
+    var setup = s.setup || {};
+    var steps = setup.steps || [];
+    var tasks = s.tasks || [];
+    var revs = tasks.filter(function (t) { return t.status === "review"; });
+    var props = (s.proposals || []).length;
+    var emps = s.employees || [];
+    var working = emps.filter(function (e) { return e.status === "working"; });
+    var todo = tasks.filter(function (t) { return t.status === "todo"; });
+    var dels = tasks.reduce(function (n, t) { return n + ((t.deliverables || []).length); }, 0);
+
+    if (steps.length && !setup.completed) {
+      var sdone = steps.filter(function (x) { return x.done; }).length;
+      return sdone === 0
+        ? { label: "セットアップを始める", cmd: "セットアップを始めて", why: "まずは5〜15分で、あなた専用の会社を立ち上げましょう" }
+        : { label: "セットアップの続きをやる", cmd: "セットアップを続けて", why: "開業準備がまだ途中です（" + sdone + "/" + steps.length + "）" };
+    }
+    if (revs.length)
+      return { label: "確認待ちのタスクを見る（🖐 " + revs.length + "件）",
+        cmd: revs[0].cmd || (revs[0].id ? revs[0].id + "の中身を見せて" : "確認待ちのタスクを見せて"),
+        why: "社長の確認待ちで仕事が止まっています（" + revs.map(function (t) { return t.id; }).filter(Boolean).join("・") + "）" };
+    if (!tasks.length)
+      return { label: "今日やることを決める", cmd: "今日やることを決めよう", why: "タスクがまだ空です" };
+    if (todo.length && !working.length)
+      return { label: "社員に仕事を振る", cmd: todo[0].cmd || ((todo[0].owner ? todo[0].owner + "、" : "") + "「" + todo[0].title + "」を進めて"), why: "未着手タスクがあるのに、全員手が空いています" };
+    if (working.length)
+      return { label: "進捗を聞く（" + working.map(function (e) { return e.name; }).join("・") + "が作業中）", cmd: "進捗どう？", why: "社員が作業中です。待っている間に他の指示もできます" };
+    if (props > 0)
+      return { label: "社員からの提案を見る（" + props + "件）", cmd: "社員からの提案を見せて", why: "社員が頭上の💬で提案を出しています" };
+    if (dels > 0)
+      return { label: "納品BOXを確認する", cmd: "最近の成果物をまとめて", why: "受け取っていない成果物があるかもしれません" };
+    return { label: "次のタスクを決める", cmd: "次にやることを提案して", why: "全員手が空いています。タスク候補を出させましょう" };
+  };
+
+  // 🧭 秘書アイのガイドパネル：いまの状況＋次の一手
+  window.openGuide = function () {
+    var s = window.AI_STATE || {};
+    var setup = s.setup || {};
+    var steps = setup.steps || [];
+    var done = steps.filter(function (x) { return x.done; }).length;
+    var tasks = s.tasks || [];
+    var cnt = { todo: 0, doing: 0, review: 0, done: 0 };
+    tasks.forEach(function (t) { if (cnt[t.status] != null) cnt[t.status]++; });
+    var emps = s.employees || [];
+    var working = emps.filter(function (e) { return e.status === "working"; });
+    var dels = tasks.reduce(function (n, t) { return n + ((t.deliverables || []).length); }, 0);
+    var na = window.computeNextAction(s);
+
+    var row = function (ic, label, val) {
+      return '<li><span class="dot"></span><div style="flex:1">' + ic + " " + label + '</div><span class="meta">' + val + '</span></li>';
+    };
+
+    // 動いている・止まっているタスクの「事情」を1件1行で（review → doing の順）
+    var active = tasks.filter(function (t) { return t.status === "review"; })
+      .concat(tasks.filter(function (t) { return t.status === "doing"; }));
+    var activeRows = active.slice(0, 4).map(function (t) {
+      var why = t.status === "review"
+        ? (t.hint || "社長のOK待ちで止まっています")
+        : ((t.log && t.log.length ? t.log[t.log.length - 1].text : "作業中") + (t.progress ? "（" + t.progress + "%）" : ""));
+      return '<li><span class="dot ' + (t.status === "review" ? "todo" : "doing") + '"></span>' +
+        '<div style="flex:1"><div><b>' + esc(t.id || "") + '</b> ' + esc(t.title || "") +
+        '<span class="who">（' + esc(t.owner || "担当未定") + '・' + (t.status === "review" ? "🖐あなた待ち" : "💻作業中") + '）</span></div>' +
+        '<div style="font-size:11.5px;color:#8a90a2;margin-top:1px">' + esc(why) + '</div></div></li>';
+    }).join("");
+
+    var body =
+      '<div class="app-note">こんにちは、秘書の' + esc((((window.COMPANY || {}).secretary || {}).name) || "アイ") + 'です。いまの会社の状況と、次にやるといいことをご案内します。</div>' +
+      '<div class="plabel">📊 いまの状況</div><ul class="dlist">' +
+      row("🚀", "開業準備", (setup.completed ? "完了（営業中）" : done + " / " + steps.length)) +
+      row("📋", "タスク", tasks.length ? "これから" + cnt.todo + " ・ 作業中" + cnt.doing + " ・ 確認待ち" + cnt.review + " ・ 完了" + cnt.done : "未設定") +
+      row("📦", "納品済みの成果物", dels + " 件") +
+      row("💬", "社員からの提案", (s.proposals || []).length + " 件") +
+      '</ul>' +
+      (activeRows
+        ? '<div class="plabel">🔎 動いているタスクの事情</div><ul class="dlist">' + activeRows + '</ul>'
+        : '') +
+      '<div class="plabel">▶ 次の一手（おすすめ）</div>' +
+      '<div style="background:#E3F2E8;border:1px solid #BFE3CD;border-radius:12px;padding:12px 14px;margin:6px 0">' +
+      '<div style="font-weight:800;color:#4D9968">' + esc(na.label) + '</div>' +
+      '<div style="font-size:12px;color:#6a6f7d;margin-top:3px">' + esc(na.why) + '</div></div>' +
+      '<div class="prompt-box"><span>' + esc(na.cmd) + '</span><button class="copy-btn" data-copy>コピー</button></div>' +
+      '<div class="app-note" style="margin-top:8px">チャットで「<b style="color:#4D9968">今どういう状況？</b>」「<b style="color:#4D9968">次何すればいい？</b>」と聞いても、私が同じことをお答えします。</div>' +
+      '<button class="close" data-close>閉じる</button>';
+    openPanel('<div class="app-title">🧭 秘書' + esc((((window.COMPANY || {}).secretary || {}).name) || "アイ") + '（ガイド）</div>' + body);
+    var cb = modal.querySelector("[data-copy]");
+    if (cb) cb.onclick = function () {
+      copyText(na.cmd).then(function (ok) {
+        cb.textContent = ok ? "コピー済み✓" : "⌘C でコピー";
+        setTimeout(function () { cb.textContent = "コピー"; }, ok ? 1500 : 2500);
+      });
+    };
+  };
+
+  // ===== チャット連動（ライブミラー）=====
+  // Claude Code が state.js を書き換える → 定期的に読み直してオフィスに反映する。
+  function renderOffice(s) {
+    if (!s) return;
+    if (window.AIOffice && window.AIOffice.applyState) window.AIOffice.applyState(s);
+    playCommand(s.command);
+  }
+
+  // 同じ演出（command.id）はリロードしても再生しない（localStorageで記憶）
+  var __lastCmd = lsGet("lastcmd");
+  function playCommand(cmd) {
+    if (!cmd || !cmd.id || cmd.id === __lastCmd) return;
+    __lastCmd = cmd.id;
+    lsSet("lastcmd", cmd.id);
+    if (cmd.type === "inauguration") window.playInauguration();
+    else if (cmd.type === "meeting") { if (window.__startMeeting) window.__startMeeting(); }
+    else if (cmd.type === "founding") playFounding(window.COMPANY || {});
+  }
+
+  // state.js を読み直す。http(s) ではタイムスタンプでキャッシュ回避（ライブ更新）。
+  // file://（ダブルクリック起動）ではクエリを付けない（パスが壊れて読めなくなるため）。
+  var __httpServed = (location.protocol === "http:" || location.protocol === "https:");
+  function loadState() {
+    var sc = document.createElement("script");
+    sc.src = "state.js" + (__httpServed ? "?t=" + Date.now() : "");
+    sc.onload = function () { try { renderOffice(window.AI_STATE); } catch (e) {} if (sc.parentNode) sc.parentNode.removeChild(sc); };
+    sc.onerror = function () { if (sc.parentNode) sc.parentNode.removeChild(sc); };
+    document.body.appendChild(sc);
+  }
+
+  // 連携状態 → 壁アプリのランプ（🟢=連携中／⚪=サンプル）
+  function pollHealth() {
+    var base = (window.AI_CONFIG || {}).apiBase || (__httpServed ? location.origin : "");
+    if (!base) return;
+    fetch(base.replace(/\/$/, "") + "/health")
+      .then(function (r) { return r.json(); })
+      .then(function (j) { if (window.AIOffice && window.AIOffice.applyHealth) window.AIOffice.applyHealth(j || {}); })
+      .catch(function () { if (window.AIOffice && window.AIOffice.applyHealth) window.AIOffice.applyHealth({}); });
+  }
+
+  loadState(); pollHealth();
+  setInterval(pollHealth, 30000);
+
+  // 更新方式：
+  //   サーバー経由（http）→ SSE で state.js の保存を即プッシュ（ほぼリアルタイム）。保険で15秒に1回読み直し。
+  //   file:// やSSE切断中 → 4秒ポーリングにフォールバック。
+  var __pollTimer = null;
+  function setPoll(ms) {
+    if (__pollTimer) clearInterval(__pollTimer);
+    __pollTimer = setInterval(loadState, ms);
+  }
+  setPoll(4000);
+  if (__httpServed && window.EventSource) {
+    try {
+      var __es = new EventSource("/api/state-events");
+      __es.onopen = function () { setPoll(15000); loadState(); };
+      __es.onmessage = function () { loadState(); };
+      __es.onerror = function () { setPoll(4000); }; // 切断中は従来ポーリング（SSEは自動再接続）
+    } catch (e) {}
+  }
+</script>
+<script src="office.js"></script>
+</body>
+</html>

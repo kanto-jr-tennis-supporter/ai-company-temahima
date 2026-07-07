@@ -1,0 +1,21 @@
+# ▼ このリポジトリは山元社長専用のPrivateリポジトリ（スマホ連携用）。
+#   会社のデータ（設計図・タスク・社員・成果物）は含めて持ち運ぶ。
+#   秘密情報（トークン類）だけは絶対にコミットしない。
+
+# 依存
+node_modules/
+
+# 秘密情報（トークン類は絶対にコミットしない）
+.env
+*.env
+server/.env
+tokens.json
+
+# 実行時に生成されるローカル状態
+server/.port
+server/.state-backup.js
+.claude/settings.local.json
+.DS_Store
+
+# 専用ツール（別途導入オプション。シンボリックリンクを配布物に含めない）
+tools/

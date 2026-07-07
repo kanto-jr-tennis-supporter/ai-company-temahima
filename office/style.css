@@ -1,0 +1,946 @@
+/* ============================================================
+   オフィスUI スタイルシート（MURAデザインシステム準拠）
+   - 角丸12px未満なし／純白・純黒なし／影は下方向の「厚み」のみ
+   - 出現は spring、押下は沈む
+   - 2/3画面（〜1000px）で使う前提のサイズ設計
+   ============================================================ */
+
+:root {
+  --bg: #F7F3E8;
+  --surface: #FFFDF5;
+  --sunken: #EFE9D8;
+  --wood: #E8D9BE;
+  --wood-2: #DCC9A6;
+  --wood-3: #C9A876;
+  --ink: #4A4238;
+  --ink-2: #8C8273;
+  --ink-3: #BDB5A4;
+  --green: #6BBF8A;
+  --green-d: #4D9968;
+  --green-t: #E3F2E8;
+  --sky: #7FB5D6;
+  --sky-t: #E6F1F8;
+  --amber: #F2A65A;
+  --caution: #E8C170;
+  --caution-t: #FBF3DD;
+  --caution-ink: #8a6d2f;
+  --stop: #D98E8E;
+  --pink: #F2599B;
+  --night: #2E3440;
+  --sh-sm: 0 2px 0 rgba(74, 66, 56, .12);
+  --sh-md: 0 4px 0 rgba(74, 66, 56, .08);
+  --sh-lg: 0 6px 16px rgba(74, 66, 56, .12);
+  --spring: cubic-bezier(.34, 1.56, .64, 1);
+
+  /* 本文＝ロダンわんぱくProDB ／ タイトル＝スーラProN DB（ローカルにあれば適用・無ければ丸ゴシックへ） */
+  --font-body: "FOT-ロダンわんぱく Pro DB", "ロダンわんぱく Pro DB", "ロダンわんぱくPro DB",
+    "FOT-RodinWanpaku Pro DB", "RodinWanpaku Pro DB",
+    "M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+  --font-title: "FOT-スーラ ProN DB", "スーラ ProN DB", "スーラProN DB",
+    "FOT-Seurat ProN DB", "Seurat ProN DB",
+    "M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--ink); min-height: 100vh; letter-spacing: .02em;
+  display: flex; flex-direction: column; align-items: center;
+}
+button { font-family: inherit; letter-spacing: inherit; }
+
+/* タイトル・見出し・主要ラベルはスーラ ProN DB */
+.app-title, .modal h2, .inaug-card h2, .founding .fname,
+.of-zl, .of-board > b, .of-cosign b, .of-np, .of-tab, .of-seclabel,
+.of-bshelf-label, .qbar-label, .qcode-label { font-family: var(--font-title); }
+
+.bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: center;
+  color: var(--ink-2); font-size: 13px; margin: 12px 0 8px; text-align: center; line-height: 1.7; }
+.bar b { color: var(--green-d); }
+.brand { font-family: var(--font-title); font-size: 19px; color: var(--green-d); letter-spacing: .03em; }
+.mbtn { background: var(--green); color: var(--surface); border: none; border-radius: 9999px;
+  padding: 11px 22px; font-weight: 700; cursor: pointer; font-size: 15px; box-shadow: var(--sh-sm);
+  transition: transform 120ms var(--spring), box-shadow 120ms ease; }
+.mbtn:hover { background: #5AAD79; transform: translateY(-1px); }
+.mbtn:active { transform: translateY(2px) scale(.97); box-shadow: none; }
+.mbtn.alt { background: var(--amber); color: #5d3a10; }
+
+/* ワンタップ指示バー */
+.qbar { width: min(1000px, calc(100vw - 24px)); margin: 10px 0 0;
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: center;
+  background: var(--surface); border-radius: 24px; padding: 12px 16px; box-shadow: var(--sh-md); }
+.qbar-label { font-size: 13px; font-weight: 700; color: var(--green-d); margin-right: 2px; }
+.qbtn { background: var(--sunken); color: var(--ink); border: none; border-radius: 9999px;
+  padding: 9px 15px; font-weight: 700; cursor: pointer; font-size: 13.5px;
+  transition: transform 120ms var(--spring); }
+.qbtn:hover { background: var(--green-t); color: var(--green-d); transform: translateY(-1px); }
+.qbtn:active { transform: translateY(1px) scale(.97); }
+/* 却下ボタン（採用の隣）：赤系 */
+.qbtn-reject { color: #B4434A; }
+.qbtn-reject:hover { background: rgba(229, 72, 77, .12); color: #B4434A; }
+.qbtn .num { display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 50%; background: var(--green); color: var(--surface);
+  font-size: 11px; margin-right: 6px; }
+.qbar-hint { width: 100%; text-align: center; font-size: 11.5px; color: var(--ink-3); margin-top: 2px; }
+
+.qcode { width: min(1000px, calc(100vw - 24px)); margin: 8px 0 0; display: none;
+  background: var(--night); border-radius: 18px; padding: 14px 16px; box-shadow: var(--sh-lg); }
+.qcode.show { display: block; }
+.qcode-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.qcode-label { font-size: 12px; color: #AEB6C8; font-weight: 700; }
+.qcopy { margin-left: auto; background: var(--green); color: var(--surface); border: none; border-radius: 9999px;
+  padding: 7px 15px; font-weight: 700; cursor: pointer; font-size: 12.5px; white-space: nowrap; }
+.qcopy:active { transform: translateY(1px); }
+.qcode pre { margin: 0; white-space: pre-wrap; word-break: break-word; color: #ECEFF4;
+  font-family: "M PLUS 1 Code", "SFMono-Regular", Menlo, Consolas, monospace; font-size: 14px; line-height: 1.8; }
+
+/* 就任式・設立アニメ */
+.inaug { position: fixed; inset: 0; background: rgba(46, 52, 64, .85);
+  display: none; align-items: center; justify-content: center; z-index: 80; overflow: hidden; }
+.inaug.open { display: flex; }
+.inaug-card { position: relative; text-align: center; z-index: 2; padding: 36px 32px;
+  background: var(--surface); border-radius: 32px; box-shadow: var(--sh-lg); }
+.inaug-card h2 { font-size: 26px; margin: 8px 0; color: var(--ink); }
+.inaug-card p { color: var(--ink-2); margin: 6px 0 24px; font-size: 15px; line-height: 1.8; }
+.inaug-card p b { color: var(--green-d); }
+.crown { font-size: 84px; animation: drop 1s var(--spring) both; }
+@keyframes drop { 0% { transform: translateY(-360px) scale(.4); opacity: 0; }
+  60% { opacity: 1; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+.confetti-layer { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.conf { position: absolute; top: -14px; width: 9px; height: 14px; border-radius: 3px; animation: fall linear forwards; }
+@keyframes fall { to { transform: translateY(110vh) rotate(620deg); } }
+
+.founding { position: fixed; inset: 0; background: rgba(46, 52, 64, .9);
+  display: none; align-items: center; justify-content: center; z-index: 90; overflow: hidden; }
+.founding.open { display: flex; }
+.founding-inner { position: relative; text-align: center; z-index: 2; }
+.founding .bldg { font-size: 90px; animation: popIn .7s var(--spring) both; }
+@keyframes popIn { 0% { transform: scale(.2); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.founding .fname { font-size: 34px; font-weight: 700; color: #ECEFF4; margin-top: 8px; letter-spacing: .04em;
+  opacity: 0; animation: fadeUp .6s ease .5s forwards; }
+.founding .fslogan { font-size: 14px; color: #C2CDE0; margin-top: 8px; opacity: 0; animation: fadeUp .6s ease .8s forwards; }
+@keyframes fadeUp { 0% { transform: translateY(14px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+.stamp { position: relative; display: inline-block; margin-top: 22px; color: var(--stop);
+  border: 5px solid var(--stop); border-radius: 50%; padding: 14px 22px; font-size: 26px; font-weight: 700;
+  transform: scale(2.6) rotate(-16deg); opacity: 0; animation: stampIn .35s ease 1.25s forwards; }
+@keyframes stampIn { to { transform: scale(1) rotate(-16deg); opacity: .92; } }
+
+/* オフィスは画面いっぱいに（幅は最大1440px／高さは .of-vp が縦の余白を使って伸びる） */
+#game { width: min(1440px, calc(100vw - 16px)); margin-bottom: 10px; }
+footer { color: var(--ink-3); font-size: 12.5px; text-align: center; padding: 16px 16px 34px; line-height: 1.8; }
+footer b { color: var(--green-d); }
+
+/* モーダル（パネル共通） */
+.overlay { position: fixed; inset: 0; background: rgba(74, 66, 56, .4);
+  display: none; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
+.overlay.open { display: flex; }
+.modal { background: var(--surface); border-radius: 28px; max-width: 520px; width: 100%; padding: 26px;
+  box-shadow: var(--sh-lg); max-height: 86vh; overflow-y: auto;
+  animation: modalIn 320ms var(--spring) both; }
+@keyframes modalIn { from { transform: translateY(24px) scale(.97); opacity: 0; } to { transform: none; opacity: 1; } }
+.modal .big { font-size: 54px; text-align: center; display: block; }
+.modal h2 { text-align: center; margin: 10px 0 2px; color: var(--ink); }
+.modal .mrole { text-align: center; font-size: 13.5px; color: var(--green-d); font-weight: 700; }
+.modal .desc { font-size: 15px; line-height: 1.8; margin: 16px 0; color: var(--ink); }
+.plabel { font-size: 12px; color: var(--ink-2); margin: 16px 0 6px; font-weight: 700; }
+.prompt-box { background: var(--green-t); border: 2px dashed var(--green); border-radius: 16px;
+  padding: 12px 14px; font-size: 14px; color: var(--green-d); font-weight: 700;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.copy-btn { background: var(--green); color: var(--surface); border: none; border-radius: 9999px;
+  padding: 8px 14px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.copy-btn:active { transform: translateY(1px); }
+.close { margin-top: 20px; width: 100%; background: var(--sunken); color: var(--ink-2);
+  border: none; border-radius: 16px; padding: 12px; cursor: pointer; font-weight: 700; font-size: 14px; }
+.close:hover { background: #E7E0CC; }
+
+.emp-status { display: flex; align-items: center; gap: 10px; justify-content: center; margin: 10px 0 4px; }
+.emp-task { font-size: 13px; color: var(--ink-2); }
+.pbar { background: var(--sunken); border-radius: 9999px; height: 10px; overflow: hidden; margin: 8px 0 2px; }
+.pbar > i { display: block; height: 100%; border-radius: 9999px; background: var(--green); transition: width .4s ease; }
+.pbar-label { font-size: 11.5px; color: var(--ink-2); text-align: right; font-weight: 700; }
+.del-row:hover { background: var(--green-t); }
+a.row, a.rowlink { text-decoration: none; color: inherit; }
+.rowlink { display: flex; gap: 8px; align-items: flex-start; width: 100%; }
+
+.app-title { display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 700; margin-bottom: 4px; color: var(--ink); }
+.app-note { font-size: 12.5px; color: var(--ink-2); margin-bottom: 14px; line-height: 1.7; }
+.row { display: flex; gap: 10px; padding: 12px 13px; border-radius: 16px; margin-bottom: 8px; background: #F7F3EA; }
+.row .ic { font-size: 21px; }
+.row .tx { flex: 1; }
+.row .tt { font-size: 14.5px; font-weight: 700; color: var(--ink); }
+.row .sub { font-size: 12.5px; color: var(--ink-2); margin-top: 2px; line-height: 1.6; }
+.row .time { font-size: 12px; color: var(--green-d); white-space: nowrap; font-weight: 700; text-align: right; }
+.row-open { font-size: 11px; color: var(--green-d); font-weight: 700; margin-top: 4px; opacity: .85; }
+a.row { transition: transform 120ms var(--spring), background 120ms ease; }
+a.row:hover { background: #F1ECDF; transform: translateY(-1px); }
+/* 既読/未読バッジ */
+.mail-unread { display: inline-block; font-size: 10.5px; font-weight: 700; color: #fff; background: var(--green);
+  padding: 1px 8px; border-radius: 9999px; margin-right: 6px; vertical-align: 1px; }
+.mail-read { display: inline-block; font-size: 10.5px; font-weight: 700; color: #98938A;
+  background: #ECE7DA; padding: 1px 8px; border-radius: 9999px; margin-right: 6px; vertical-align: 1px; }
+/* 既読の行は少し控えめに */
+.row.is-read { background: #F3EFE6; }
+.row.is-read .tt { color: var(--ink-2); font-weight: 700; }
+.row.is-read .sub { color: #A29C90; }
+.chat { background: var(--sunken); border-radius: 18px; padding: 12px; }
+.msg { max-width: 80%; padding: 10px 13px; border-radius: 18px; margin: 6px 0; font-size: 13.5px; line-height: 1.7; }
+.msg.them { background: var(--surface); color: var(--ink); }
+.msg.me { background: #06c755; color: #FFFDF5; margin-left: auto; }
+
+.setup-btn { background: var(--surface); color: var(--green-d); border: none; border-radius: 9999px;
+  padding: 9px 16px; font-weight: 700; cursor: pointer; font-size: 13px; box-shadow: var(--sh-sm); }
+.setup-btn:active { transform: translateY(1px); }
+
+.form-row { margin: 12px 0; text-align: left; }
+.form-row label { display: block; font-size: 12.5px; font-weight: 700; color: var(--ink-2); margin-bottom: 5px; }
+.form-row input, .form-row select { width: 100%; padding: 12px 14px; border: 2px solid transparent;
+  border-radius: 16px; font-size: 15px; color: var(--ink); background: var(--sunken); font-family: inherit; }
+.form-row input:focus, .form-row select:focus { outline: none; border-color: var(--green);
+  background: var(--surface); box-shadow: 0 0 0 4px var(--green-t); }
+.form-hint { font-size: 11.5px; color: var(--ink-3); margin-top: 5px; }
+.submit-btn { margin-top: 18px; width: 100%; background: var(--green); color: var(--surface); border: none;
+  border-radius: 9999px; padding: 14px; cursor: pointer; font-weight: 700; font-size: 15px; box-shadow: var(--sh-sm); }
+.submit-btn:active { transform: translateY(2px); box-shadow: none; }
+/* フォーム内の補助ボタン（外部連携の状況を見る 等） */
+.su-sub-btn { width: 100%; background: var(--sunken); color: var(--ink); border: none; cursor: pointer;
+  border-radius: 12px; padding: 12px 14px; font-weight: 700; font-size: 13.5px; box-shadow: var(--sh-sm);
+  transition: transform 140ms var(--spring), background 140ms ease; }
+.su-sub-btn:hover { background: var(--green-t); color: var(--green-d); transform: translateY(-1px); }
+
+.dlist { list-style: none; margin: 0; padding: 0; }
+.dlist li { display: flex; gap: 9px; align-items: flex-start; font-size: 13.5px; color: var(--ink);
+  padding: 8px 0; line-height: 1.6; }
+.dlist li + li { border-top: none; margin-top: 2px; }
+.dlist .dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 6px; flex: none; background: #D6CEBC; }
+.dlist .dot.doing { background: var(--sky); } .dlist .dot.todo { background: #D6CEBC; } .dlist .dot.done { background: var(--green); }
+.dlist .who { color: var(--ink-2); font-size: 11.5px; }
+.dlist .meta { margin-left: auto; color: var(--ink-2); font-size: 12px; white-space: nowrap; }
+.stt { font-size: 11.5px; padding: 2px 10px; border-radius: 9999px; font-weight: 700; }
+.stt.working { background: var(--sky-t); color: #3f6f96; } .stt.meeting { background: var(--caution-t); color: var(--caution-ink); }
+.stt.idle { background: var(--sunken); color: var(--ink-2); }
+
+.setup-mk { width: 19px; height: 19px; border-radius: 50%; flex: none; display: flex; align-items: center;
+  justify-content: center; font-size: 11px; font-weight: 700; background: var(--sunken); color: var(--ink-3); }
+.setup-mk.ok { background: var(--green-t); color: var(--green-d); }
+.setup-next { font-size: 11px; font-weight: 700; background: var(--caution-t); color: var(--caution-ink);
+  border-radius: 9999px; padding: 2px 9px; margin-left: auto; white-space: nowrap; }
+
+/* タスクリスト（メモ風） */
+.tl { margin: 4px 0 0; }
+.tl-item + .tl-item { margin-top: 2px; }
+.tl-row { display: flex; align-items: center; gap: 10px; padding: 11px 8px; cursor: pointer; user-select: none; border-radius: 14px; }
+.tl-row:hover { background: #F7F3EA; }
+.tl-item.review .tl-row { background: var(--caution-t); }
+.tl-item.review .tl-row:hover { background: #F6EBCB; }
+.tl-mark { width: 24px; height: 24px; flex-shrink: 0; position: relative; }
+.tl-mark svg { display: block; width: 24px; height: 24px; }
+.tl-pct { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  font-size: 8px; font-weight: 700; color: var(--green-d); }
+.tl-hand { font-size: 18px; line-height: 24px; text-align: center; animation: tlwave 1.6s ease-in-out infinite; }
+@keyframes tlwave { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(14deg); } }
+.tl-ttl { flex: 1; min-width: 0; }
+.tl-ttl .t { font-size: 15px; line-height: 1.5; color: var(--ink); }
+.tl-item.done .tl-ttl .t { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--ink-3); }
+.tl-hint { font-size: 12px; color: var(--caution-ink); margin-top: 2px; line-height: 1.5; font-weight: 500; }
+.tl-id { color: var(--ink-3); font-weight: 700; font-size: 12px; margin-right: 4px; }
+.tl-clip { font-size: 13px; flex-shrink: 0; }
+.tl-st { font-size: 11px; padding: 3px 10px; border-radius: 9999px; font-weight: 700; flex-shrink: 0; white-space: nowrap; }
+.tl-st.st-todo { background: var(--sunken); color: var(--ink-2); }
+.tl-st.st-doing { background: var(--sky-t); color: #3f6f96; }
+.tl-st.st-review { background: #F6E3BC; color: var(--caution-ink); }
+.tl-st.st-done { background: var(--green-t); color: var(--green-d); }
+.tl-owner { flex-shrink: 0; font-size: 11px; font-weight: 700; color: #FFFDF5; padding: 3px 10px; border-radius: 9999px; }
+.tl-owner.none { background: var(--sunken); color: var(--ink-2); }
+.tl-chev { color: var(--ink-3); font-size: 12px; flex-shrink: 0; transition: transform .2s; }
+.tl-item.open .tl-chev { transform: rotate(90deg); }
+.tl-detail { display: none; padding: 4px 8px 14px 42px; }
+.tl-item.open .tl-detail { display: block; }
+.tl-log { list-style: none; margin: 0; padding: 0; }
+.tl-log li { font-size: 12.5px; color: var(--ink); line-height: 1.6; padding: 2px 0 2px 13px; position: relative; }
+.tl-log li::before { content: "・"; position: absolute; left: 0; color: var(--ink-3); }
+.tl-log .tm { color: var(--ink-3); font-size: 11px; margin-right: 5px; }
+.tl-dels { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.tl-del { display: flex; align-items: center; gap: 7px; background: #F7F3EA; border-radius: 12px;
+  padding: 9px 12px; font-size: 13px; cursor: pointer; color: var(--ink); text-decoration: none; }
+.tl-del:hover { background: var(--green-t); }
+.tl-del .om { margin-left: auto; color: var(--green-d); font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.tl-ask { margin-top: 10px; display: flex; align-items: center; gap: 8px; background: var(--green-t);
+  border: 2px dashed var(--green); border-radius: 12px; padding: 8px 11px; }
+.tl-ask .q { font-size: 12.5px; color: var(--green-d); font-weight: 600; flex: 1; line-height: 1.5; }
+.tl-copy { flex-shrink: 0; border: none; background: var(--green); color: var(--surface); font-size: 11.5px;
+  font-weight: 700; padding: 5px 12px; border-radius: 9999px; cursor: pointer; }
+.tl-approve { margin-top: 9px; width: 100%; border: none; background: var(--amber); color: #5d3a10;
+  font-size: 13.5px; font-weight: 700; padding: 11px; border-radius: 12px; cursor: pointer; box-shadow: var(--sh-sm); }
+.tl-approve:active { transform: translateY(2px); box-shadow: none; }
+
+/* ============================================================
+   オフィス本体（of-*）：2部屋スライド構成
+   ============================================================ */
+.of-hud { display: flex; gap: 8px; align-items: stretch; margin-bottom: 10px; }
+.of-tick { flex: 1; min-width: 0; background: var(--surface); border: none; border-radius: 9999px;
+  padding: 8px 14px; font-size: 13.5px; font-weight: 500; color: var(--ink); display: flex; gap: 9px;
+  align-items: center; box-shadow: var(--sh-sm); cursor: pointer; text-align: left; }
+.of-tick:hover { background: #FFFEF9; }
+.of-now { background: var(--sunken); border-radius: 9999px; padding: 3px 11px; font-size: 12.5px;
+  color: var(--ink-2); font-weight: 700; flex-shrink: 0; }
+.of-tx { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* アプリボタン：提案箱・納品BOXと同じサイズ感（アイコン56×46＋ラベル） */
+.of-appbtn { display: flex; flex-direction: column; align-items: center; border: none; background: none;
+  padding: 0; cursor: pointer; flex-shrink: 0; transition: transform 160ms var(--spring); }
+.of-appbtn:hover { transform: translateY(-3px); }
+.of-appic { position: relative; width: 56px; height: 46px; display: flex; align-items: center; justify-content: center;
+  background: var(--surface); border-radius: 7px; box-shadow: var(--sh-sm); font-size: 23px; }
+.of-appbtn .of-bshelf-label { margin-top: 5px; }
+/* LINEアイコン：緑の角丸スクエア＋白い吹き出し */
+.of-lineic { position: relative; display: inline-block; width: 30px; height: 30px;
+  background: #06C755; border-radius: 9px; box-shadow: var(--sh-sm); }
+.of-lineic::before { content: ''; position: absolute; left: 50%; top: 47%; transform: translate(-50%, -50%);
+  width: 19px; height: 14px; background: #fff; border-radius: 50%; }
+.of-lineic::after { content: ''; position: absolute; left: 36%; bottom: 5px;
+  width: 0; height: 0; border: 4px solid transparent; border-top-color: #fff; border-right: 0; }
+.of-dot { position: absolute; top: -3px; right: -3px; width: 11px; height: 11px; border-radius: 50%;
+  background: var(--ink-3); }
+.of-dot.on { background: var(--green); }
+.of-salesbtn { border: none; border-radius: 9999px; background: var(--surface); cursor: pointer;
+  display: flex; align-items: center; gap: 8px; padding: 6px 14px; font-size: 13px; font-weight: 700;
+  color: var(--ink); box-shadow: var(--sh-sm); flex-shrink: 0; }
+.of-sbar { width: 76px; height: 10px; background: var(--sunken); border-radius: 9999px; overflow: hidden; }
+.of-sbar i { display: block; height: 100%; width: 0; min-width: 0; background: var(--green); border-radius: 9999px; transition: width .5s ease; }
+
+.of-tabs { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+.of-tab { background: var(--sunken); color: var(--ink-2); font-size: 14px; font-weight: 700; border: none;
+  padding: 8px 22px; border-radius: 9999px; cursor: pointer; transition: all 200ms var(--spring); }
+.of-tab.on { background: var(--green-t); color: var(--green-d); }
+.of-tab:hover { transform: translateY(-1px); }
+
+.of-vp { position: relative; border-radius: 28px; overflow: hidden; box-shadow: var(--sh-md);
+  /* 下の余白を使ってフロアを縦に広げる（タブ撤去ぶんも使う。画面の高さに追従・最大840px） */
+  height: min(840px, calc(100vh - 64px)); min-height: 540px; }
+/* 社長室はオフィスの1/2サイズ。トラック150%幅・translateX(-50%)で社長室が中央に来る */
+.of-trk { display: flex; width: 150%; height: 100%; transition: transform 480ms var(--spring); align-items: stretch; }
+.of-room { position: relative;
+  background: repeating-linear-gradient(90deg, rgba(74, 66, 56, .05) 0 2px, transparent 2px 64px), var(--wood);
+  min-height: 480px; padding-top: 96px; }
+.of-ws { width: 66.667%; }
+.of-boss { width: 33.333%; }
+/* オフィス室：壁を約2.5倍（96→240px）に高くし、メンバー（社員）を下の余白へ降ろす。
+   ただし底の秘書吹き出し（2〜3行）と被らないよう、下に十分な余白を確保して持ち上げる。 */
+.of-ws { display: flex; flex-direction: column; padding-top: 240px; }
+.of-ws .of-wall { height: 240px; }
+.of-ws .of-floor { margin-top: auto; padding-bottom: 168px; }
+.of-wall { position: absolute; top: 0; left: 0; right: 0; height: 96px; background: var(--wood-2); }
+.of-wall::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 7px; background: #C9B286; }
+.of-boss .of-wall { background: #DCD4EC; left: 18px; }
+.of-boss .of-wall::after { background: #C7BCDF; }
+
+/* オフィスと社長室の間仕切り壁。中央を開放して通り抜けできる戸口にする */
+.of-partition { position: absolute; left: 0; top: 0; bottom: 0; width: 18px; z-index: 7; pointer-events: none; }
+.of-pseg { position: absolute; left: 0; right: 0;
+  background: linear-gradient(90deg, #C9A876 0 68%, #B98F5A 100%);
+  box-shadow: -7px 0 14px rgba(74, 66, 56, .16); }
+.of-pseg::before { content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(74, 66, 56, .06) 0 1px, transparent 1px 22px); }
+/* 上下2枚に分割し、中央 約116px を開口に。開口端は丸める＝柱の小口 */
+.of-pseg.top { top: 0; height: calc(50% - 58px); border-radius: 0 0 9px 9px; }
+.of-pseg.bot { bottom: 0; height: calc(50% - 58px); border-radius: 9px 9px 0 0; }
+/* 戸口の敷居：開口部の床にうっすら明るい通路マーク */
+.of-doorsill { position: absolute; left: -2px; right: -10px; top: 50%; height: 110px;
+  transform: translateY(-50%); background: rgba(255, 253, 245, .35); border-radius: 8px; }
+.of-plate { position: absolute; bottom: 26px; left: 50%; transform: translate(-50%, 0) rotate(90deg);
+  transform-origin: center; white-space: nowrap; font-size: 11px; font-weight: 700; color: #6e5230;
+  letter-spacing: .12em; }
+/* 時間連動の照明（ナイトモード等）は廃止。オフィスは常に明るい昼の状態に固定 */
+.of-light { display: none; }
+
+.of-zl { position: absolute; top: 12px; left: 16px; background: var(--pink); color: #FFFDF5;
+  font-size: 14px; font-weight: 700; padding: 5px 18px; border-radius: 9999px; box-shadow: var(--sh-sm); z-index: 4; }
+.of-zl::after { content: ''; position: absolute; left: 18px; bottom: -5px;
+  border: 5px solid transparent; border-top-color: var(--pink); border-bottom: 0; }
+.of-win { position: absolute; top: 16px; width: 84px; height: 60px;
+  background: linear-gradient(#A8D8F0, #C9E8F7); border: 7px solid var(--wood-3); border-radius: 16px; }
+.of-win::after { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 5px; margin-left: -2.5px; background: var(--wood-3); }
+/* アナログ時計（丸い文字盤＋針） */
+.of-clockw { position: absolute; top: 20px; width: 38px; height: 38px; border-radius: 50%;
+  background: var(--surface); box-shadow: var(--sh-sm); border: 2.5px solid var(--wood-3); padding: 0;
+  /* 12/3/6/9 の目盛り（放射状の点） */
+  background-image:
+    radial-gradient(circle at 50% 13%, var(--ink-3) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 50% 87%, var(--ink-3) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 13% 50%, var(--ink-3) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 87% 50%, var(--ink-3) 0 1px, transparent 1.5px); }
+.of-clockw::after { content: ''; position: absolute; left: 50%; top: 50%; width: 4px; height: 4px;
+  border-radius: 50%; background: var(--ink); transform: translate(-50%, -50%); z-index: 2; }
+.ck-hand { position: absolute; left: 50%; bottom: 50%; transform-origin: bottom center;
+  background: var(--ink); border-radius: 2px; }
+.ck-hour { width: 3px; height: 9px; margin-left: -1.5px; }
+.ck-min { width: 2px; height: 13px; margin-left: -1px; background: var(--ink-2); }
+.of-cosign { position: absolute; top: 20px; background: var(--wood-3); border-radius: 14px;
+  padding: 7px 16px; color: #5d4524; box-shadow: var(--sh-sm); max-width: 290px; }
+.of-cosign b { font-size: 14.5px; display: block; line-height: 1.35; }
+.of-cosign span { font-size: 10.5px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.of-prep { position: absolute; top: 30px; right: 16px; background: var(--caution); color: #6e5b3a;
+  font-size: 12.5px; font-weight: 700; padding: 6px 15px; border-radius: 9999px; border: none; cursor: pointer;
+  box-shadow: var(--sh-sm); z-index: 4; }
+.of-prep.open { background: var(--green-t); color: var(--green-d); }
+.of-prep:hover { transform: translateY(-1px); }
+
+/* 床レイアウト */
+.of-floor { display: flex; gap: 16px; padding: 22px 86px 96px 22px; position: relative; }
+.of-desks { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 14px 10px; align-items: end;
+  max-width: 482px; margin-inline: auto; }
+.of-side { width: 230px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; }
+/* 壁のダッシュボード：左[タスク｜売上＋ティッカー]／右[今日の予定]の2カラム。壁の幅内（左右16px余白）に必ず収める */
+.of-ws .of-wallpanel { position: absolute; top: 16px; left: 16px; right: 16px; z-index: 4;
+  display: flex; gap: 12px; align-items: flex-start; }
+/* 左カラム：タスク・売上の行＋下にティッカー（幅2／合計3） */
+.of-ws .of-wallmain { flex: 2 1 0; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+/* タスク・売上を等幅の伸縮行に */
+.of-ws .of-dashrow { display: flex; gap: 12px; align-items: flex-start; }
+.of-ws .of-dashrow > .of-board { flex: 1 1 0; min-width: 0; width: auto; box-sizing: border-box; margin: 0; }
+.of-ws .of-dashrow > .of-dashcol { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.of-ws .of-dashcol > .of-board { width: 100%; box-sizing: border-box; margin: 0; }
+/* タスクボード下の道具列：納品ボタン＋メール＋外部連携 */
+.of-dashtools { display: flex; gap: 8px; align-items: stretch; }
+/* 納品成果物ボタン（道具列の左・伸縮） */
+.of-deliv-btn { position: relative; flex: 1 1 0; min-width: 0; box-sizing: border-box; border: none; cursor: pointer;
+  background: var(--surface); border-radius: 16px; padding: 11px 14px; font-size: 13px; font-weight: 700;
+  color: var(--ink); box-shadow: var(--sh-sm); display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: transform 160ms var(--spring), box-shadow 160ms ease; }
+.of-deliv-btn:hover { transform: translateY(-2px); box-shadow: var(--sh-md); }
+/* メール・外部連携アイコン（道具列の右） */
+.of-tool-ic { position: relative; flex-shrink: 0; border: none; cursor: pointer; background: var(--surface);
+  border-radius: 16px; padding: 6px 12px; box-shadow: var(--sh-sm); font-size: 19px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; min-width: 56px;
+  transition: transform 160ms var(--spring), box-shadow 160ms ease; }
+.of-tool-ic:hover { transform: translateY(-2px); box-shadow: var(--sh-md); }
+.of-tool-cap { font-size: 10px; font-weight: 700; color: var(--ink-2); }
+.int-ok { color: #2E9E5B; font-weight: 700; flex-shrink: 0; font-size: 13px; }
+.of-deliv-bdg { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--green);
+  color: #fff; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+.of-deliv-bdg[hidden] { display: none; }
+/* 右カラム：今日の予定（幅1） */
+.of-ws .of-wallpanel > .of-calboard { flex: 1 1 0; min-width: 0; margin: 0; }
+.of-biz-goal { font-size: 12px; font-weight: 700; color: var(--ink-2); margin-bottom: 6px; line-height: 1.4; }
+.of-biz-goal span { color: var(--green-d); }
+/* 売上ボードのヘッダー：タイトル左・金額を右上に詰める */
+.of-biz-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.of-biz-head > b { margin-bottom: 0; }
+.of-biz-amt { font-size: 12.5px; font-weight: 700; color: var(--green-d); white-space: nowrap; }
+.of-biz-bar { display: block; height: 8px; background: #EDE7DA; border-radius: 9999px; overflow: hidden; margin-bottom: 9px; }
+.of-biz-bar i { display: block; height: 100%; width: 0; background: var(--green); border-radius: 9999px; transition: width .5s ease; }
+/* 会社の動き（ティッカー）：ダッシュボード行の下（枠いっぱいの横長） */
+.of-ws .of-tick { width: auto; box-sizing: border-box; flex: none; }
+/* 今日の予定：ダッシュボード行の1枚（伸縮）。背景・余白だけ指定 */
+.of-ws .of-calboard { box-sizing: border-box;
+  background: var(--surface); border-radius: 20px; padding: 12px 14px; box-shadow: var(--sh-md); }
+.of-cal-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 7px; }
+.of-cal-head b { font-family: var(--font-title); font-size: 14px; color: var(--ink); }
+.of-cal-note { font-size: 10.5px; font-weight: 700; color: var(--ink-3); }
+.of-cal-list { display: flex; flex-direction: column; gap: 4px; }
+.of-cal-row { display: flex; align-items: center; gap: 8px; background: #F7F3EA; border-radius: 9px; padding: 6px 10px; }
+.of-cal-t { font-size: 11.5px; font-weight: 700; color: var(--green-d); flex-shrink: 0; width: 44px; }
+.of-cal-tt { font-size: 12px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.of-cal-more { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+.of-cal-more[hidden] { display: none; }
+.of-cal-empty { font-size: 11.5px; color: var(--ink-3); padding: 6px 2px; }
+.of-cal-toggle { margin-top: 7px; width: 100%; background: var(--green-t); color: var(--green-d); border: none;
+  border-radius: 10px; padding: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer; }
+.of-cal-toggle:hover { background: #D4EBDC; }
+.of-cal-toggle[hidden] { display: none; }
+
+/* 社員ユニット */
+.of-unit { position: relative; z-index: 2; text-align: center; cursor: pointer; padding-top: 26px; border-radius: 20px;
+  transition: transform 200ms var(--spring); }
+.of-unit:hover { transform: translateY(-3px); }
+.of-stt { position: absolute; top: 0; left: 50%; transform: translateX(-50%); font-size: 11px;
+  font-weight: 700; padding: 3px 12px; border-radius: 9999px; white-space: nowrap; z-index: 3;
+  background: var(--sunken); color: var(--ink-2); }
+.of-stt.is-working { background: var(--sky-t); color: #3f6f96; }
+.of-stt.is-meeting { background: var(--caution-t); color: var(--caution-ink); }
+.of-fb { position: absolute; top: 22px; right: 8px; background: var(--amber); color: #5d3a10;
+  font-size: 11px; font-weight: 700; border-radius: 9999px; padding: 3px 8px; z-index: 3; }
+.of-chr { display: inline-block; animation: of-bob 4s ease-in-out infinite; position: relative; z-index: 1; }
+.of-hd { width: 42px; height: 42px; border-radius: 50%; background: #F2D2B6; margin: 0 auto; position: relative; }
+.of-hh { position: absolute; top: -5px; left: -3px; width: 48px; height: 24px; border-radius: 24px 24px 0 0; display: block; }
+.of-ey { position: absolute; top: 20px; width: 5px; height: 5px; border-radius: 50%; background: var(--ink); display: block; }
+.of-ey.l { left: 11px; } .of-ey.r { right: 11px; }
+.of-mo { position: absolute; top: 28px; left: 50%; transform: translateX(-50%); width: 12px; height: 6px;
+  border-bottom: 2.5px solid var(--ink); border-radius: 0 0 10px 10px; display: block; }
+
+/* === 表情バリエーション 10種（of-hd に fv1〜fv10） === */
+/* fv1：標準（丸目＋ほほえみ）= ベースのまま */
+/* fv2：くりっと大きい目＋小さめ口 */
+.fv2 .of-ey { width: 6px; height: 6px; }
+.fv2 .of-mo { width: 9px; }
+/* fv3：にこにこ閉じ目（⌒ ⌒） */
+.fv3 .of-ey { width: 7px; height: 4px; background: none; border-top: 2.5px solid var(--ink);
+  border-radius: 7px 7px 0 0; top: 21px; }
+.fv3 .of-ey.l { left: 10px; } .fv3 .of-ey.r { right: 10px; }
+/* fv4：ウインク（右目だけ線） */
+.fv4 .of-ey.r { height: 2.5px; width: 6px; border-radius: 2px; top: 22px; }
+/* fv5：あーんと開いた口（おどろき・元気） */
+.fv5 .of-mo { width: 7px; height: 7px; border: 2px solid var(--ink); border-bottom: 2px solid var(--ink);
+  border-radius: 50%; top: 27px; }
+/* fv6：点目＋にっこり大きい口 */
+.fv6 .of-ey { width: 4px; height: 4px; top: 21px; }
+.fv6 .of-mo { width: 15px; height: 7px; }
+/* fv7：たて長の目 */
+.fv7 .of-ey { width: 4px; height: 6.5px; border-radius: 3px; top: 19px; }
+/* fv8：きらきら目（ハイライト付き） */
+.fv8 .of-ey { width: 7px; height: 7px; top: 19px; }
+.fv8 .of-ey::after { content: ''; position: absolute; top: 1px; left: 1.5px; width: 2.5px; height: 2.5px;
+  border-radius: 50%; background: #FFFDF5; }
+/* fv9：ねむそうな半目＋やさしい小さな口 */
+.fv9 .of-ey { width: 6px; height: 2.5px; border-radius: 2px; top: 22px; }
+.fv9 .of-mo { width: 8px; height: 4px; }
+/* fv10：にぱっと開いた笑顔（塗りの口） */
+.fv10 .of-mo { width: 13px; height: 6px; background: var(--ink); border: none; border-radius: 0 0 13px 13px; }
+
+/* === 髪型バリエーション（of-hd に hs1〜hs5） === */
+/* hs1：標準の短めキャップ（ベース） */
+/* hs2：横分けの前髪 */
+.hs2 .of-hh::before { content: ''; position: absolute; bottom: -4px; left: 7px; width: 24px; height: 10px;
+  background: inherit; border-radius: 0 0 12px 3px; }
+/* hs3：高めのボリューム */
+.hs3 .of-hh { height: 28px; top: -9px; }
+/* hs4：横に流れるボブ（サイドが下がる） */
+.hs4 .of-hh { width: 52px; left: -5px; }
+.hs4 .of-hh::before, .hs4 .of-hh::after { content: ''; position: absolute; bottom: -13px; width: 10px; height: 19px;
+  background: inherit; border-radius: 0 0 7px 7px; }
+.hs4 .of-hh::before { left: 0; } .hs4 .of-hh::after { right: 0; }
+/* hs5：短め・控えめ */
+.hs5 .of-hh { height: 16px; top: -3px; width: 46px; left: -2px; }
+
+/* === 装飾（of-ac ＋ ac-*） === */
+.of-ac { position: absolute; z-index: 4; pointer-events: none; }
+/* メガネ：レンズ中心を目（top:20・左右11px）に合わせる。ブリッジは鼻の上で2つを橋渡し */
+.ac-glasses { top: 21px; left: 50%; transform: translateX(-50%); width: 6px; height: 2px; background: #3E3A34; border-radius: 2px; }
+.ac-glasses::before, .ac-glasses::after { content: ''; position: absolute; top: -3.5px; width: 9px; height: 9px;
+  border: 2px solid #3E3A34; border-radius: 50%; box-sizing: border-box; background: rgba(180,205,235,.18); }
+.ac-glasses::before { right: 100%; } .ac-glasses::after { left: 100%; }
+/* ヘアクリップ */
+.ac-clip { top: 4px; right: 4px; width: 11px; height: 6px; background: #F2599B; border-radius: 3px; transform: rotate(-14deg); box-shadow: var(--sh-sm); }
+/* キャップ（つば付き帽子） */
+.ac-hat { top: -13px; left: 50%; transform: translateX(-50%); width: 44px; height: 15px; }
+.ac-hat::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 6px; background: #5AAD79; border-radius: 5px; }
+.ac-hat::after { content: ''; position: absolute; bottom: 4px; left: 8px; right: 8px; height: 12px; background: #6BBF8A; border-radius: 9px 9px 2px 2px; }
+/* リボン */
+.ac-bow { top: -8px; left: 50%; transform: translateX(-50%); width: 18px; height: 9px; }
+.ac-bow::before, .ac-bow::after { content: ''; position: absolute; top: 0; width: 8px; height: 9px; background: #F2599B; }
+.ac-bow::before { left: 0; border-radius: 5px 2px 5px 2px; } .ac-bow::after { right: 0; border-radius: 2px 5px 2px 5px; }
+/* ヘッドセット */
+.ac-headset { top: -5px; left: 50%; transform: translateX(-50%); width: 50px; height: 24px; }
+.ac-headset::before { content: ''; position: absolute; top: 0; left: 2px; right: 2px; height: 13px;
+  border: 3px solid #454049; border-bottom: none; border-radius: 24px 24px 0 0; box-sizing: border-box; }
+.ac-headset::after { content: ''; position: absolute; top: 9px; left: -1px; width: 6px; height: 10px;
+  background: #454049; border-radius: 3px; box-shadow: 45px 0 0 #454049; }
+.of-bd { width: 54px; height: 24px; border-radius: 18px 18px 10px 10px; margin: -4px auto 0; }
+/* 下半身（脚）。通常は隠し、歩き回るキャラ（of-walker）のときだけ出す */
+.of-lg { display: none; justify-content: center; gap: 7px; margin: -2px auto 0; }
+.of-lg i { display: block; width: 8px; height: 13px; border-radius: 0 0 4px 4px; background: #5C6270; }
+.of-walker .of-lg { display: flex; }
+/* 歩行中だけ：左右の脚を交互に＋体を小さく上下（ちょこちょこ・あえてカクカク） */
+@keyframes of-stepL { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes of-stepR { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(0); } }
+@keyframes of-waddle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+.of-walker.is-walking .of-lg i:first-child { animation: of-stepL .26s steps(2, end) infinite; }
+.of-walker.is-walking .of-lg i:last-child { animation: of-stepR .26s steps(2, end) infinite; }
+.of-walker.is-walking .of-chr { animation: of-waddle .26s steps(2, end) infinite; }
+.of-dk { width: 56px; height: 30px; background: var(--wood-3); border-radius: 12px 12px 8px 8px;
+  margin: -7px auto 0; position: relative; z-index: 2; }
+.of-dk::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 8px; background: #DDBE93; border-radius: 12px 12px 0 0; }
+/* デスクトップPC：モニター（スタンド付き）＋タワー（あつ森風アイコン） */
+.of-pc { position: absolute; left: 50%; transform: translateX(-50%); top: -24px;
+  display: flex; align-items: flex-end; justify-content: center; gap: 3px; }
+.pc-mon { position: relative; width: 28px; height: 18px; background: #2E2C33; border-radius: 3px;
+  margin-bottom: 6px; box-shadow: var(--sh-sm); }
+.pc-scr { position: absolute; inset: 2px; background: #3C4250; border-radius: 1px;
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,.07); }
+.pc-mon::before { content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
+  width: 5px; height: 5px; background: #2E2C33; }
+.pc-mon::after { content: ''; position: absolute; bottom: -7px; left: 50%; transform: translateX(-50%);
+  width: 16px; height: 4px; background: #2E2C33; border-radius: 2px; }
+.pc-tower { position: relative; width: 11px; height: 24px; background: #2E2C33; border-radius: 2px; box-shadow: var(--sh-sm); }
+.pc-tower::before { content: ''; position: absolute; top: 5px; left: 2.5px; right: 2.5px; height: 1.5px;
+  background: #5A5A64; border-radius: 1px; box-shadow: 0 4px 0 #5A5A64, 0 8px 0 #4E4E58; }
+/* 秘書アイの机：横向きノートPC。画面はアイ（右）を向き、キーボードは右へ広がる */
+.of-laptop { position: absolute; left: 50%; top: 50%; transform: translate(-52%, -48%);
+  width: 28px; height: 18px; }
+/* キーボード面（右へ広がる・奥行きのスキュー） */
+.lp-base { position: absolute; bottom: 3px; left: 10px; right: 0; height: 5px; background: #4A4853;
+  border-radius: 1px 3px 4px 1px; transform: skewX(-26deg); transform-origin: bottom left;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12); }
+/* 画面（左に立ち上がり、表示面はアイ側＝右を向く） */
+.lp-scr { position: absolute; bottom: 4px; left: 2px; width: 13px; height: 13px; background: #2E2C33;
+  border-radius: 2px; transform: rotate(-22deg); transform-origin: bottom right; box-shadow: var(--sh-sm); }
+.lp-scr::before { content: ''; position: absolute; inset: 2px; background: #49566B; border-radius: 1px; }
+.of-np { display: inline-block; color: #FFFDF5; font-size: 12.5px; font-weight: 700; padding: 3px 14px;
+  border-radius: 9999px; margin-top: 6px; background: var(--pink); box-shadow: var(--sh-sm); }
+.of-role { display: block; font-size: 11px; color: var(--ink-2); margin-top: 3px; }
+/* 社長・秘書：名前を上（アバターの上）／役職を机の下・中央に（社員と同じ並び） */
+/* 秘書：名前を上（流し込み・アバターはブロックなので行は分かれる）／役職を下 */
+.of-ai .of-np { display: inline-block; margin: 0 0 5px; position: relative; z-index: 3; }
+/* 社長：アバターがインラインなので、名前は頭上に絶対配置（社員と同じ確実な方式） */
+.of-ceo { padding-top: 26px; }
+.of-ceo .of-np { position: absolute; top: 0; left: 50%; transform: translateX(-50%); margin: 0; z-index: 3; }
+.of-ceo .of-role, .of-ai .of-role { display: block; text-align: center; margin-top: 8px; white-space: nowrap; }
+/* 社員：名前は上の定位置（旧「待機中」の場所）／役職は机の下・中央 */
+.of-unit .of-np { position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 3;
+  margin-top: 0; max-width: 130px; box-sizing: border-box; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.of-unit .of-role { display: block; text-align: center; margin-top: 8px; white-space: nowrap; }
+/* 作業中タスク：頭の右上に吹き出しで表示（作業中バッジの右側に逃がして重ねない） */
+.of-chip { position: absolute; top: -10px; left: calc(50% + 40px); z-index: 6; width: max-content; max-width: 140px;
+  background: var(--surface); border-radius: 13px; padding: 6px 11px 7px; font-size: 11px;
+  box-shadow: var(--sh-md); text-align: left; }
+.of-chip[hidden] { display: none; }
+.of-chip::after { content: ''; position: absolute; bottom: -6px; left: 8px;
+  border: 6px solid transparent; border-top-color: var(--surface); border-bottom: 0; }
+.of-chip .tline { display: flex; align-items: center; gap: 5px; }
+.of-chip b { color: var(--green-d); flex-shrink: 0; }
+.of-chip .txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+.of-chip .bar { display: block; margin-top: 5px; height: 5px;
+  background: var(--sunken); border-radius: 9999px; overflow: hidden; }
+.of-chip .bar u { display: block; height: 100%; background: var(--green); border-radius: 9999px; transition: width .5s ease; }
+@keyframes of-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+.of-meet .of-chr { animation: of-hop .55s ease-in-out infinite; }
+@keyframes of-hop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+
+/* 待機中：ポケモンNPC方式のグリッド移動（1マスずつ歩く。人は家具より前＝最前面に来る） */
+.of-walk { position: absolute; inset: 96px 0 0 0; z-index: 6; pointer-events: none; }
+.of-walker { position: absolute; pointer-events: auto; cursor: pointer; text-align: center;
+  /* あえて滑らかさを減らす：1マスを2コマでカクッと運ぶ（ポケモンNPC風） */
+  transition: left .2s steps(2, end), top .2s steps(2, end), opacity .26s ease; will-change: left, top; }
+.of-walker .of-np { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%);
+  margin-bottom: 3px; font-size: 10.5px; padding: 2px 10px; white-space: nowrap; }
+.of-walker .of-ey, .of-walker .of-mo { transition: transform .22s ease; }
+.face-l .of-ey { transform: translateX(-2.5px); }
+.face-l .of-mo { transform: translateX(calc(-50% - 2px)); }
+.face-r .of-ey { transform: translateX(2.5px); }
+.face-r .of-mo { transform: translateX(calc(-50% + 2px)); }
+/* 上（奥）へ歩くとき＝後ろ姿。顔（目・口）を隠し、髪で後頭部を覆う */
+.face-u .of-ey, .face-u .of-mo { visibility: hidden; }
+.face-u .of-hh { height: 36px; top: -5px; border-radius: 24px 24px 16px 16px; }
+/* 💬 提案の吹き出し（雲）：本人の「顔の横」（右側）に出す。名前や上の文字と重ならない。右上に赤い件数バッジ */
+.of-propbub { position: absolute; left: calc(100% + 4px); top: -4px; bottom: auto; transform: none;
+  background: #FFFDF5; border: 2px solid #E3DCC8; border-radius: 14px; padding: 4px 9px; line-height: 1;
+  box-shadow: var(--sh-md); z-index: 6; cursor: pointer; white-space: nowrap;
+  animation: of-bob 2.4s ease-in-out infinite; transition: transform 140ms var(--spring); }
+.of-propbub:hover { transform: translateY(-2px); }
+.of-propbub[hidden] { display: none; }
+.of-propbub-ic { font-size: 16px; }
+.of-propbub-count { position: absolute; top: -7px; right: -8px; min-width: 16px; height: 16px; padding: 0 4px;
+  box-sizing: border-box; background: #E5484D; color: #fff; border: 2px solid #FFFDF5; border-radius: 9px;
+  font-size: 10px; font-weight: 700; font-style: normal; display: flex; align-items: center; justify-content: center; }
+/* しっぽ：吹き出しの左側から顔（左）へ向ける */
+.of-propbub-tail { position: absolute; left: -6px; top: 12px;
+  width: 0; height: 0; border: 6px solid transparent; border-right-color: #FFFDF5; border-left: 0; }
+.of-propbub-tail::before { content: ''; position: absolute; left: -2px; top: -7px;
+  width: 0; height: 0; border: 7px solid transparent; border-right-color: #E3DCC8; border-left: 0; z-index: -1; }
+.of-unit.has-prop { z-index: 4; }
+/* 社員詳細パネル内の「💬 提案を見る」ボタン（本体タップ→ここから提案を開ける） */
+.talk-prop-btn { position: relative; display: flex; align-items: center; gap: 8px; width: 100%;
+  margin: 12px 0 2px; border: none; cursor: pointer; background: var(--green-t); color: var(--green-d);
+  font-size: 13.5px; font-weight: 700; padding: 12px 16px; border-radius: 14px;
+  transition: transform 140ms var(--spring), background 140ms ease; }
+.talk-prop-btn:hover { background: #D9EBE0; transform: translateY(-1px); }
+.talk-prop-btn .tpb-ic { font-size: 17px; }
+.talk-prop-btn .tpb-count { margin-left: auto; min-width: 20px; height: 20px; padding: 0 5px; box-sizing: border-box;
+  background: #E5484D; color: #fff; border-radius: 9999px; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+/* 席を立って歩き回っている社員：机だけ残して本人・名札・役職は消す（人が二重に出ないように） */
+.of-unit.is-away .of-chr,
+.of-unit.is-away .of-np,
+.of-unit.is-away .of-role,
+.of-unit.is-away .of-sweat,
+.of-unit.is-away .of-zzz { visibility: hidden; }
+
+/* 仕事中：デスクで前のめりにカタカタ＋汗マーク */
+.of-unit.is-working .of-chr { animation: of-type .5s ease-in-out infinite; }
+@keyframes of-type { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(2px); } }
+.of-sweat { position: absolute; top: 24px; left: 50%; margin-left: 26px; font-size: 14px; z-index: 3;
+  animation: of-sweatpulse 1.2s ease-in-out infinite; }
+.of-sweat[hidden] { display: none; }
+@keyframes of-sweatpulse { 0%, 100% { transform: translateY(0); opacity: .9; } 50% { transform: translateY(3px); opacity: .5; } }
+
+/* 待機中：Zzz…で休憩。文字がふわっと立ちのぼる */
+.of-zzz { position: absolute; top: 16px; left: 50%; margin-left: 18px; font-size: 13px; font-weight: 700;
+  color: var(--ink-3); z-index: 3; letter-spacing: .04em; animation: of-zzz 2.6s ease-in-out infinite; }
+.of-zzz[hidden] { display: none; }
+@keyframes of-zzz { 0% { transform: translateY(4px) scale(.85); opacity: 0; }
+  30% { opacity: .85; } 100% { transform: translateY(-10px) scale(1.1); opacity: 0; } }
+/* 待機中はゆっくり眠そうに呼吸 */
+.of-unit.is-idle .of-chr { animation-duration: 5s; }
+
+/* 空席（社員を雇う） */
+.of-hire { align-self: center; justify-self: center; width: 86px; height: 86px;
+  border: 3px dashed var(--ink-3); border-radius: 50%; background: none; cursor: pointer;
+  color: var(--ink-2); font-size: 11.5px; font-weight: 700; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 2px; transition: transform 160ms var(--spring); }
+.of-hire:hover { transform: scale(1.06); color: var(--green-d); border-color: var(--green); }
+.of-hire i { font-style: normal; font-size: 22px; }
+
+/* タスクボード */
+.of-board { background: var(--surface); border: none; border-radius: 20px; padding: 13px 14px;
+  box-shadow: var(--sh-md); cursor: pointer; text-align: left; width: 100%;
+  transition: transform 200ms var(--spring); }
+.of-board:hover { transform: translateY(-3px); box-shadow: var(--sh-lg); }
+.of-board > b { font-size: 14px; color: var(--ink); display: block; margin-bottom: 9px; }
+.of-cols { display: flex; gap: 6px; }
+.of-col { flex: 1; text-align: center; background: #F7F3EA; border-radius: 12px; padding: 8px 2px 7px; }
+.of-col b { display: block; font-size: 19px; color: var(--ink); line-height: 1.1; }
+.of-col label { font-size: 10px; color: var(--ink-2); cursor: pointer; font-weight: 700; }
+.of-col.rev { background: var(--caution-t); }
+.of-col.rev b { color: var(--caution-ink); }
+.of-bhint { display: block; margin-top: 9px; background: var(--caution-t); color: var(--caution-ink);
+  font-size: 11.5px; font-weight: 700; padding: 6px 11px; border-radius: 10px; text-align: center; }
+.of-bhint[hidden] { display: none; }
+
+/* 提案箱・納品BOX：オフィス右下の壁沿い。資料棚（本棚）と同じ木の什器デザイン */
+.of-wallshelf { position: absolute; right: 16px; bottom: 16px; z-index: 2; display: flex; gap: 10px; align-items: flex-end; }
+.of-shelfbtn { position: relative; border: none; cursor: pointer; background: var(--wood-3); border-radius: 14px;
+  padding: 8px 10px 7px; box-shadow: var(--sh-md); transition: transform 160ms var(--spring); }
+.of-shelfbtn:hover { transform: translateY(-3px); box-shadow: var(--sh-lg); }
+.of-shelfbtn > .of-bdg { top: -7px; right: -6px; }
+
+/* 什器ボタン共通（投票箱・引き出し） */
+.of-furnbtn { position: relative; border: none; cursor: pointer; background: none; padding: 0;
+  transition: transform 160ms var(--spring); display: flex; flex-direction: column; align-items: center; }
+.of-furnbtn:hover { transform: translateY(-3px); }
+.of-furnbtn > .of-bdg { top: -6px; right: -2px; z-index: 3; }
+.of-furnbtn .of-bshelf-label { margin-top: 5px; }
+
+/* 提案箱＝投票箱：上に投入口（スロット）＋紙が入っていく */
+.of-ballot { position: relative; width: 56px; height: 46px; background: #FBF3DD;
+  border: 2px solid #E0C089; border-radius: 7px; box-shadow: inset 0 -7px 0 rgba(224,192,137,.45), var(--sh-sm); }
+.of-ballot-slot { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 28px; height: 4px;
+  background: #8C7B53; border-radius: 2px; }
+.of-ballot-paper { position: absolute; top: -7px; left: 50%; transform: translateX(-50%) rotate(-9deg);
+  width: 16px; height: 15px; background: #FFFDF5; border: 1px solid #E0C089; border-radius: 2px; box-shadow: var(--sh-sm); }
+.of-ballot-face { position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); font-size: 16px; line-height: 1; }
+
+/* 納品BOX＝引き出しキャビネット：横長の引き出し3段＋取っ手 */
+.of-drawer { width: 56px; height: 46px; background: var(--wood-3); border-radius: 7px; box-shadow: var(--sh-sm);
+  padding: 5px; display: flex; flex-direction: column; gap: 3px; }
+.of-drawer-row { flex: 1; background: #DDBE93; border-radius: 3px; position: relative; box-shadow: inset 0 1px 0 rgba(255,255,255,.35); }
+.of-drawer-row::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 16px; height: 3px; background: #A9854F; border-radius: 2px; }
+
+/* ミニ家具ボタン（提案箱・資料棚・納品BOX・決裁トレイ） */
+.of-minis { display: flex; gap: 8px; }
+.of-mini { flex: 1; position: relative; background: var(--surface); border: none; border-radius: 16px;
+  padding: 11px 4px 9px; cursor: pointer; box-shadow: var(--sh-sm); text-align: center;
+  font-size: 19px; transition: transform 160ms var(--spring); }
+.of-mini:hover { transform: translateY(-3px); box-shadow: var(--sh-md); }
+.of-mini span { display: block; font-size: 10.5px; font-weight: 700; color: var(--ink-2); margin-top: 2px; }
+.of-bdg { position: absolute; top: -7px; right: -4px; background: var(--amber); color: #5d3a10;
+  font-size: 11px; font-weight: 700; min-width: 19px; height: 19px; border-radius: 9999px;
+  display: flex; align-items: center; justify-content: center; padding: 0 5px; font-style: normal; }
+.of-bdg[hidden] { display: none; }
+
+/* 観葉植物・ソファ */
+.of-plant { position: absolute; width: 38px; text-align: center; pointer-events: none; }
+.of-plant .pl { width: 34px; height: 34px; border-radius: 50%; background: #7FB571; margin: 0 auto; }
+.of-plant .pl::before { content: ''; display: block; width: 18px; height: 18px; border-radius: 50%; background: #9FCB86; transform: translate(3px, 3px); }
+.of-plant .pot { width: 22px; height: 15px; background: #D98E6B; margin: -5px auto 0; border-radius: 5px 5px 8px 8px; }
+.of-sofa { position: absolute; width: 110px; height: 38px; background: var(--stop); border-radius: 16px; pointer-events: none; }
+.of-sofa::before { content: ''; position: absolute; top: -13px; left: 0; right: 0; height: 18px; background: var(--stop); border-radius: 14px 14px 0 0; }
+
+/* 応接セット：右下に対面のチャコールソファ2脚＋白天板テーブル（あつ森風） */
+.of-reception { position: absolute; bottom: 14px; right: 12px; z-index: 2; pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  transform: scale(1.05); transform-origin: bottom right; }
+
+/* チャコールソファ（背もたれ・肘掛け・タフティング・木脚） */
+.of-csofa { position: relative; width: 98px; height: 34px; }
+.cs-back { position: absolute; left: 9px; right: 9px; height: 19px; background: #4D4852; border-radius: 9px 9px 4px 4px;
+  box-shadow: inset 0 3px 0 rgba(255,255,255,.06); }
+.cs-back::before { content: ''; position: absolute; left: 50%; top: 5px; bottom: 5px; width: 1.5px;
+  transform: translateX(-50%); background: rgba(0,0,0,.16); }
+.cs-seat { position: absolute; left: 6px; right: 6px; height: 16px; background: #5C5660; border-radius: 4px 4px 9px 9px; }
+.cs-seat::before { content: ''; position: absolute; left: 50%; top: 2px; bottom: 2px; width: 1.5px;
+  transform: translateX(-50%); background: rgba(0,0,0,.18); }
+.cs-arm { position: absolute; width: 12px; height: 24px; background: #454049; border-radius: 6px; }
+.cs-arm.cs-l { left: 0; } .cs-arm.cs-r { right: 0; }
+.cs-leg { position: absolute; width: 6px; height: 7px; background: #C9A876; border-radius: 0 0 3px 3px; }
+.cs-leg.cs-l { left: 15px; } .cs-leg.cs-r { right: 15px; }
+.of-csofa.down .cs-back { top: 0; }
+.of-csofa.down .cs-seat { top: 15px; }
+.of-csofa.down .cs-arm { top: 9px; }
+.of-csofa.down .cs-leg { bottom: -3px; }
+.of-csofa.up .cs-back { bottom: 0; border-radius: 4px 4px 9px 9px; }
+.of-csofa.up .cs-seat { bottom: 15px; border-radius: 9px 9px 4px 4px; }
+.of-csofa.up .cs-arm { bottom: 9px; }
+.of-csofa.up .cs-leg { top: -3px; border-radius: 3px 3px 0 0; }
+
+/* 白天板テーブル（金属フレーム＋下棚） */
+.of-ctable { position: relative; width: 64px; height: 22px; }
+.ct-top { position: absolute; top: 0; left: 0; right: 0; height: 11px; background: #F4F1E8; border-radius: 4px;
+  box-shadow: var(--sh-sm); }
+.ct-shelf { position: absolute; bottom: 2px; left: 7px; right: 7px; height: 5px; background: #E7E2D4; border-radius: 3px; }
+.ct-leg { position: absolute; top: 7px; bottom: 0; width: 3px; background: #A9A7A0; border-radius: 0 0 2px 2px; }
+.ct-leg.ct-l { left: 9px; } .ct-leg.ct-r { right: 9px; }
+
+/* 社長室（1/2サイズ。社長＝横向きの机／秘書＝縦向きの机でL字＝直角に配置） */
+/* 会社の紋章：社長室の壁に掲げるエンブレム（紋章バッジ＋社名） */
+.of-crest { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); z-index: 3;
+  display: flex; flex-direction: column; align-items: center; gap: 9px; pointer-events: none; }
+.of-crest-badge { position: relative; width: 92px; height: 92px; border-radius: 50%;
+  background: radial-gradient(circle at 50% 36%, #6E5FAE 0%, #4C4080 68%, #382F60 100%);
+  border: 4px solid #D9B968;
+  box-shadow: inset 0 0 0 3px rgba(184,151,81,.55), inset 0 -8px 14px rgba(0,0,0,.22), var(--sh-md);
+  display: flex; align-items: center; justify-content: center; }
+.of-crest-crown { position: absolute; top: -15px; font-size: 23px; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
+.of-crest-mono { font-family: var(--font-title); font-size: 33px; font-weight: 700; color: #F4E4B8;
+  letter-spacing: .01em; text-shadow: 0 1px 0 rgba(0,0,0,.3); }
+.of-crest-name { font-family: var(--font-title); font-size: 12.5px; font-weight: 700; letter-spacing: .18em;
+  color: #5b4a7a; white-space: nowrap; }
+
+/* 社長室：壁の高さをオフィスに揃える（240px）。中身は壁の下いっぱいに広げ、社長(上)と秘書(下)を引き離す */
+.of-boss { padding-top: 240px; display: flex; flex-direction: column; }
+.of-boss .of-wall { height: 240px; }
+.of-floor-boss { flex: 1; display: block; position: relative; min-height: 384px; padding: 0 0 0 84px; }
+.of-boss .of-win { display: none; }
+.of-ceo { position: absolute; top: 14px; left: 46%; transform: translateX(-50%); text-align: center; z-index: 2;
+  cursor: pointer; transition: transform 160ms var(--spring); }
+.of-ceo:hover { transform: translateX(-50%) translateY(-3px); }
+.of-ceo .of-crown { font-size: 20px; display: block; height: 24px; }
+.of-ceo .of-dk { width: 150px; }
+/* 社長がやるべきタスク件数バッジ（頭の右上）。大きめで目立たせる */
+.of-ceo-bdg { position: absolute; top: 18px; right: 38px; left: auto; z-index: 4;
+  min-width: 22px; height: 22px; padding: 0 6px; box-sizing: border-box; border: 2px solid #FFFDF5;
+  background: #E5484D; color: #fff; font-size: 12px; border-radius: 9999px;
+  display: flex; align-items: center; justify-content: center; box-shadow: var(--sh-sm); }
+
+/* 秘書デスク：右辺寄り・縦向きの机。アイは背中を右辺に向け、左を向いて座る */
+/* 秘書：上から固定（中段右）。社長(上)・決裁トレイ(右上)・応接ソファ(右下)のいずれとも被らない位置 */
+.of-secdesk { position: absolute; top: 172px; right: 36px; bottom: auto; text-align: center; z-index: 5; }
+.of-deskpair { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 0; }
+/* 縦向きの机（90°回転）。天板ハイライトは右辺＝アイ側に */
+.of-dk-v { width: 30px; height: 78px; border-radius: 11px; margin: 0; }
+.of-dk-v::before { top: 0; bottom: 0; left: auto; right: 0; width: 9px; height: auto;
+  border-radius: 0 11px 11px 0; }
+.of-ai { cursor: pointer; padding-top: 4px; position: relative; border-radius: 16px;
+  transition: transform 200ms var(--spring); }
+.of-ai:hover { transform: translateY(-3px); }
+.of-seclabel { position: absolute; top: -12px; left: -6px; white-space: nowrap;
+  background: var(--sky); color: #FFFDF5; font-size: 11px; font-weight: 700; padding: 3px 12px; border-radius: 9999px; z-index: 4; }
+.of-aihint { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); white-space: nowrap;
+  background: var(--caution-t); color: var(--caution-ink); font-size: 11px; font-weight: 700;
+  padding: 4px 12px; border-radius: 9999px; box-shadow: var(--sh-sm); max-width: 220px;
+  overflow: hidden; text-overflow: ellipsis; z-index: 3; }
+/* 社長タスク：ゴールドの二重枠線で目立たせる（社長専用の決裁トレイ） */
+.of-tray { background: #FFFCF2; border: 4px double #CFA53B; border-radius: 14px;
+  padding: 11px 18px; cursor: pointer; font-size: 14px; font-weight: 800;
+  color: #6E5512; position: relative; transition: transform 160ms var(--spring), box-shadow 160ms ease; white-space: nowrap;
+  box-shadow: 0 0 0 2px rgba(207,165,59,.20), 0 4px 12px rgba(150,110,20,.22); }
+.of-tray:hover { transform: translateY(-2px); box-shadow: 0 0 0 3px rgba(207,165,59,.30), 0 7px 18px rgba(150,110,20,.30); }
+.of-tray .of-bdg { top: -8px; right: -6px; }
+/* 決裁トレイ：社長室の「右上」に固定（CEOの右どなりの空きスペース）。お顔は中央なので被らない。 */
+.of-tray-pos { position: absolute; top: 26px; right: 22px; left: auto; bottom: auto; z-index: 5;
+  display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.of-tray-pos .of-tray-ic { font-size: 22px; }
+
+/* 社長室の下側：本棚（資料棚） */
+.of-bshelf { position: absolute; bottom: 14px; left: 84px; z-index: 2; border: none; cursor: pointer;
+  background: var(--wood-3); border-radius: 14px; padding: 8px 10px 7px; box-shadow: var(--sh-md);
+  transition: transform 160ms var(--spring); }
+.of-bshelf:hover { transform: translateY(-3px); box-shadow: var(--sh-lg); }
+.of-books { display: flex; align-items: flex-end; gap: 3px; height: 40px; padding: 4px 6px 0;
+  background: #A9854F; border-radius: 8px; }
+.of-books i { width: 8px; border-radius: 3px 3px 0 0; display: block; }
+.of-bshelf-label { display: block; text-align: center; font-size: 11px; font-weight: 700; color: #5d4524; margin-top: 4px; }
+.of-bizbig { position: absolute; top: 22px; left: 50%; transform: translateX(-50%);
+  background: var(--wood-3); border: none; border-radius: 16px; padding: 9px 16px; cursor: pointer;
+  color: #5d4524; font-size: 13.5px; font-weight: 700; display: flex; align-items: center; gap: 8px;
+  box-shadow: var(--sh-sm); z-index: 4; white-space: nowrap; }
+.of-bizbig:hover { transform: translateX(-50%) translateY(-1px); }
+.of-bizbig .of-sbar { width: 72px; background: #B59A6B; }
+
+/* 部屋移動ボタン＋ラベル（画面の縦中央。オフィス→▶「社長室へ移動する」／社長室→◀「オフィスへ移動する」） */
+/* 左のクイックメニュー：縦長ボタン、タップで3機能を右に開く。社長室では非表示（移動ボタンと被るため） */
+/* 横向きの「クイックメニュー」ボタン＋押すと真下にずらっとドロップ。両部屋で表示 */
+/* pointer-events:none で枠自体はクリックを奪わない（◀ボタン等を塞がない）。FABと開いた項目だけ反応する */
+.of-quickmenu { position: absolute; left: 14px; top: 252px; transform: none; z-index: 9;
+  display: flex; flex-direction: column; gap: 10px; align-items: flex-start; pointer-events: none; }
+.of-quickmenu.hidden-room { display: none; }
+/* 横長ボタン（☰ ＋ クイックメニュー を横並び） */
+.of-qm-fab { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px;
+  width: auto; min-height: 0; padding: 11px 18px; border: none; border-radius: 16px; cursor: pointer; pointer-events: auto;
+  background: var(--green); color: #fff; box-shadow: var(--sh-md); position: relative; white-space: nowrap;
+  transition: transform 160ms var(--spring), box-shadow 160ms ease, background 160ms ease; }
+.of-qm-fab:hover { transform: translateY(-2px); box-shadow: var(--sh-lg); }
+.of-qm-bars { font-size: 18px; line-height: 1; }
+.of-qm-x { display: none; font-size: 16px; line-height: 1; }
+.of-qm-tx { writing-mode: horizontal-tb; font-size: 13px; font-weight: 700; letter-spacing: .04em; }
+.of-quickmenu.open .of-qm-fab { background: #4f9a6e; }
+.of-quickmenu.open .of-qm-bars { display: none; }
+.of-quickmenu.open .of-qm-x { display: inline; }
+.of-qm-list { display: flex; flex-direction: column; gap: 8px; align-items: flex-start;
+  opacity: 0; transform: translateY(-10px) scale(.97); transform-origin: top left; pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms var(--spring); }
+.of-quickmenu.open .of-qm-list { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+.of-qm-btn { display: flex; align-items: center; gap: 8px; border: none; cursor: pointer;
+  background: var(--surface); color: var(--ink); font-size: 13px; font-weight: 700;
+  padding: 9px 16px 9px 11px; border-radius: 9999px; box-shadow: var(--sh-md); white-space: nowrap;
+  transition: transform 140ms var(--spring); }
+.of-qm-btn:hover { transform: translateX(3px); }
+.of-qm-ic { font-size: 17px; }
+
+.of-navwrap { position: absolute; top: 50%; transform: translateY(-50%); z-index: 8; display: flex; }
+.of-navwrap.right { right: 12px; }
+.of-navwrap.left { left: 12px; }
+/* ラベル＋▶を1つにまとめた縦長ボタン（省スペース） */
+.of-nav { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px;
+  width: 46px; min-height: 122px; padding: 16px 0; border: none; border-radius: 16px; cursor: pointer;
+  background: var(--surface); color: var(--green-d); box-shadow: var(--sh-md);
+  transition: transform 160ms var(--spring), box-shadow 160ms ease; }
+.of-nav:hover { transform: translateY(-2px); box-shadow: var(--sh-lg); }
+.of-nav:active { transform: translateY(1px); box-shadow: var(--sh-sm); }
+.of-nav-ar { font-size: 20px; line-height: 1; color: var(--green); }
+.of-nav-tx { writing-mode: vertical-rl; font-size: 13px; font-weight: 700; letter-spacing: .14em; color: var(--ink); }
+
+/* 会話ウィンドウ（あつ森式） */
+.of-dlg { position: absolute; left: 50%; transform: translateX(-50%); bottom: 12px;
+  width: min(460px, calc(100% - 180px)); background: #FFF6E3; border-radius: 24px;
+  padding: 13px 20px 10px; box-shadow: var(--sh-md); z-index: 6; }
+.of-tag { position: absolute; top: -12px; left: 18px; background: var(--amber); color: #5d3a10;
+  font-size: 12px; font-weight: 700; padding: 4px 16px; border-radius: 9999px; }
+.of-dlg p { margin: 0; font-size: 14px; font-weight: 500; line-height: 1.7; color: var(--ink);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.of-nxt { display: block; text-align: center; color: #D9A24A; font-size: 13px; height: 11px;
+  line-height: .5; animation: of-bob 1.6s ease-in-out infinite; }
+/* オフィスの下壁沿い（提案箱・納品BOXを避けて左寄せ） */
+/* 右端の下段棚（メール/カレンダー/チャット/提案箱/納品BOX 約340px）を避けて、メールと被らない */
+.of-dlg-office { left: 66px; right: 360px; bottom: 14px; transform: none; width: auto; max-width: 470px; z-index: 7; }
+@media (max-width: 820px) { .of-dlg-office { right: 348px; } }
+/* 会社の動き（ティッカー）を秘書の吹き出しと同じ大きさ・同じタグ付きで、右隣・下部に置く */
+.of-ws .of-tick-floor { position: absolute; left: 556px; right: 78px; bottom: 14px; width: auto; z-index: 7;
+  background: #FFF6E3; border-radius: 24px; box-shadow: var(--sh-md); padding: 16px 20px 12px; box-sizing: border-box;
+  display: flex; flex-direction: column; justify-content: center; min-height: 81px; overflow: visible; }
+.of-tick-tag { background: #86C28F; color: #1c3a25; }
+.of-tick-row { display: flex; gap: 9px; align-items: center; min-width: 0; }
+.of-tick-floor .of-tx { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; line-height: 1.5; }
+@media (max-width: 820px) { .of-ws .of-tick-floor { left: auto; right: 78px; width: 44%; } }
+
+/* 2/3画面より狭いとき */
+@media (max-width: 820px) {
+  .of-side { width: 188px; }
+  .of-cosign { max-width: 200px; }
+  .of-dlg { width: calc(100% - 170px); }
+}
+@media (max-width: 680px) {
+  .of-floor { flex-direction: column; padding-right: 96px; }
+  .of-side { width: 100%; flex-direction: row; }
+  .of-side .of-board { flex: 1.4; }
+  .of-side .of-minis { flex: 1; }
+  .of-secdesk { right: 2px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .of-chr, .of-nxt, .tl-hand { animation: none; }
+  .of-trk { transition: opacity 200ms ease; }
+  .of-unit:hover, .of-door:hover, .of-tab:hover, .of-board:hover, .of-mini:hover { transform: none; }
+  .modal { animation: none; }
+}
