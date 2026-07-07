@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T16:15:00+09:00",
+  updatedAt: "2026-07-07T16:40:00+09:00",
 
   setup: {
     completed: true,
@@ -74,12 +74,18 @@ window.AI_STATE = {
       id: "T12",
       title: "部活キット製造・工程2：出欠管理シートの実装（ハック）",
       owner: "ハック",
-      status: "doing",
-      progress: 10,
-      hint: "",
-      cmd: "T12の途中経過を見せて",
-      log: [{ time: "16:15", text: "社長の決裁（区分は欠席・遅刻・早退・遅早／匿名販売）を受けて実装開始。ワンペーストで全シートを自動生成するGAS方式" }],
-      deliverables: []
+      status: "review",
+      progress: 100,
+      hint: "手順書どおりコードを貼ってsetup実行→テニス部で3日間の実運用テスト",
+      cmd: "T12を構築してみる。手順を1ステップずつ案内して",
+      log: [
+        { time: "16:15", text: "社長の決裁（区分は欠席・遅刻・早退・遅早／匿名販売）を受けて実装開始。ワンペーストで全シートを自動生成するGAS方式" },
+        { time: "16:40", text: "実装完了（全718行・構文チェックOK・実名混入なし確認済み）。6シート自動生成＋🎾メニュー＋記録GAS。社長の構築・実地テスト待ち" }
+      ],
+      deliverables: [
+        { title: "T12_部活キット_出欠管理.gs（貼るだけセットアップGAS）", type: "コード", at: "7/7", path: "logs/T12_部活キット_出欠管理.gs", app: "Visual Studio Code" },
+        { title: "T12_構築・検証手順.md（社長用・約10分）", type: "ドキュメント", at: "7/7", path: "logs/T12_構築・検証手順.md", app: "Visual Studio Code" }
+      ]
     },
     {
       id: "T9",
@@ -233,7 +239,7 @@ window.AI_STATE = {
     { name: "リサ", status: "idle", taskId: "" },
     { name: "コトハ", status: "idle", taskId: "" },
     { name: "サトル", status: "idle", taskId: "" },
-    { name: "ハック", status: "working", taskId: "T12" },
+    { name: "ハック", status: "working", taskId: "T3" },
   ],
 
   links: [
@@ -245,6 +251,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "16:40", who: "ハック", text: "T12：出欠管理シート完成！コード1本貼れば全シートが自動で組み上がります⚙️ 社長の実地テスト待ち" },
     { time: "16:15", who: "アイ", text: "T11決裁完了！区分4つ・匿名販売で確定。ハックが出欠シートの製造を開始（T12）⚙️" },
     { time: "16:00", who: "コトハ", text: "T10：応募文が完成！決裁トレイに上げました。社長のOK待ちです📥" },
     { time: "15:45", who: "リサ", text: "T9：判定完了！応募推奨は①データ集計効率化の1件。⑥は危険案件として見送り推奨🔍" },
