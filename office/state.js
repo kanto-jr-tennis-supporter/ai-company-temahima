@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T16:40:00+09:00",
+  updatedAt: "2026-07-07T17:10:00+09:00",
 
   setup: {
     completed: true,
@@ -63,7 +63,7 @@ window.AI_STATE = {
     goalAmount: 65000,
     current: 0,
     pipeline: [
-      { label: "応募", count: 0 },
+      { label: "応募", count: 1 },
       { label: "返信", count: 0 },
       { label: "受注", count: 0 },
     ],
@@ -107,14 +107,15 @@ window.AI_STATE = {
       id: "T10",
       title: "精査でGOになった案件の応募文作成",
       owner: "コトハ",
-      status: "review",
-      progress: 90,
-      hint: "応募文を確認してOKか修正指示を出すだけ。OKなら応募は社長の手で（今日〜明日推奨）",
-      cmd: "T10の応募文OK。このまま応募する",
+      status: "done",
+      progress: 100,
+      hint: "",
+      cmd: "",
       log: [
         { time: "15:00", text: "T9（リサの精査）の結果待ち。GO案件が決まり次第着手" },
         { time: "15:45", text: "GO案件は①データ集計効率化の1件。コトハが応募文の執筆を開始" },
-        { time: "16:00", text: "応募文完成。テレアポシート実績を冒頭に、稼働条件を正直に明示。社長の承認待ち" }
+        { time: "16:00", text: "応募文完成。テレアポシート実績を冒頭に、稼働条件を正直に明示。社長の承認待ち" },
+        { time: "17:00", text: "社長が①に応募完了！パイプライン「応募」を1に更新。返信待ち" }
       ],
       deliverables: [{ title: "T10_応募文_データ集計効率化.md（応募前チェックメモ付き）", type: "ドキュメント", at: "7/7", path: "logs/T10_応募文_データ集計効率化.md", app: "Visual Studio Code" }]
     },
@@ -156,7 +157,10 @@ window.AI_STATE = {
       progress: 10,
       hint: "",
       cmd: "T6の提案文を見せて",
-      log: [{ time: "今日", text: "現行2パターンを分析中。社長の実績（GAS業務委託）を武器に書き直す" }],
+      log: [
+        { time: "今日", text: "現行2パターンを分析中。社長の実績（GAS業務委託）を武器に書き直す" },
+        { time: "17:10", text: "T10で好評だった型（実績→進め方→正直な稼働条件）をベースに、汎用提案文v2の執筆を開始" }
+      ],
       deliverables: []
     },
     {
@@ -167,7 +171,10 @@ window.AI_STATE = {
       progress: 10,
       hint: "",
       cmd: "T7の案件一覧を見せて",
-      log: [{ time: "今日", text: "スプレッドシート・GAS・自動転記系を中心に探索中" }],
+      log: [
+        { time: "今日", text: "スプレッドシート・GAS・自動転記系を中心に探索中" },
+        { time: "17:10", text: "CWへ直接アクセス不可のため方針転換：社長が毎朝5分で回せる「案件パトロール手順書」（検索URL・足切り基準・貼り付けテンプレ）づくりへ" }
+      ],
       deliverables: []
     },
     {
@@ -200,7 +207,10 @@ window.AI_STATE = {
       progress: 10,
       hint: "",
       cmd: "T3の状況を教えて",
-      log: [{ time: "7/2", text: "着手。シートの構成確認中" }],
+      log: [
+        { time: "7/2", text: "着手。シートの構成確認中" },
+        { time: "17:10", text: "既存GAS（GAS_ToGList_v3.js）の集計ロジックを解析し、修正方針と社長への確認事項を整理中" }
+      ],
       deliverables: []
     },
     {
@@ -218,13 +228,14 @@ window.AI_STATE = {
       id: "T5",
       title: "部活動出欠確認シート：今年のメンバーに更新・修正",
       owner: "ハック",
-      status: "todo",
-      progress: 0,
+      status: "doing",
+      progress: 30,
       hint: "",
       cmd: "T5を始めて",
       log: [
         { time: "今日", text: "着手方針が決定。社長の準備（今年のメンバー情報など）が整い次第、開始" },
-        { time: "15:05", text: "社長から今年の女子メンバー20名（1年8名・2年12名）を受領。logs/T5_2026年度メンバー_女子.csv に保存。男子リスト待ち" }
+        { time: "15:05", text: "社長から今年の女子メンバー20名（1年8名・2年12名）を受領。logs/T5_2026年度メンバー_女子.csv に保存。男子リスト待ち" },
+        { time: "17:10", text: "女子分から先行着手：シートに貼るだけの更新データ＋手順書を作成中（男子は届き次第追加）" }
       ],
       deliverables: []
     },
@@ -236,8 +247,8 @@ window.AI_STATE = {
   ],
 
   employees: [
-    { name: "リサ", status: "idle", taskId: "" },
-    { name: "コトハ", status: "idle", taskId: "" },
+    { name: "リサ", status: "working", taskId: "T7" },
+    { name: "コトハ", status: "working", taskId: "T6" },
     { name: "サトル", status: "idle", taskId: "" },
     { name: "ハック", status: "working", taskId: "T3" },
   ],
@@ -251,6 +262,8 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "17:10", who: "アイ", text: "リサ・コトハ・ハックが同時に動き始めました（T7・T6・T3+T5の並列進行）💨" },
+    { time: "17:00", who: "アイ", text: "🎉 記念すべき応募1号！社長がデータ集計効率化案件に応募しました。返信を待ちます" },
     { time: "16:40", who: "ハック", text: "T12：出欠管理シート完成！コード1本貼れば全シートが自動で組み上がります⚙️ 社長の実地テスト待ち" },
     { time: "16:15", who: "アイ", text: "T11決裁完了！区分4つ・匿名販売で確定。ハックが出欠シートの製造を開始（T12）⚙️" },
     { time: "16:00", who: "コトハ", text: "T10：応募文が完成！決裁トレイに上げました。社長のOK待ちです📥" },
