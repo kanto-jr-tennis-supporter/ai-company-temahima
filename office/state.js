@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T15:15:00+09:00",
+  updatedAt: "2026-07-07T15:30:00+09:00",
 
   setup: {
     completed: true,
@@ -74,13 +74,14 @@ window.AI_STATE = {
       id: "T9",
       title: "クラウドワークス6案件の精査（社長にできるか判定）",
       owner: "リサ",
-      status: "review",
-      progress: 40,
-      hint: "6案件のページ本文（仕事内容）をチャットに貼るだけ",
-      cmd: "T9の案件本文を貼るね（このあと6件分ペースト）",
+      status: "doing",
+      progress: 70,
+      hint: "",
+      cmd: "T9の判定結果を見せて",
       log: [
         { time: "15:00", text: "社長指定の6案件URLを1件ずつ精査開始" },
-        { time: "15:05", text: "この環境からクラウドワークスへの接続がブロックされ本文を取得できず。判定保留。社長に本文の貼り付けを依頼中" }
+        { time: "15:05", text: "この環境からクラウドワークスへの接続がブロックされ本文を取得できず。判定保留。社長に本文の貼り付けを依頼中" },
+        { time: "15:30", text: "社長から6案件の本文を受領。リサが◎○×の判定を再開" }
       ],
       deliverables: [{ title: "T9_クラウドワークス6件精査.md（5分チェックリスト付き）", type: "ドキュメント", at: "7/7", path: "logs/T9_クラウドワークス6件精査.md", app: "Visual Studio Code" }]
     },
@@ -99,12 +100,15 @@ window.AI_STATE = {
       id: "T11",
       title: "部活動まるごと管理キット：商品設計書v1（機能・構成・価格）",
       owner: "サトル",
-      status: "doing",
-      progress: 10,
-      hint: "",
-      cmd: "T11の途中経過を見せて",
-      log: [{ time: "15:15", text: "社長が第1候補「部活動まるごと管理キット」を採択。T8のリサーチをもとに商品設計を開始" }],
-      deliverables: []
+      status: "review",
+      progress: 100,
+      hint: "論点3つに答えるだけ（会計の版切り分け・出欠区分・販売名義）",
+      cmd: "T11の論点1は賛成。区分は◯◯を使ってる。名義は◯◯で",
+      log: [
+        { time: "15:15", text: "社長が第1候補「部活動まるごと管理キット」を採択。T8のリサーチをもとに商品設計を開始" },
+        { time: "15:30", text: "設計書v1完成。基本版¥1,980／完全版¥3,980／カスタム¥5,000〜の3段構成。実装可能な粒度で機能要件を定義。社長の論点3つを提示" }
+      ],
+      deliverables: [{ title: "T11_部活動まるごと管理キット_商品設計書v1.md", type: "ドキュメント", at: "7/7", path: "logs/T11_部活動まるごと管理キット_商品設計書v1.md", app: "Visual Studio Code" }]
     },
     {
       id: "T8",
@@ -209,9 +213,9 @@ window.AI_STATE = {
   ],
 
   employees: [
-    { name: "リサ", status: "idle", taskId: "" },
+    { name: "リサ", status: "working", taskId: "T9" },
     { name: "コトハ", status: "idle", taskId: "" },
-    { name: "サトル", status: "working", taskId: "T11" },
+    { name: "サトル", status: "idle", taskId: "" },
     { name: "ハック", status: "working", taskId: "T3" },
   ],
 
@@ -224,6 +228,8 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "15:30", who: "サトル", text: "T11：商品設計書v1が完成！社長の論点3つの回答待ちです🧭" },
+    { time: "15:30", who: "リサ", text: "T9：社長から6案件の本文を受領。判定を再開しました🔍" },
     { time: "15:15", who: "アイ", text: "T8決裁！最初の商品は「部活動まるごと管理キット」に決定🎉 サトルが商品設計に着手（T11）" },
     { time: "15:05", who: "リサ", text: "T9：クラウドワークスに接続できず判定保留。社長に案件本文の貼り付けをお願いしています🙏" },
     { time: "15:05", who: "アイ", text: "T5：今年の女子メンバー20名を受領しました。男子リストが揃えば着手できます📝" },
