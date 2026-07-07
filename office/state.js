@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T17:10:00+09:00",
+  updatedAt: "2026-07-07T17:25:00+09:00",
 
   setup: {
     completed: true,
@@ -153,15 +153,16 @@ window.AI_STATE = {
       id: "T6",
       title: "クラウドワークス提案文の改善（コトハ）",
       owner: "コトハ",
-      status: "doing",
-      progress: 10,
+      status: "done",
+      progress: 100,
       hint: "",
-      cmd: "T6の提案文を見せて",
+      cmd: "",
       log: [
         { time: "今日", text: "現行2パターンを分析中。社長の実績（GAS業務委託）を武器に書き直す" },
-        { time: "17:10", text: "T10で好評だった型（実績→進め方→正直な稼働条件）をベースに、汎用提案文v2の執筆を開始" }
+        { time: "17:10", text: "T10で好評だった型（実績→進め方→正直な稼働条件）をベースに、汎用提案文v2の執筆を開始" },
+        { time: "17:25", text: "完成。フル版＋ショート版の2本立て。旧文の弱点（実績が開発中止まり・稼働の盛り）も解消" }
       ],
-      deliverables: []
+      deliverables: [{ title: "T6_提案文テンプレv2.md（フル版＋ショート版＋使い方メモ）", type: "ドキュメント", at: "7/7", path: "logs/T6_提案文テンプレv2.md", app: "Visual Studio Code" }]
     },
     {
       id: "T7",
@@ -248,7 +249,7 @@ window.AI_STATE = {
 
   employees: [
     { name: "リサ", status: "working", taskId: "T7" },
-    { name: "コトハ", status: "working", taskId: "T6" },
+    { name: "コトハ", status: "idle", taskId: "" },
     { name: "サトル", status: "idle", taskId: "" },
     { name: "ハック", status: "working", taskId: "T3" },
   ],
@@ -262,6 +263,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "17:25", who: "コトハ", text: "T6：提案文テンプレv2が完成！次の応募からこの型が使えます✍️" },
     { time: "17:10", who: "アイ", text: "リサ・コトハ・ハックが同時に動き始めました（T7・T6・T3+T5の並列進行）💨" },
     { time: "17:00", who: "アイ", text: "🎉 記念すべき応募1号！社長がデータ集計効率化案件に応募しました。返信を待ちます" },
     { time: "16:40", who: "ハック", text: "T12：出欠管理シート完成！コード1本貼れば全シートが自動で組み上がります⚙️ 社長の実地テスト待ち" },
