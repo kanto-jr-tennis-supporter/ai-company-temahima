@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T15:00:00+09:00",
+  updatedAt: "2026-07-07T15:15:00+09:00",
 
   setup: {
     completed: true,
@@ -96,16 +96,28 @@ window.AI_STATE = {
       deliverables: []
     },
     {
+      id: "T11",
+      title: "部活動まるごと管理キット：商品設計書v1（機能・構成・価格）",
+      owner: "サトル",
+      status: "doing",
+      progress: 10,
+      hint: "",
+      cmd: "T11の途中経過を見せて",
+      log: [{ time: "15:15", text: "社長が第1候補「部活動まるごと管理キット」を採択。T8のリサーチをもとに商品設計を開始" }],
+      deliverables: []
+    },
+    {
       id: "T8",
       title: "教員向けテンプレ商品の市場リサーチ（何が売れるか・社長に作れるか）",
       owner: "リサ",
-      status: "review",
+      status: "done",
       progress: 100,
-      hint: "トップ3から「最初に作る商品」を選ぶだけ",
-      cmd: "T8を読んだ。1位の部活動管理キットでいく",
+      hint: "",
+      cmd: "",
       log: [
         { time: "今日", text: "教員の困りごと×売れているテンプレ×社長のスキルで作れるか、の3点調査を開始" },
-        { time: "今日", text: "調査完了。noteで教員テンプレが売れている実例を確認、ココナラの教員向けGASは空白地帯。トップ3を提案" }
+        { time: "今日", text: "調査完了。noteで教員テンプレが売れている実例を確認、ココナラの教員向けGASは空白地帯。トップ3を提案" },
+        { time: "15:15", text: "社長が第1位「部活動まるごと管理キット」を採択。商品化はT11へ" }
       ],
       deliverables: [{ title: "T8_教員向けテンプレ市場リサーチ.md", type: "ドキュメント", at: "7/7", path: "logs/T8_教員向けテンプレ市場リサーチ.md", app: "Visual Studio Code" }]
     },
@@ -199,7 +211,7 @@ window.AI_STATE = {
   employees: [
     { name: "リサ", status: "idle", taskId: "" },
     { name: "コトハ", status: "idle", taskId: "" },
-    { name: "サトル", status: "idle", taskId: "" },
+    { name: "サトル", status: "working", taskId: "T11" },
     { name: "ハック", status: "working", taskId: "T3" },
   ],
 
@@ -212,6 +224,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "15:15", who: "アイ", text: "T8決裁！最初の商品は「部活動まるごと管理キット」に決定🎉 サトルが商品設計に着手（T11）" },
     { time: "15:05", who: "リサ", text: "T9：クラウドワークスに接続できず判定保留。社長に案件本文の貼り付けをお願いしています🙏" },
     { time: "15:05", who: "アイ", text: "T5：今年の女子メンバー20名を受領しました。男子リストが揃えば着手できます📝" },
     { time: "15:00", who: "リサ", text: "T9：社長指定のクラウドワークス6案件の精査を開始しました🔍" },
