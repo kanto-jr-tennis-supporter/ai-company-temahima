@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T14:30:00+09:00",
+  updatedAt: "2026-07-07T15:30:00+09:00",
 
   setup: {
     completed: true,
@@ -74,23 +74,35 @@ window.AI_STATE = {
       id: "T9",
       title: "商品化第1弾：部活動まるごと管理キット（設計・GAS・note販売ページ）",
       owner: "ハック",
-      status: "doing",
-      progress: 10,
-      hint: "",
-      cmd: "T9の進捗を見せて",
-      log: [{ time: "今日", text: "社長がT8の1位案を採用。商品設計・GASコード・販売ページの3点セットを作成開始" }],
-      deliverables: []
+      status: "review",
+      progress: 100,
+      hint: "3点セット完成。商品設計と価格（¥1,980/¥2,980の2段構え）を確認してGOなら組み立てへ",
+      cmd: "T9の商品設計を見せて",
+      log: [
+        { time: "今日", text: "社長がT8の1位案を採用。商品設計・GASコード・販売ページの3点セットを作成開始" },
+        { time: "今日", text: "3点セット完成：商品設計書・GAS一式（設置手順つき）・note販売ページ下書き。価格はライト¥1,980/完全版¥2,980" }
+      ],
+      deliverables: [
+        { title: "T9_部活キット_商品設計.md", type: "ドキュメント", at: "7/7", path: "logs/T9_部活キット_商品設計.md", app: "Google Chrome" },
+        { title: "T9_部活キット_GAS一式.md（設置手順つき）", type: "コード", at: "7/7", path: "logs/T9_部活キット_GAS一式.md", app: "Visual Studio Code" },
+        { title: "T9_部活キット_note販売ページ.md", type: "ドキュメント", at: "7/7", path: "logs/T9_部活キット_note販売ページ.md", app: "Google Chrome" }
+      ]
     },
     {
       id: "T10",
       title: "SNS立ち上げ準備：アカウント設計＋初週投稿バッチ（顔出しなし）",
       owner: "コトハ",
-      status: "doing",
-      progress: 10,
-      hint: "",
-      cmd: "T10の投稿案を見せて",
-      log: [{ time: "今日", text: "X中心のアカウント設計（名前・アイコン案・プロフィール）と初週投稿の作成開始。今晩スマホで承認できる形に" }],
-      deliverables: []
+      status: "review",
+      progress: 100,
+      hint: "スマホで番号を返すだけ：名前5案・プロフ3案・アイコン3案・初週7投稿から選ぶ",
+      cmd: "T10のSNSキットを見せて",
+      log: [
+        { time: "今日", text: "X中心のアカウント設計（名前・アイコン案・プロフィール）と初週投稿の作成開始。今晩スマホで承認できる形に" },
+        { time: "今日", text: "完成：X一択の結論＋名前5案・プロフ3案・アイコン3案・固定ポスト・初週7投稿・運用ルール。全項目に番号を振り、スマホで返信するだけで確定できる形式" }
+      ],
+      deliverables: [
+        { title: "T10_SNS立ち上げキット.md", type: "ドキュメント", at: "7/7", path: "logs/T10_SNS立ち上げキット.md", app: "Google Chrome" }
+      ]
     },
     {
       id: "T8",
@@ -191,9 +203,9 @@ window.AI_STATE = {
 
   employees: [
     { name: "リサ", status: "idle", taskId: "" },
-    { name: "コトハ", status: "working", taskId: "T10" },
+    { name: "コトハ", status: "idle", taskId: "" },
     { name: "サトル", status: "idle", taskId: "" },
-    { name: "ハック", status: "working", taskId: "T9" },
+    { name: "ハック", status: "idle", taskId: "" },
   ],
 
   links: [
@@ -205,6 +217,8 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "今日", who: "コトハ", text: "T10：SNS立ち上げキット完成！名前・プロフ・アイコン・初週7投稿を、スマホで番号を返すだけで確定できる形に✍️" },
+    { time: "今日", who: "ハック", text: "T9：部活キット3点セット完成！商品設計・GAS一式・note販売ページ。価格は¥1,980/¥2,980の2段構え💻" },
     { time: "今日", who: "アイ", text: "T9（部活キット商品化）とT10（SNS立ち上げ）が同時始動。ハックとコトハが並列で作業中💻" },
     { time: "今日", who: "アイ", text: "スマホ連携が開通！社長がスマホからテマヒマに接続成功📱🎉" },
     { time: "今日", who: "アイ", text: "スマホ連携の土台が完成！会社一式をGitHub（Private）にアップロードしました📱" },
