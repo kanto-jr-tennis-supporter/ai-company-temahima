@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T17:25:00+09:00",
+  updatedAt: "2026-07-07T17:35:00+09:00",
 
   setup: {
     completed: true,
@@ -166,17 +166,18 @@ window.AI_STATE = {
     },
     {
       id: "T7",
-      title: "クラウドワークス案件リサーチ（リサ）",
+      title: "クラウドワークス案件リサーチ → 毎朝5分パトロール体制づくり（リサ）",
       owner: "リサ",
-      status: "doing",
-      progress: 10,
-      hint: "",
-      cmd: "T7の案件一覧を見せて",
+      status: "review",
+      progress: 95,
+      hint: "手順書の検索URL★1を1本クリックして動作確認するだけ",
+      cmd: "T7のURL、ちゃんと開けたよ（/開けなかった）",
       log: [
         { time: "今日", text: "スプレッドシート・GAS・自動転記系を中心に探索中" },
-        { time: "17:10", text: "CWへ直接アクセス不可のため方針転換：社長が毎朝5分で回せる「案件パトロール手順書」（検索URL・足切り基準・貼り付けテンプレ）づくりへ" }
+        { time: "17:10", text: "CWへ直接アクセス不可のため方針転換：社長が毎朝5分で回せる「案件パトロール手順書」（検索URL・足切り基準・貼り付けテンプレ）づくりへ" },
+        { time: "17:35", text: "手順書完成。検索URL8本＋30秒足切り基準＋精査依頼テンプレ。URLの動作確認1本だけ社長にお願い中" }
       ],
-      deliverables: []
+      deliverables: [{ title: "T7_毎朝5分の案件パトロール手順.md", type: "ドキュメント", at: "7/7", path: "logs/T7_毎朝5分の案件パトロール手順.md", app: "Google Chrome" }]
     },
     {
       id: "T1",
@@ -248,7 +249,7 @@ window.AI_STATE = {
   ],
 
   employees: [
-    { name: "リサ", status: "working", taskId: "T7" },
+    { name: "リサ", status: "idle", taskId: "" },
     { name: "コトハ", status: "idle", taskId: "" },
     { name: "サトル", status: "idle", taskId: "" },
     { name: "ハック", status: "working", taskId: "T3" },
@@ -263,6 +264,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "17:35", who: "リサ", text: "T7：毎朝5分の案件パトロール手順書が完成！URL動作確認を1本だけお願いします🔍" },
     { time: "17:25", who: "コトハ", text: "T6：提案文テンプレv2が完成！次の応募からこの型が使えます✍️" },
     { time: "17:10", who: "アイ", text: "リサ・コトハ・ハックが同時に動き始めました（T7・T6・T3+T5の並列進行）💨" },
     { time: "17:00", who: "アイ", text: "🎉 記念すべき応募1号！社長がデータ集計効率化案件に応募しました。返信を待ちます" },
