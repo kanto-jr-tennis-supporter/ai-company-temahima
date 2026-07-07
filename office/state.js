@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T14:00:00+09:00",
+  updatedAt: "2026-07-07T14:30:00+09:00",
 
   setup: {
     completed: true,
@@ -71,16 +71,39 @@ window.AI_STATE = {
 
   tasks: [
     {
+      id: "T9",
+      title: "商品化第1弾：部活動まるごと管理キット（設計・GAS・note販売ページ）",
+      owner: "ハック",
+      status: "doing",
+      progress: 10,
+      hint: "",
+      cmd: "T9の進捗を見せて",
+      log: [{ time: "今日", text: "社長がT8の1位案を採用。商品設計・GASコード・販売ページの3点セットを作成開始" }],
+      deliverables: []
+    },
+    {
+      id: "T10",
+      title: "SNS立ち上げ準備：アカウント設計＋初週投稿バッチ（顔出しなし）",
+      owner: "コトハ",
+      status: "doing",
+      progress: 10,
+      hint: "",
+      cmd: "T10の投稿案を見せて",
+      log: [{ time: "今日", text: "X中心のアカウント設計（名前・アイコン案・プロフィール）と初週投稿の作成開始。今晩スマホで承認できる形に" }],
+      deliverables: []
+    },
+    {
       id: "T8",
       title: "教員向けテンプレ商品の市場リサーチ（何が売れるか・社長に作れるか）",
       owner: "リサ",
-      status: "review",
+      status: "done",
       progress: 100,
-      hint: "トップ3から「最初に作る商品」を選ぶだけ",
-      cmd: "T8を読んだ。1位の部活動管理キットでいく",
+      hint: "",
+      cmd: "",
       log: [
         { time: "今日", text: "教員の困りごと×売れているテンプレ×社長のスキルで作れるか、の3点調査を開始" },
-        { time: "今日", text: "調査完了。noteで教員テンプレが売れている実例を確認、ココナラの教員向けGASは空白地帯。トップ3を提案" }
+        { time: "今日", text: "調査完了。noteで教員テンプレが売れている実例を確認、ココナラの教員向けGASは空白地帯。トップ3を提案" },
+        { time: "今日", text: "社長決裁：1位「部活動まるごと管理キット」の商品化が決定 → T9へ" }
       ],
       deliverables: [{ title: "T8_教員向けテンプレ市場リサーチ.md", type: "ドキュメント", at: "7/7", path: "logs/T8_教員向けテンプレ市場リサーチ.md", app: "Visual Studio Code" }]
     },
@@ -163,16 +186,14 @@ window.AI_STATE = {
     },
   ],
   proposals: [
-    { from: "リサ", title: "毎朝の自動案件パトロール", detail: "GAS・スプシ自動化の新着案件を毎朝リサーチして一覧化。応募の弾を切らさないのが今月6.5万の生命線です。", at: "12:00" },
-    { from: "コトハ", title: "既存クライアントに月額サポートを提案", detail: "テレアポシートの納品先に「月額保守・改善サポート」を提案。単発で終わらせないのが月16.5万への一番の近道です。", at: "12:00" },
     { from: "サトル", title: "納品後の定番メニュー「継続プラン」を設計", detail: "受注のたびに月額プランを必ず添える型を作る。3社×3万円で毎月9万円の土台になります。", at: "12:00" },
   ],
 
   employees: [
     { name: "リサ", status: "idle", taskId: "" },
-    { name: "コトハ", status: "idle", taskId: "" },
+    { name: "コトハ", status: "working", taskId: "T10" },
     { name: "サトル", status: "idle", taskId: "" },
-    { name: "ハック", status: "working", taskId: "T3" },
+    { name: "ハック", status: "working", taskId: "T9" },
   ],
 
   links: [
@@ -184,6 +205,8 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "今日", who: "アイ", text: "T9（部活キット商品化）とT10（SNS立ち上げ）が同時始動。ハックとコトハが並列で作業中💻" },
+    { time: "今日", who: "アイ", text: "スマホ連携が開通！社長がスマホからテマヒマに接続成功📱🎉" },
     { time: "今日", who: "アイ", text: "スマホ連携の土台が完成！会社一式をGitHub（Private）にアップロードしました📱" },
     { time: "今日", who: "リサ", text: "T8：リサーチ完了！ココナラの教員向けGASは空白地帯。商品候補トップ3を提案しました📊" },
     { time: "今日", who: "リサ", text: "T8：教員向けテンプレ商品の市場リサーチを開始しました🔍" },
