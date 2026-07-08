@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  updatedAt: "2026-07-08T09:45:00+09:00",
+  updatedAt: "2026-07-08T10:15:00+09:00",
 
   addone: {
     company: "add one",
@@ -238,19 +238,22 @@ window.AI_STATE = {
       id: "T4",
       title: "入札参加資格申請書＋メール作成アプリの完成",
       owner: "ハック",
-      status: "doing",
-      progress: 20,
-      hint: "",
-      cmd: "T4の進捗を見せて",
+      status: "review",
+      progress: 70,
+      hint: "構築手順どおり動かして、特にフリガナの文字位置がズレていないか確認するだけ",
+      cmd: "T4を構築してみる。手順を1ステップずつ案内して",
       log: [
         { time: "9:00", text: "社長から各省庁の入札参加資格審査申請書サンプル5点を受領。構造抽出完了（各7〜12シート・最大250列の文字グリッド形式）" },
         { time: "9:00", text: "既知の不具合2点を確認：①条件付き書式（未入力=色付き→入力で色が消える）が変換で崩れた ②図形で置くべき○印がセルに直書きされ位置ずれ。設計に反映してサトルへ" },
         { time: "9:30", text: "設計書v1完成。5サンプルを実際にPythonで検証した結果、過去の不具合は省庁配布Excel自体の機能ではなく社長側の独自追加が壊れたものと判明。「原本ロック＋入力フォーム分離＋自動転記」の3層構成で再設計を提案。社長の論点3つを提示" },
-        { time: "9:45", text: "社長決裁：①メール文面は既存を継承 ②優先省庁なし（クライアント次第、汎用構成でOK） ③○は図形オーバーレイ必須（電子提出でも要項指示で必要）。ハックがStep1（文科省サンプルでの型づくり）に着手。既存GASアプリのソース共有を社長に依頼中" }
+        { time: "9:45", text: "社長決裁：①メール文面は既存を継承 ②優先省庁なし（クライアント次第、汎用構成でOK） ③○は図形オーバーレイ必須（電子提出でも要項指示で必要）。ハックがStep1（文科省サンプルでの型づくり）に着手。既存GASアプリのソース共有を社長に依頼中" },
+        { time: "10:15", text: "プロトタイプ完成。実座標をPythonで実測して転記・○配置まで一気通貫で実装。正直な注意点2つ：①フリガナ欄の座標は罫線の裏付けがなく推測（代替手段も用意済み）②GASに図形直接挿入APIが無いため○は自作の赤い楕円PNG画像で代用。社長の実地確認待ち" }
       ],
       deliverables: [
         { title: "T4_入札サンプル/構造抽出.md（5サンプルの全シート構造）", type: "ドキュメント", at: "7/8", path: "logs/T4_入札サンプル/構造抽出.md", app: "Visual Studio Code" },
-        { title: "T4_入札申請書アプリ_設計書v1.md", type: "ドキュメント", at: "7/8", path: "logs/T4_入札申請書アプリ_設計書v1.md", app: "Visual Studio Code" }
+        { title: "T4_入札申請書アプリ_設計書v1.md", type: "ドキュメント", at: "7/8", path: "logs/T4_入札申請書アプリ_設計書v1.md", app: "Visual Studio Code" },
+        { title: "T4_入札申請書アプリ_プロトタイプ.gs", type: "コード", at: "7/8", path: "logs/T4_入札申請書アプリ_プロトタイプ.gs", app: "Visual Studio Code" },
+        { title: "T4_構築・検証手順.md", type: "ドキュメント", at: "7/8", path: "logs/T4_構築・検証手順.md", app: "Visual Studio Code" }
       ]
     },
     {
@@ -280,7 +283,7 @@ window.AI_STATE = {
     { name: "リサ", status: "idle", taskId: "" },
     { name: "コトハ", status: "idle", taskId: "" },
     { name: "サトル", status: "idle", taskId: "" },
-    { name: "ハック", status: "working", taskId: "T4" },
+    { name: "ハック", status: "idle", taskId: "" },
   ],
 
   links: [
@@ -292,6 +295,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "10:15", who: "ハック", text: "T4：プロトタイプ完成！フリガナ座標は推測・○は画像代用と正直に報告。社長の実地確認待ちです⚙️" },
     { time: "9:45", who: "アイ", text: "T4決裁完了！○は図形オーバーレイ方式で確定。ハックが文科省サンプルでの型づくりに着手⚙️" },
     { time: "9:30", who: "サトル", text: "T4：設計書完成！過去の不具合は社長独自の追加分だったと判明。社長の論点3つの回答待ちです🧭" },
     { time: "9:00", who: "アイ", text: "T4：社長から各省庁の入札申請書サンプル5点を受領。サトルが設計に着手しました🧭" },
