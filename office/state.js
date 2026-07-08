@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T17:50:00+09:00",
+  updatedAt: "2026-07-08T09:00:00+09:00",
 
   addone: {
     company: "add one",
@@ -237,13 +237,16 @@ window.AI_STATE = {
     {
       id: "T4",
       title: "入札参加資格申請書＋メール作成アプリの完成",
-      owner: "ハック",
-      status: "todo",
-      progress: 0,
+      owner: "サトル",
+      status: "doing",
+      progress: 15,
       hint: "",
-      cmd: "T4を始めて",
-      log: [],
-      deliverables: []
+      cmd: "T4設計書の途中経過を見せて",
+      log: [
+        { time: "9:00", text: "社長から各省庁の入札参加資格審査申請書サンプル5点を受領。構造抽出完了（各7〜12シート・最大250列の文字グリッド形式）" },
+        { time: "9:00", text: "既知の不具合2点を確認：①条件付き書式（未入力=色付き→入力で色が消える）が変換で崩れた ②図形で置くべき○印がセルに直書きされ位置ずれ。設計に反映してサトルへ" }
+      ],
+      deliverables: [{ title: "T4_入札サンプル/構造抽出.md（5サンプルの全シート構造）", type: "ドキュメント", at: "7/8", path: "logs/T4_入札サンプル/構造抽出.md", app: "Visual Studio Code" }]
     },
     {
       id: "T5",
@@ -271,7 +274,7 @@ window.AI_STATE = {
   employees: [
     { name: "リサ", status: "idle", taskId: "" },
     { name: "コトハ", status: "idle", taskId: "" },
-    { name: "サトル", status: "idle", taskId: "" },
+    { name: "サトル", status: "working", taskId: "T4" },
     { name: "ハック", status: "idle", taskId: "" },
   ],
 
@@ -284,6 +287,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "9:00", who: "アイ", text: "T4：社長から各省庁の入札申請書サンプル5点を受領。サトルが設計に着手しました🧭" },
     { time: "17:50", who: "ハック", text: "T3：集計バグの診断完了（候補6件）＆T5：女子分の貼るだけ更新パック完成⚙️" },
     { time: "17:35", who: "リサ", text: "T7：毎朝5分の案件パトロール手順書が完成！URL動作確認を1本だけお願いします🔍" },
     { time: "17:25", who: "コトハ", text: "T6：提案文テンプレv2が完成！次の応募からこの型が使えます✍️" },
