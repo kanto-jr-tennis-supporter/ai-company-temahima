@@ -204,6 +204,110 @@ try {
   });
 } catch (e) { console.error("state.js の監視を開始できませんでした:", e.message); }
 
+// ---- タスク完了（社長がオフィス画面から直接チェックできるように）----
+// state.js の tasks[] / addone.tasks[] のどちらも対象。ここで保存するとファイル監視（上）が
+// 自動でSSE通知するので、開いている全員の画面がほぼリアルタイムで更新される。
+// GITHUB_TOKEN / GITHUB_REPO が設定されていれば、GitHubにも同じ内容をコミットして
+// （Renderの保存領域は再デプロイで消えるため）変更が永続的に残るようにする。
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";
+const GITHUB_REPO = process.env.GITHUB_REPO || ""; // "owner/repo"
+const GITHUB_BRANCH = process.env.GITHUB_BRANCH || "main";
+
+async function commitStateToGitHub(content, label) {
+  const api = "https://api.github.com/repos/" + GITHUB_REPO + "/contents/office/state.js";
+  const headers = {
+    Authorization: "Bearer " + GITHUB_TOKEN,
+    "User-Agent": "ai-company-brain",
+    Accept: "application/vnd.github+json",
+  };
+  const getRes = await fetch(api + "?ref=" + encodeURIComponent(GITHUB_BRANCH), { headers });
+  if (!getRes.ok) throw new Error("GitHub取得に失敗しました（" + getRes.status + "）");
+  const { sha } = await getRes.json();
+  const putRes = await fetch(api, {
+    method: "PUT",
+    headers: { ...headers, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: "社長がダッシュボードから " + label + " を完了にしました",
+      content: Buffer.from(content, "utf-8").toString("base64"),
+      sha,
+      branch: GITHUB_BRANCH,
+    }),
+  });
+  if (!putRes.ok) {
+    const t = await putRes.text().catch(() => "");
+    throw new Error("GitHub保存に失敗しました（" + putRes.status + "）" + t);
+  }
+}
+
+app.post("/api/tasks/complete", async (req, res) => {
+  try {
+    const kind = String((req.body || {}).kind || "task");
+    const id = String((req.body || {}).id || "").trim();
+    if (!id) return res.status(400).json({ ok: false, message: "id is required" });
+
+    const raw = readFileSync(STATE_FILE, "utf-8");
+    const markerIdx = raw.indexOf("window.AI_STATE");
+    if (markerIdx < 0) return res.status(500).json({ ok: false, message: "state.js の形式が想定と違います" });
+    const header = raw.slice(0, markerIdx);
+
+    const sandbox = { window: {} };
+    new Script(raw).runInNewContext(sandbox);
+    const state = sandbox.window.AI_STATE;
+    if (!state) return res.status(500).json({ ok: false, message: "AI_STATE を読み込めません" });
+
+    const now = new Date();
+    const timeLabel = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+    let found = false;
+
+    if (kind === "addone") {
+      for (const t of (state.addone && state.addone.tasks) || []) {
+        if (t.id === id) {
+          t.status = "done";
+          t.note = (t.note ? t.note + "／" : "") + "社長がダッシュボードから完了にしました（" + timeLabel + "）";
+          found = true;
+          break;
+        }
+      }
+    } else {
+      for (const t of state.tasks || []) {
+        if (t.id === id) {
+          t.status = "done";
+          t.progress = 100;
+          t.hint = "";
+          t.cmd = "";
+          t.log = (t.log || []).concat([{ time: timeLabel, text: "社長がダッシュボードから完了にしました" }]);
+          found = true;
+          break;
+        }
+      }
+      if (found) {
+        for (const e of state.employees || []) {
+          if (e.taskId === id) { e.status = "idle"; e.taskId = ""; }
+        }
+      }
+    }
+    if (!found) return res.status(404).json({ ok: false, message: "タスクが見つかりません: " + id });
+
+    state.updatedAt = now.toISOString();
+    const newCode = header + "window.AI_STATE = " + JSON.stringify(state, null, 2) + ";\n";
+    const checkErr = validateState(newCode);
+    if (checkErr) return res.status(500).json({ ok: false, message: "保存前チェックに失敗しました: " + checkErr });
+
+    writeFileSync(STATE_FILE, newCode, "utf-8");
+
+    const github = { attempted: false };
+    if (GITHUB_TOKEN && GITHUB_REPO) {
+      github.attempted = true;
+      try { await commitStateToGitHub(newCode, id); github.ok = true; }
+      catch (e) { github.ok = false; github.message = e.message; console.error("GitHubへの反映に失敗:", e.message); }
+    }
+    res.json({ ok: true, id, kind, github });
+  } catch (e) {
+    console.error("complete task error:", e.message);
+    res.status(500).json({ ok: false, message: e.message });
+  }
+});
+
 // ---- 状態確認 ----
 // name / kitRoot は「この会社の本体か」を他のセッションが見分けるための目印
 app.get("/health", (_req, res) => {

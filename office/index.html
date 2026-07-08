@@ -99,7 +99,24 @@
   }
 
   // ===== タスク（v2：仕事の中心）のヘルパー =====
-  function allTasks() { return ((window.AI_STATE || {}).tasks || []); }
+  // addone（業務委託先）のタスクも、同じ形に変換してタスクリストに混ぜて出す（完了ボタンも共通で使えるように）
+  function addoneAsTasks() {
+    var addone = ((window.AI_STATE || {}).addone || {}).tasks || [];
+    return addone.map(function (a) {
+      return {
+        id: a.id, title: a.text, owner: "add one",
+        status: a.status === "done" ? "done" : "todo",
+        progress: 0, hint: "", cmd: "",
+        log: [{ time: a.receivedAt || "", text: (a.source || "") + (a.note ? "：" + a.note : "") }],
+        deliverables: a.url ? [{ title: "元メッセージ・シートを開く", url: a.url, type: "リンク" }] : [],
+        _kind: "addone",
+      };
+    });
+  }
+  function allTasks() {
+    var base = ((window.AI_STATE || {}).tasks || []).map(function (t) { t._kind = "task"; return t; });
+    return base.concat(addoneAsTasks());
+  }
   function taskById(id) {
     var found = null;
     allTasks().forEach(function (t) { if (t && t.id === id) found = t; });
@@ -821,9 +838,14 @@
           return '<div class="tl-del" data-tdel="' + ti + ':' + di + '">' + inner + '</div>';
         }).join("");
         var cmd = t.cmd || ((t.id ? t.id + "の" : "") + "途中経過を見せて");
-        var action = st === "review"
+        var kind = t._kind || "task";
+        var askBlock = kind === "addone" ? "" : (st === "review"
           ? '<button class="tl-approve" data-tcmd="' + escAttr(cmd) + '">🖐 ' + esc(t.hint ? "中身を確認 → OKなら指示文をコピー" : "指示文をコピー") + '</button>'
-          : '<div class="tl-ask"><span class="q">💬 ' + esc(cmd) + '</span><button class="tl-copy" data-tcmd="' + escAttr(cmd) + '">コピー</button></div>';
+          : '<div class="tl-ask"><span class="q">💬 ' + esc(cmd) + '</span><button class="tl-copy" data-tcmd="' + escAttr(cmd) + '">コピー</button></div>');
+        var completeBlock = st === "done"
+          ? '<div class="tl-done-note">✓ 完了しました</div>'
+          : '<button class="tl-complete" data-tcomplete="' + escAttr(kind + ":" + (t.id || "")) + '">✅ 完了にする</button>';
+        var action = askBlock + completeBlock;
         return (
           '<div class="tl-item ' + st + (t.id === focusId ? " open" : "") + '" data-tid="' + escAttr(t.id || "") + '">' +
             '<div class="tl-row">' +
@@ -863,6 +885,34 @@
           var old = btn.textContent;
           btn.textContent = ok ? "コピーしました ✓ チャットに ⌘V" : "⌘C でコピー";
           setTimeout(function () { btn.textContent = old; }, 1800);
+        });
+      };
+    });
+    // 完了ボタン：本体（server/）に直接反映を依頼する。file:// や本体未接続では使えない
+    Array.prototype.forEach.call(modal.querySelectorAll("[data-tcomplete]"), function (btn) {
+      btn.onclick = function (e) {
+        e.stopPropagation();
+        var parts = btn.getAttribute("data-tcomplete").split(":");
+        var kind = parts[0], id = parts.slice(1).join(":");
+        var base = (window.AI_CONFIG || {}).apiBase || (__httpServed ? location.origin : "");
+        if (!base) { btn.textContent = "本体に未接続のためできません"; return; }
+        btn.disabled = true;
+        btn.textContent = "送信中…";
+        fetch(base.replace(/\/$/, "") + "/api/tasks/complete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ kind: kind, id: id }),
+        }).then(function (r) { return r.json(); }).then(function (j) {
+          if (j && j.ok) {
+            btn.textContent = "完了にしました ✓";
+            setTimeout(function () { loadState(); setTimeout(function () { window.openTasks(); }, 300); }, 400);
+          } else {
+            btn.disabled = false;
+            btn.textContent = "失敗：" + ((j && j.message) || "原因不明");
+          }
+        }).catch(function () {
+          btn.disabled = false;
+          btn.textContent = "通信エラー（本体に届きませんでした）";
         });
       };
     });
