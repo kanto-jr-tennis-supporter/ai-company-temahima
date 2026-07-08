@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  updatedAt: "2026-07-08T10:15:00+09:00",
+  updatedAt: "2026-07-08T11:00:00+09:00",
 
   addone: {
     company: "add one",
@@ -57,8 +57,8 @@ window.AI_STATE = {
         text: "テレアポシートのハイライト（条件付き書式）が効かなくなっている。修正してほしい。",
         url: "https://docs.google.com/spreadsheets/d/1oQpq8VukdjWfcKqv_YCZTlLUQHPPkqRTcvyqfAny3YU/edit?gid=405482077",
         receivedAt: "7/7 09:51",
-        status: "open",
-        note: "テマヒマ社内のT3（コール数集計の修正）と同一スプレッドシート。同時に見るのが効率的。同日16:30のWEB会議で解決済みの可能性あり、社長に確認要"
+        status: "done",
+        note: "社長確認済み・対応済み。7/7のWEB会議で解決していた"
       }
     ]
   },
@@ -295,6 +295,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "11:00", who: "アイ", text: "addoneのA1（シートハイライト）完了！対応済みにしました🏗" },
     { time: "10:15", who: "ハック", text: "T4：プロトタイプ完成！フリガナ座標は推測・○は画像代用と正直に報告。社長の実地確認待ちです⚙️" },
     { time: "9:45", who: "アイ", text: "T4決裁完了！○は図形オーバーレイ方式で確定。ハックが文科省サンプルでの型づくりに着手⚙️" },
     { time: "9:30", who: "サトル", text: "T4：設計書完成！過去の不具合は社長独自の追加分だったと判明。社長の論点3つの回答待ちです🧭" },
