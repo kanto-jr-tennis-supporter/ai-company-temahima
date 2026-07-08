@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  updatedAt: "2026-07-08T09:00:00+09:00",
+  updatedAt: "2026-07-08T09:30:00+09:00",
 
   addone: {
     company: "add one",
@@ -238,15 +238,19 @@ window.AI_STATE = {
       id: "T4",
       title: "入札参加資格申請書＋メール作成アプリの完成",
       owner: "サトル",
-      status: "doing",
-      progress: 15,
-      hint: "",
-      cmd: "T4設計書の途中経過を見せて",
+      status: "review",
+      progress: 60,
+      hint: "論点3つに答えるだけ（既存GASの扱い／優先省庁／○印の提出形式）",
+      cmd: "T4の論点1は◯◯。優先は◯◯省。○印は◯◯でいい",
       log: [
         { time: "9:00", text: "社長から各省庁の入札参加資格審査申請書サンプル5点を受領。構造抽出完了（各7〜12シート・最大250列の文字グリッド形式）" },
-        { time: "9:00", text: "既知の不具合2点を確認：①条件付き書式（未入力=色付き→入力で色が消える）が変換で崩れた ②図形で置くべき○印がセルに直書きされ位置ずれ。設計に反映してサトルへ" }
+        { time: "9:00", text: "既知の不具合2点を確認：①条件付き書式（未入力=色付き→入力で色が消える）が変換で崩れた ②図形で置くべき○印がセルに直書きされ位置ずれ。設計に反映してサトルへ" },
+        { time: "9:30", text: "設計書v1完成。5サンプルを実際にPythonで検証した結果、過去の不具合は省庁配布Excel自体の機能ではなく社長側の独自追加が壊れたものと判明。「原本ロック＋入力フォーム分離＋自動転記」の3層構成で再設計を提案。社長の論点3つを提示" }
       ],
-      deliverables: [{ title: "T4_入札サンプル/構造抽出.md（5サンプルの全シート構造）", type: "ドキュメント", at: "7/8", path: "logs/T4_入札サンプル/構造抽出.md", app: "Visual Studio Code" }]
+      deliverables: [
+        { title: "T4_入札サンプル/構造抽出.md（5サンプルの全シート構造）", type: "ドキュメント", at: "7/8", path: "logs/T4_入札サンプル/構造抽出.md", app: "Visual Studio Code" },
+        { title: "T4_入札申請書アプリ_設計書v1.md", type: "ドキュメント", at: "7/8", path: "logs/T4_入札申請書アプリ_設計書v1.md", app: "Visual Studio Code" }
+      ]
     },
     {
       id: "T5",
@@ -274,7 +278,7 @@ window.AI_STATE = {
   employees: [
     { name: "リサ", status: "idle", taskId: "" },
     { name: "コトハ", status: "idle", taskId: "" },
-    { name: "サトル", status: "working", taskId: "T4" },
+    { name: "サトル", status: "idle", taskId: "" },
     { name: "ハック", status: "idle", taskId: "" },
   ],
 
@@ -287,6 +291,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "9:30", who: "サトル", text: "T4：設計書完成！過去の不具合は社長独自の追加分だったと判明。社長の論点3つの回答待ちです🧭" },
     { time: "9:00", who: "アイ", text: "T4：社長から各省庁の入札申請書サンプル5点を受領。サトルが設計に着手しました🧭" },
     { time: "17:50", who: "ハック", text: "T3：集計バグの診断完了（候補6件）＆T5：女子分の貼るだけ更新パック完成⚙️" },
     { time: "17:35", who: "リサ", text: "T7：毎朝5分の案件パトロール手順書が完成！URL動作確認を1本だけお願いします🔍" },
