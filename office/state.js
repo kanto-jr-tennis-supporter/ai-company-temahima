@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-11T15:10:22.823Z",
+  "updatedAt": "2026-07-11T15:19:40.109Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -400,10 +400,10 @@ window.AI_STATE = {
       "id": "T3",
       "title": "テレアポシート③：コール数集計の修正",
       "owner": "ハック",
-      "status": "review",
-      "progress": 60,
-      "hint": "診断レポートの確認3問に答えるだけ（特に：集計の数字は多い？少ない？）",
-      "cmd": "T3の答え：数字は◯◯。集計は◯◯シートがおかしい",
+      "status": "done",
+      "progress": 100,
+      "hint": "",
+      "cmd": "",
       "log": [
         {
           "time": "7/2",
@@ -420,6 +420,10 @@ window.AI_STATE = {
         {
           "time": "15:10",
           "text": "ダッシュボードの完了ボタンで誤って完了扱いになっていたのを、実作業が終わっていないため確認待ちに戻しました"
+        },
+        {
+          "time": "15:19",
+          "text": "社長がダッシュボードから完了にしました"
         }
       ],
       "deliverables": [
