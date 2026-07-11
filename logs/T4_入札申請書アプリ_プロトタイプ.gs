@@ -41,13 +41,13 @@ const OVAL_PNG_BASE64 =
 const REQUIRED_FORM_CELLS = ['D5', 'D6', 'D9', 'D11', 'D12', 'D14', 'D15'];
 
 // 設定シートに書き出す座標マッピング（フィールドの追加はここに1行足すだけでよい設計）。
-// kind: 'text'(単純転記) / 'oval'(プルダウン選択→楕円画像) / 'chargrid'(1文字1セル分解)
+// kind: 'text'(単純転記) / 'oval'(プルダウン選択→楕円画像) / 'chargrid'(1文字1セル分解) / 'yubinsplit'(郵便番号を前3桁・後4桁の2箱に分割)
 const FIELD_CONFIG = [
   // id, kind, 入力フォーム参照セル, 転記先シート, 転記先セル, 予備1, 予備2, 備考
   ['shinki_koushin', 'oval', 'D5', '様式1-1', 'J3', 'J4', '', '新規→J3 / 更新→J4 に楕円を配置'],
   ['shago', 'text', 'D6', '様式1-1', 'X25', '', '', '商号又は名称（単純転記の代表例）'],
   ['shago_furigana', 'chargrid', 'D7', '様式1-1', 'N23', 2, 5, '商号ふりがな。あふれはX23へ追記'],
-  ['yubin', 'text', 'D8', '様式1-1', 'X15', '', '', '郵便番号'],
+  ['yubin', 'yubinsplit', 'D8', '様式1-1', 'X15', 'AK15', '', '郵便番号（前3桁→X15 / 後4桁→AK15の2箱に分割）'],
   ['jusho', 'text', 'D9', '様式1-1', 'X20', '', '', '本社（店）住所'],
   ['jusho_furigana', 'chargrid', 'D10', '様式1-1', 'N18', 2, 5, '住所ふりがな。あふれはX18へ追記'],
   ['yakushoku', 'text', 'D11', '様式1-1', 'X28', '', '', '代表者役職'],
@@ -55,7 +55,7 @@ const FIELD_CONFIG = [
   ['daihyo_furigana', 'chargrid', 'D13', '様式1-1', 'N31', 2, 5, '代表者氏名ふりがな。あふれはX31へ追記'],
   ['kyoka_mae', 'text', 'D14', '様式1-1', 'CF4', '', '', '建設業許可番号（ハイフン前）'],
   ['kyoka_ato', 'text', 'D15', '様式1-1', 'CO4', '', '', '建設業許可番号（ハイフン後。ハイフン自体はCL4に印字済み）'],
-  ['hojin_bango', 'text', 'D16', '様式1-1', 'AK15', '', '', '法人番号'],
+  ['hojin_bango', 'text', 'D16', '様式1-1', 'BP15', '', '', '法人番号（正しい箱はBP15。旧設定でAK15＝郵便番号の箱を誤って使っていたのを修正）'],
 ];
 
 // ====== メニュー ======
@@ -252,6 +252,12 @@ function transcribeToMaster() {
     if (kind === 'text') {
       if (value === '' || value === null) return;
       masterSheet.getRange(target).setValue(String(value));
+      textCount++;
+    } else if (kind === 'yubinsplit') {
+      if (value === '' || value === null) return;
+      const digits = String(value).replace(/[^0-9]/g, '');
+      masterSheet.getRange(target).setValue(digits.slice(0, 3));
+      masterSheet.getRange(String(extra1)).setValue(digits.slice(3, 7));
       textCount++;
     } else if (kind === 'oval') {
       if (value === '') return;
