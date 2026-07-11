@@ -12,7 +12,7 @@
 //   - path（ローカルファイル）→ 本体をローカル起動（http://localhost:3000/）して
 //     オフィスをそこから開いていれば、コンピューターの標準アプリで開く
 window.AI_CONFIG = {
-  apiBase: "http://localhost:3000", // ← ローカル本体に接続（Gmail/カレンダー連携 有効）
+  apiBase: "https://ai-company-temahima.onrender.com", // ← Renderにデプロイした本体に接続
   // ブラウザ記憶（localStorage）の名前空間。1台のPCで複数のデモ会社を別フォルダで動かすとき、
   // 前のデモの会社情報が混ざらないよう、フォルダごとに固有値にする（営業デモ用）。
   // 単独利用なら "default" のままでOK。
