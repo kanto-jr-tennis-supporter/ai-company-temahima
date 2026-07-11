@@ -38,10 +38,14 @@ const OVAL_PNG_BASE64 =
   'iVBORw0KGgoAAAANSUhEUgAAAMgAAAA8CAYAAAAjW/WRAAACG0lEQVR4nO3dW1LDMBBEUcNa2P+K2At8pFJJOdb7MT3je77BkqVuXCGOcxwAAAAAsM+X9QSi+D2OP+s5nP2wv8NYwBPFoO9GsV5utRCEf567lCjcSVICe5HK4/pEKIMfXkvjYtIUIS714khOzlshlDeZtRwjMRmVTVTbHEvsyYPZ4Ds3wHqRI4u+j9sGXL2QlEBPhD1fOsCKBaII/nnKxZKDzloAynAfqpmZdrAZJ0gh8KSSp+EDjJwIhUAtq5x1/2LPhCkEZtmVv67AtkyOUmC1lXls+mGKAWUr8lkd4prBKQVUzMprVaBLg1EMqBrN7vfqAQBLpXyW8t39yxQD3vTkOXkFoRyIJpfbVN4vC0I5EFVrSYqvQWoPDnjRkuOPgqSuHpQDkaTyfM5/0xUEuBsKAmRQECCDggAZHwWpffECeFb7z6imKwglQQQtOb4sSM87joAHrW+CJ68glATR9NwhUnzzj7t54d1IhouvQUZvFwYsjf6B5xOFCGnrJwpbBm0ZHJjJ9DPpqycC9JJ5qsk7nosFS9LPxXrHkxWxg7snK56pPEsVMajkiae7Q4JqZvh+EGznKRd8wxSWibDnfEchhkTfR4ngqNyuQpFe2JMHyUCobE4t603MYS3HSE0mxdsmo55aIc6kJ1dCcfxQL0KKy0nnUBp7XstwJcyJ1KA880QqQc4tTrIFJbpP+GuwEJMoFougAwAAQNA/WNuoRCvricwAAAAASUVORK5CYII=';
 
 // 必須項目（入力フォームの入力セル）。条件付き書式・未入力集計の両方でここを参照する。
-const REQUIRED_FORM_CELLS = ['D5', 'D6', 'D9', 'D11', 'D12', 'D14', 'D15'];
+const REQUIRED_FORM_CELLS = [
+  'D5', 'D6', 'D9', 'D11', 'D12', 'D14', 'D15',
+  'D18', 'D20', 'D21', 'D22', 'D23', 'D24', 'D25', 'D26', 'D27', 'D28',
+];
 
 // 設定シートに書き出す座標マッピング（フィールドの追加はここに1行足すだけでよい設計）。
-// kind: 'text'(単純転記) / 'oval'(プルダウン選択→楕円画像) / 'chargrid'(1文字1セル分解) / 'yubinsplit'(郵便番号を前3桁・後4桁の2箱に分割)
+// kind: 'text'(単純転記) / 'oval'(プルダウン選択→楕円画像、2択専用) / 'ovaln'(楕円画像、N択。extra1にJSON "{選択肢:セルA1}") /
+//       'chargrid'(1文字1セル分解) / 'yubinsplit'(郵便番号を前3桁・後4桁の2箱に分割) / 'textOrFallback'(空欄ならextra1の入力フォームセルの値を使う)
 const FIELD_CONFIG = [
   // id, kind, 入力フォーム参照セル, 転記先シート, 転記先セル, 予備1, 予備2, 備考
   ['shinki_koushin', 'oval', 'D5', '様式1-1', 'J3', 'J4', '', '新規→J3 / 更新→J4 に楕円を配置'],
@@ -56,6 +60,19 @@ const FIELD_CONFIG = [
   ['kyoka_mae', 'text', 'D14', '様式1-1', 'CF4', '', '', '建設業許可番号（ハイフン前）'],
   ['kyoka_ato', 'text', 'D15', '様式1-1', 'CO4', '', '', '建設業許可番号（ハイフン後。ハイフン自体はCL4に印字済み）'],
   ['hojin_bango', 'text', 'D16', '様式1-1', 'BP15', '', '', '法人番号（正しい箱はBP15。旧設定でAK15＝郵便番号の箱を誤って使っていたのを修正）'],
+  ['tantosha_shimei', 'textOrFallback', 'D17', '様式1-1', 'DL33', 'D12', '', '担当者氏名。空欄なら代表者氏名(D12)をそのまま転記'],
+  ['honsha_tel', 'text', 'D18', '様式1-1', 'X36', '', '', '本社（店）電話番号'],
+  ['tantosha_tel', 'textOrFallback', 'D19', '様式1-1', 'DL36', 'D18', '', '担当者電話番号。空欄なら本社電話番号(D18)をそのまま転記'],
+  ['honsha_fax', 'text', 'D20', '様式1-1', 'X40', '', '', '本社（店）ＦＡＸ番号'],
+  ['email', 'text', 'D21', '様式1-1', 'X43', '', '', 'メールアドレス'],
+  ['soshokuinsu', 'text', 'D22', '様式1-1', 'EQ56', '', '', '総職員数（人）'],
+  ['eigyo_nensu', 'text', 'D23', '様式1-1', 'EQ53', '', '', '営業年数（年）。現状は総合評定値通知書の記載値をそのまま手入力。省庁ごとの算出方式の違いは今後パターンを蓄積して対応する'],
+  ['setsuritsu_gengo', 'ovaln', 'D24', '様式1-1', '', '{"明治":"C62","大正":"I62","昭和":"C63","平成":"I63","令和":"C64"}', '', '設立年号（和暦）。選んだ元号の文字に楕円を配置'],
+  ['setsuritsu_nen', 'text', 'D25', '様式1-1', 'O62', '', '', '設立年（和暦の数字のみ）'],
+  ['setsuritsu_tsuki', 'text', 'D26', '様式1-1', 'AA62', '', '', '設立月'],
+  ['setsuritsu_hi', 'text', 'D27', '様式1-1', 'AM62', '', '', '設立日'],
+  ['minashi_daikigyo', 'ovaln', 'D28', '様式1-1', '', '{"該当しない":"DI62","該当する":"BY62"}', '', 'みなし大企業。デフォルトは「該当しない」'],
+  ['minashi_riyu', 'ovaln', 'D29', '様式1-1', '', '{"発行済株式2分の1以上":"BV63","発行済株式3分の2以上":"BV64","役員兼務":"BV65"}', '', 'D28で「該当する」を選んだ場合のみ。該当理由の「・」に楕円を配置'],
 ];
 
 // ====== メニュー ======
@@ -172,6 +189,19 @@ function createInputFormSheet_(ss) {
     [10, '🟩直接入力', '建設業許可番号（ハイフンの前）', '', '必須', '例：6'],
     [11, '🟩直接入力', '建設業許可番号（ハイフンの後）', '', '必須', '例：123456'],
     [12, '🟩直接入力', '法人番号', '', '任意', ''],
+    [13, '🟩直接入力', '担当者氏名', '', '任意', '空欄なら代表者氏名と同じものを転記します'],
+    [14, '🟩直接入力', '本社（店）電話番号', '', '必須', ''],
+    [15, '🟩直接入力', '担当者電話番号', '', '任意', '空欄なら本社電話番号と同じものを転記します'],
+    [16, '🟩直接入力', '本社（店）ＦＡＸ番号', '', '必須', ''],
+    [17, '🟩直接入力', 'メールアドレス', '', '必須', ''],
+    [18, '🟩直接入力', '総職員数', '', '必須', '人数のみ入力'],
+    [19, '🟩直接入力', '営業年数', '', '必須', '総合評定値通知書に記載の数字をそのまま入力'],
+    [20, '🟨選択式', '設立年号（和暦）', '', '必須', 'プルダウンから選択'],
+    [21, '🟩直接入力', '設立年', '', '必須', '和暦の数字のみ（例：6）'],
+    [22, '🟩直接入力', '設立月', '', '必須', ''],
+    [23, '🟩直接入力', '設立日', '', '必須', ''],
+    [24, '🟨選択式', 'みなし大企業', '', '必須', '通常は「該当しない」のままでOK'],
+    [25, '🟨選択式', 'みなし大企業の該当理由', '', '任意', '24で「該当する」を選んだ場合のみ選択'],
   ];
   sheet.getRange(5, 1, rows.length, header.length).setValues(rows);
 
@@ -181,6 +211,31 @@ function createInputFormSheet_(ss) {
     .setAllowInvalid(false)
     .build();
   sheet.getRange('D5').setDataValidation(rule);
+
+  // D24 に設立年号（和暦）のプルダウン
+  sheet.getRange('D24').setDataValidation(
+    SpreadsheetApp.newDataValidation()
+      .requireValueInList(['明治', '大正', '昭和', '平成', '令和'], true)
+      .setAllowInvalid(false)
+      .build()
+  );
+
+  // D28 にみなし大企業のプルダウン（デフォルトは「該当しない」）
+  sheet.getRange('D28').setDataValidation(
+    SpreadsheetApp.newDataValidation()
+      .requireValueInList(['該当しない', '該当する'], true)
+      .setAllowInvalid(false)
+      .build()
+  );
+  sheet.getRange('D28').setValue('該当しない');
+
+  // D29 は「該当する」のときだけ使う任意項目。空欄も許可する。
+  sheet.getRange('D29').setDataValidation(
+    SpreadsheetApp.newDataValidation()
+      .requireValueInList(['発行済株式2分の1以上', '発行済株式3分の2以上', '役員兼務'], true)
+      .setAllowInvalid(true)
+      .build()
+  );
 
   sheet.setColumnWidth(1, 30);
   sheet.setColumnWidth(2, 80);
@@ -263,6 +318,23 @@ function transcribeToMaster() {
       if (value === '') return;
       insertOvalMark_(masterSheet, id, value, target, extra1);
       ovalCount++;
+    } else if (kind === 'ovaln') {
+      removeExistingAutoImages_(masterSheet, id);
+      if (value === '' || value === null) return;
+      let optionMap;
+      try { optionMap = JSON.parse(extra1); } catch (e) { return; }
+      const cellA1 = optionMap[String(value)];
+      if (!cellA1) return; // 想定外の値は安全側で何もしない
+      insertOvalAt_(masterSheet, id, cellA1);
+      ovalCount++;
+    } else if (kind === 'textOrFallback') {
+      let v = value;
+      if (v === '' || v === null) {
+        v = formSheet.getRange(String(extra1)).getValue();
+      }
+      if (v === '' || v === null) return;
+      masterSheet.getRange(target).setValue(String(v));
+      textCount++;
     } else if (kind === 'chargrid') {
       if (value === '' || value === null) return;
       writeCharGrid_(masterSheet, String(value), target, Number(extra1), Number(extra2));
@@ -283,7 +355,11 @@ function insertOvalMark_(sheet, fieldId, value, target, alt) {
   const targetCellA1 = value === '新規' ? target : value === '更新' ? alt : null;
   removeExistingAutoImages_(sheet, fieldId); // 再実行時に楕円が重ならないよう毎回消してから置き直す
   if (!targetCellA1) return; // 想定外の値（プルダウン以外から入力された等）は安全側で何もしない
+  insertOvalAt_(sheet, fieldId, targetCellA1);
+}
 
+// N択の楕円配置（'ovaln'種別）。呼び出し側で removeExistingAutoImages_ 済みであること。
+function insertOvalAt_(sheet, fieldId, targetCellA1) {
   const range = sheet.getRange(targetCellA1);
   const merged = range.getMergedRanges();
   const anchorRange = merged.length > 0 ? merged[0] : range;
