@@ -12,14 +12,12 @@
  * 座標の根拠：
  *  - すべて logs/T4_入札サンプル/サンプル⑤.xlsx を openpyxl で直接開き、
  *    結合セル(merged_cells)・罫線(border)を検証して特定した実座標（推測ではない）。
- *  - 「フリガナ欄は1文字1セルに分解」という当初の想定は、実際にサンプル⑤を検証した結果、
- *    フリガナの記入欄そのものは罫線のない1個の結合セル（例：X23:GA23）であることが判明した。
- *    ラベル文字「フ・リ・ガ・ナ」が2列ピッチ（F,H,J,L=6,8,10,12列目）で置かれていること、
- *    かつ結合セルの開始列（X=24列目）がちょうどそのピッチの続き（N,P,R,T,V=14,16,18,20,22列目）
- *    の直後に来ることから、この5マス（N,P,R,T,V）が本来の1文字入力マスである可能性が高いと判断し、
- *    「1文字1セル分解」の実装対象とした。ただし罫線での裏付けはないため確実ではない。
- *    → Step4の検証で必ず目視確認すること（logs/T4_構築・検証手順.md 参照）。
- *    5文字を超える場合は、あふれた分をまとめて結合セル（X23等）側に追記する。
+ *  - フリガナ（商号・住所・代表者氏名）は当初「1文字1セルに分解」を試したが、実測の結果
+ *    分解先セルに罫線の裏付けがなく、実機検証で位置ズレが確認されたため、フリガナの記入欄
+ *    そのもの（罫線のない1個の結合セル。例：商号ふりがなはX23:GA23）へ1つの文字列として
+ *    そのまま転記する方式（kind: 'text'）に変更した。1文字1セル分解の仕組み自体
+ *    （writeCharGrid_ / kind: 'chargrid'）は、将来ほかの様式（例：明確な罫線で1文字1マスが
+ *    区切られているサンプル④）に流用できるよう関数は残してある。
  */
 
 // ====== 基本設定 ======
@@ -30,12 +28,18 @@ const SHEET_NAMES = {
 };
 const MASTER_SHEETS_REQUIRED = ['様式1-1', '様式1-2', '様式2'];
 
-// 「○」の代わりに貼る図形の代替：楕円のPNG画像（透過背景・赤枠）をBase64で埋め込み。
+// 「○」の代わりに貼る図形の代替：楕円のPNG画像（透過背景・黒枠）をBase64で埋め込み。
 // 理由：SpreadsheetApp（Sheets用のApps Script API）には、Slidesのinsert Shape(OVAL)に相当する
 // 「図形を直接挿入するAPI」が存在しない（2026年7月時点で確認）。そのためSheet.insertImage()で
 // 画像を代わりに配置する次善策を採用した。誤魔化さずここに明記する。
 const OVAL_PNG_BASE64 =
-  'iVBORw0KGgoAAAANSUhEUgAAAMgAAAA8CAYAAAAjW/WRAAACG0lEQVR4nO3dW1LDMBBEUcNa2P+K2At8pFJJOdb7MT3je77BkqVuXCGOcxwAAAAAsM+X9QSi+D2OP+s5nP2wv8NYwBPFoO9GsV5utRCEf567lCjcSVICe5HK4/pEKIMfXkvjYtIUIS714khOzlshlDeZtRwjMRmVTVTbHEvsyYPZ4Ds3wHqRI4u+j9sGXL2QlEBPhD1fOsCKBaII/nnKxZKDzloAynAfqpmZdrAZJ0gh8KSSp+EDjJwIhUAtq5x1/2LPhCkEZtmVv67AtkyOUmC1lXls+mGKAWUr8lkd4prBKQVUzMprVaBLg1EMqBrN7vfqAQBLpXyW8t39yxQD3vTkOXkFoRyIJpfbVN4vC0I5EFVrSYqvQWoPDnjRkuOPgqSuHpQDkaTyfM5/0xUEuBsKAmRQECCDggAZHwWpffECeFb7z6imKwglQQQtOb4sSM87joAHrW+CJ68glATR9NwhUnzzj7t54d1IhouvQUZvFwYsjf6B5xOFCGnrJwpbBm0ZHJjJ9DPpqycC9JJ5qsk7nosFS9LPxXrHkxWxg7snK56pPEsVMajkiae7Q4JqZvh+EGznKRd8wxSWibDnfEchhkTfR4ngqNyuQpFe2JMHyUCobE4t603MYS3HSE0mxdsmo55aIc6kJ1dCcfxQL0KKy0nnUBp7XstwJcyJ1KA880QqQc4tTrIFJbpP+GuwEJMoFougAwAAQNA/WNuoRCvricwAAAAASUVORK5CYII=';
+  'iVBORw0KGgoAAAANSUhEUgAAAMgAAAA8CAYAAAAjW/WRAAACEElEQVR4nO3d0VbrIBCF4ej7v7PeqKtqQoYMMHuG/7s/hcDeZvU0pccBAAAAAOu8RU+gkI/oCZxgf51YwP8Ug74aufiy20IQ/nG2yE7Fi6QE8crkKvuFUIY8UmYty6QpQl3SGVSdXLZCqK7jcbCWLiqTUdlElfVQwJ4ED75yAwj+PKX3ceWAsxeSEuhJv+ezB5ixQBQhvzS5mBW2UQtAGfYhmZmRLzbiAikEvknkaUQgPRdCIWAVkjNPQJ9MmEJglCX5exrYnslRCsw2LY+94aUYUDY8nz0htgxOKaBiSF6tgb4bjGJAlSu777MHAILd5bOZb88/phjIpjvPrTsI5UA1rdye5v2qIJQDVXWVxPIexPriQBbmHJ8V5OruQTlQyVWef+W/9w4CbIWCAA0UBGigIEDDWUFMb16A5Ez/GdV7B6EkqMCc46uCdH/iCCTR9SF46w5CSVBN9xMilg//eJoX2T3OsOU9iOtxYSCY6w883yhEVUu/Udgz6NPXBrxCv5M+dSKAg8ypJq84FwuRpM/FesXJilgh3cmKf0mcpYoyJPLE6e5QIZkZfh8EEdLkgl+Ywkzp95zfKIRX6X1UCY7K4yoq66GAPYkevEFlc6xU1/E4WEsXqck0ZNtk2ElnUHpyBhQnj5RZSznpG5QmXplclbkQI8ozzhbZ2eIiO1EicvGDhRhHsVjsLwAAANR8Ank5VETKpQASAAAAAElFTkSuQmCC';
+
+// チェックマーク（レ点／✓）のPNG画像（透過背景・黒）をBase64で埋め込み。みなし大企業など
+// 「○で囲む」より「チェックを入れる」方が自然な項目向け。Macでは見栄えの良いチェック文字を
+// 手軽に入力できないため、画像として自動配置する。
+const CHECK_PNG_BASE64 =
+  'iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAACbklEQVR4nO3bUXbbMAwF0Zfuf8/JRw8btY1skQQIgJy7AEfGWKQlRxIAAAAAAAAAAPj2afEivyxeBH9iTEchiL1PTYQhyLy74Q9FIcicd0PvjvIxeCDoH/ajWXOGrPMoIGfImNlvU7dz5wzpZ3G9cfsaBOljcvEnzpBUXm4TBHnO6ux4iSDPuC9VDUHeWxZDIsgqjy8vCPLakn3jiiD3li5VDUF+FhJDIoinodtSBPnf8n3jiiB/C1uqGoJ8C48hEcTa9M8ZBPktdN+4IkiSpao5PUiqGBJBLJj+DH5ykDT7xtWpQdItVc2JQdLGkM4MYsHt36dOC5Jy37g6KUjqpao5JUiJGNI5QSws+bfbE4Kk3zeudg9SZqlqPIJk+USWiyHZBzF7+DGJ5Y9rWAb5N0JklLIfCKsgpg8+Tiq5VDUWQcwffJxQOoY0H+TpACotIaGP+c0E6R2yd5RK0W+NBsn25ssvVc1IkJk37xFymxhSfxDXJ1ADpYgh9QexOnCrKBnjThlZsrJE2WqpakY39egoW8aQ5r72RkeZlS6GNH9hGBFlu33jyuLWycoo2y5VTbYfqF4NfPsYkl0QyzfpuSSljiHZniGeUbbeN66slyyPKEcsVY3XQWb7RJeIIflt6pkGkOlY3vL8llVqEFl4f+2NjhL997utuA6JGkq5GNK6C8PVwykZQ1p7pV52SCutvnWyIkrp8BH3sjwHVjqGFHdz0WNw5WNI+e72Hi8yiOUneouzQ4o/QywGuU0MKT6INDfQrWJIOYJIGw52VJYgUn+ULSNmfFPvfkvJeMxmMr+5n8JkPl4AAAAAAAD4+gJb01GKNhqh7AAAAABJRU5ErkJggg==';
 
 // 必須項目（入力フォームの入力セル）。条件付き書式・未入力集計の両方でここを参照する。
 const REQUIRED_FORM_CELLS = [
@@ -44,19 +48,20 @@ const REQUIRED_FORM_CELLS = [
 ];
 
 // 設定シートに書き出す座標マッピング（フィールドの追加はここに1行足すだけでよい設計）。
-// kind: 'text'(単純転記) / 'oval'(プルダウン選択→楕円画像、2択専用) / 'ovaln'(楕円画像、N択。extra1にJSON "{選択肢:セルA1}") /
+// kind: 'text'(単純転記) / 'none'(入力フォームの記録用のみ。マスターへは何もしない) /
+//       'ovaln'(楕円画像、N択。extra1にJSON "{選択肢:セルA1}") / 'checkln'(チェックマーク画像、N択。extra1の書式はovalnと同じ) /
 //       'chargrid'(1文字1セル分解) / 'yubinsplit'(郵便番号を前3桁・後4桁の2箱に分割) / 'textOrFallback'(空欄ならextra1の入力フォームセルの値を使う)
 const FIELD_CONFIG = [
   // id, kind, 入力フォーム参照セル, 転記先シート, 転記先セル, 予備1, 予備2, 備考
-  ['shinki_koushin', 'oval', 'D5', '様式1-1', 'J3', 'J4', '', '新規→J3 / 更新→J4 に楕円を配置'],
+  ['shinki_koushin', 'none', 'D5', '様式1-1', '', '', '', '新規／更新は文部科学省では丸印不要のため転記なし（入力フォーム上の記録のみ）'],
   ['shago', 'text', 'D6', '様式1-1', 'X25', '', '', '商号又は名称（単純転記の代表例）'],
-  ['shago_furigana', 'chargrid', 'D7', '様式1-1', 'N23', 2, 5, '商号ふりがな。あふれはX23へ追記'],
+  ['shago_furigana', 'text', 'D7', '様式1-1', 'X23', '', '', '商号ふりがな。1文字1セルの推測位置ではなく結合セルへそのまま転記'],
   ['yubin', 'yubinsplit', 'D8', '様式1-1', 'X15', 'AK15', '', '郵便番号（前3桁→X15 / 後4桁→AK15の2箱に分割）'],
   ['jusho', 'text', 'D9', '様式1-1', 'X20', '', '', '本社（店）住所'],
-  ['jusho_furigana', 'chargrid', 'D10', '様式1-1', 'N18', 2, 5, '住所ふりがな。あふれはX18へ追記'],
+  ['jusho_furigana', 'text', 'D10', '様式1-1', 'X18', '', '', '住所ふりがな。1文字1セルの推測位置ではなく結合セルへそのまま転記'],
   ['yakushoku', 'text', 'D11', '様式1-1', 'X28', '', '', '代表者役職'],
   ['daihyo_shimei', 'text', 'D12', '様式1-1', 'X33', '', '', '代表者氏名'],
-  ['daihyo_furigana', 'chargrid', 'D13', '様式1-1', 'N31', 2, 5, '代表者氏名ふりがな。あふれはX31へ追記'],
+  ['daihyo_furigana', 'text', 'D13', '様式1-1', 'X31', '', '', '代表者氏名ふりがな。1文字1セルの推測位置ではなく結合セルへそのまま転記'],
   ['kyoka_mae', 'text', 'D14', '様式1-1', 'CF4', '', '', '建設業許可番号（ハイフン前）'],
   ['kyoka_ato', 'text', 'D15', '様式1-1', 'CO4', '', '', '建設業許可番号（ハイフン後。ハイフン自体はCL4に印字済み）'],
   ['hojin_bango', 'text', 'D16', '様式1-1', 'BP15', '', '', '法人番号（正しい箱はBP15。旧設定でAK15＝郵便番号の箱を誤って使っていたのを修正）'],
@@ -67,12 +72,12 @@ const FIELD_CONFIG = [
   ['email', 'text', 'D21', '様式1-1', 'X43', '', '', 'メールアドレス'],
   ['soshokuinsu', 'text', 'D22', '様式1-1', 'EQ56', '', '', '総職員数（人）'],
   ['eigyo_nensu', 'text', 'D23', '様式1-1', 'EQ53', '', '', '営業年数（年）。現状は総合評定値通知書の記載値をそのまま手入力。省庁ごとの算出方式の違いは今後パターンを蓄積して対応する'],
-  ['setsuritsu_gengo', 'ovaln', 'D24', '様式1-1', '', '{"明治":"C62","大正":"I62","昭和":"C63","平成":"I63","令和":"C64"}', '', '設立年号（和暦）。選んだ元号の文字に楕円を配置'],
+  ['setsuritsu_gengo', 'ovaln', 'D24', '様式1-1', '', '{"明治":"C62","大正":"I62","昭和":"C63","平成":"I63","令和":"C64"}', '', '設立年号（和暦）。選んだ元号の文字に黒楕円を配置'],
   ['setsuritsu_nen', 'text', 'D25', '様式1-1', 'O62', '', '', '設立年（和暦の数字のみ）'],
   ['setsuritsu_tsuki', 'text', 'D26', '様式1-1', 'AA62', '', '', '設立月'],
   ['setsuritsu_hi', 'text', 'D27', '様式1-1', 'AM62', '', '', '設立日'],
-  ['minashi_daikigyo', 'ovaln', 'D28', '様式1-1', '', '{"該当しない":"DI62","該当する":"BY62"}', '', 'みなし大企業。デフォルトは「該当しない」'],
-  ['minashi_riyu', 'ovaln', 'D29', '様式1-1', '', '{"発行済株式2分の1以上":"BV63","発行済株式3分の2以上":"BV64","役員兼務":"BV65"}', '', 'D28で「該当する」を選んだ場合のみ。該当理由の「・」に楕円を配置'],
+  ['minashi_daikigyo', 'checkln', 'D28', '様式1-1', '', '{"該当しない":"DI62","該当する":"BY62"}', '', 'みなし大企業。デフォルトは「該当しない」。楕円ではなくチェックマークを配置'],
+  ['minashi_riyu', 'checkln', 'D29', '様式1-1', '', '{"発行済株式2分の1以上":"BV63","発行済株式3分の2以上":"BV64","役員兼務":"BV65"}', '', 'D28で「該当する」を選んだ場合のみ。該当理由の「・」にチェックマークを配置'],
 ];
 
 // ====== メニュー ======
@@ -347,6 +352,7 @@ function transcribeToMaster() {
 
   let textCount = 0;
   let ovalCount = 0;
+  let checkCount = 0;
   let charCount = 0;
 
   config.forEach((row) => {
@@ -356,7 +362,10 @@ function transcribeToMaster() {
 
     const value = formSheet.getRange(formCell).getValue();
 
-    if (kind === 'text') {
+    if (kind === 'none') {
+      // 転記なし。入力フォーム上の記録のみで、マスターへは何もしない（例：新規/更新）。
+      return;
+    } else if (kind === 'text') {
       if (value === '' || value === null) return;
       masterSheet.getRange(target).setValue(String(value));
       textCount++;
@@ -366,19 +375,20 @@ function transcribeToMaster() {
       masterSheet.getRange(target).setValue(digits.slice(0, 3));
       masterSheet.getRange(String(extra1)).setValue(digits.slice(3, 7));
       textCount++;
-    } else if (kind === 'oval') {
-      if (value === '') return;
-      insertOvalMark_(masterSheet, id, value, target, extra1);
-      ovalCount++;
-    } else if (kind === 'ovaln') {
+    } else if (kind === 'ovaln' || kind === 'checkln') {
       removeExistingAutoImages_(masterSheet, id);
       if (value === '' || value === null) return;
       let optionMap;
       try { optionMap = JSON.parse(extra1); } catch (e) { return; }
       const cellA1 = optionMap[String(value)];
       if (!cellA1) return; // 想定外の値は安全側で何もしない
-      insertOvalAt_(masterSheet, id, cellA1);
-      ovalCount++;
+      if (kind === 'ovaln') {
+        insertOvalAt_(masterSheet, id, cellA1);
+        ovalCount++;
+      } else {
+        insertCheckAt_(masterSheet, id, cellA1);
+        checkCount++;
+      }
     } else if (kind === 'textOrFallback') {
       let v = value;
       if (v === '' || v === null) {
@@ -395,28 +405,27 @@ function transcribeToMaster() {
   });
 
   SpreadsheetApp.getUi().alert(
-    '転記が完了しました。\nテキスト転記: ' + textCount + '件 / 楕円配置: ' + ovalCount + '件 / 文字分解転記: ' + charCount + '件'
+    '転記が完了しました。\nテキスト転記: ' + textCount + '件 / 楕円配置: ' + ovalCount + '件 / ' +
+    'チェック配置: ' + checkCount + '件 / 文字分解転記: ' + charCount + '件'
   );
 }
 
-// 「有／無」「新規／更新」など、選んだ方の位置に楕円画像を配置する。
-// target=選択肢1のセル(A1)、alt=選択肢2のセル(A1)。入力フォームの値が
-// 設定シートの並び順で「1番目の選択肢」と一致すればtarget、そうでなければaltに置く。
-// （このプロトタイプでは 新規=1番目=target(J3) / 更新=2番目=alt(J4) の1パターンのみ実装）
-function insertOvalMark_(sheet, fieldId, value, target, alt) {
-  const targetCellA1 = value === '新規' ? target : value === '更新' ? alt : null;
-  removeExistingAutoImages_(sheet, fieldId); // 再実行時に楕円が重ならないよう毎回消してから置き直す
-  if (!targetCellA1) return; // 想定外の値（プルダウン以外から入力された等）は安全側で何もしない
-  insertOvalAt_(sheet, fieldId, targetCellA1);
+function insertOvalAt_(sheet, fieldId, targetCellA1) {
+  insertMarkAt_(sheet, fieldId, targetCellA1, OVAL_PNG_BASE64);
 }
 
-// N択の楕円配置（'ovaln'種別）。呼び出し側で removeExistingAutoImages_ 済みであること。
-function insertOvalAt_(sheet, fieldId, targetCellA1) {
+function insertCheckAt_(sheet, fieldId, targetCellA1) {
+  insertMarkAt_(sheet, fieldId, targetCellA1, CHECK_PNG_BASE64);
+}
+
+// 楕円／チェックマーク共通の画像配置処理（'ovaln'・'checkln'種別）。
+// 呼び出し側で removeExistingAutoImages_ 済みであること。
+function insertMarkAt_(sheet, fieldId, targetCellA1, pngBase64) {
   const range = sheet.getRange(targetCellA1);
   const merged = range.getMergedRanges();
   const anchorRange = merged.length > 0 ? merged[0] : range;
 
-  // 対象セル（結合セル）の実ピクセルサイズを動的に計算し、楕円画像をそこに収める。
+  // 対象セル（結合セル）の実ピクセルサイズを動的に計算し、画像をそこに収める。
   let widthPx = 0;
   for (let c = anchorRange.getColumn(); c < anchorRange.getColumn() + anchorRange.getNumColumns(); c++) {
     widthPx += sheet.getColumnWidth(c);
@@ -426,7 +435,7 @@ function insertOvalAt_(sheet, fieldId, targetCellA1) {
     heightPx += sheet.getRowHeight(r);
   }
 
-  const blob = Utilities.newBlob(Utilities.base64Decode(OVAL_PNG_BASE64), 'image/png', fieldId + '.png');
+  const blob = Utilities.newBlob(Utilities.base64Decode(pngBase64), 'image/png', fieldId + '.png');
   const image = sheet.insertImage(blob, anchorRange.getColumn(), anchorRange.getRow());
   image.setWidth(Math.max(widthPx, 20)).setHeight(Math.max(heightPx, 14));
   image.setAltTextTitle('AUTO_OVAL_' + fieldId);
