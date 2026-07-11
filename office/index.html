@@ -202,14 +202,26 @@
       .catch(function () { return false; });
   }
 
-  // クリック時の挙動：url → 新規タブで開く ／ path → コンピューター上で開く ／ 無理ならビューア
+  // リポジトリ内のファイルをGitHub上で開くためのURL（Renderなど、ローカル本体が使えない環境向け）
+  var REPO_URL_BASE = "https://github.com/kanto-jr-tennis-supporter/ai-company-temahima/blob/claude/company-situation-06lpad/";
+  function repoFileUrl(path) {
+    return REPO_URL_BASE + String(path).split("/").map(encodeURIComponent).join("/");
+  }
+
+  // クリック時の挙動：url → 新規タブで開く ／ path → コンピューター上で開く（無理ならGitHubで開く）
   function openDeliverableSmart(d) {
     if (!d) return;
     if (d.url) { openUrl(d.url); return; }
     if (d.path) {
-      openLocalFile(d.path, d.app).then(function (ok) {
-        if (!ok) openDeliverable(d); // 本体未起動などはビューアでパス表示＋コピー
-      });
+      var base = (window.AI_CONFIG || {}).apiBase || (location.protocol.indexOf("http") === 0 ? location.origin : "");
+      var isLocal = base && /^https?:\/\/(localhost|127\.0\.0\.1)/.test(base);
+      if (isLocal) {
+        openLocalFile(d.path, d.app).then(function (ok) {
+          if (!ok) openUrl(repoFileUrl(d.path)); // ローカル本体が動いていなければGitHubで開く
+        });
+      } else {
+        openUrl(repoFileUrl(d.path)); // Renderなどローカル本体が無い環境ではGitHubで開く
+      }
       return;
     }
     openDeliverable(d); // テキスト本文のみはビューアで
