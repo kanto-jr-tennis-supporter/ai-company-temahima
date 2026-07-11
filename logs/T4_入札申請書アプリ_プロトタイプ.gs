@@ -78,6 +78,7 @@ const FIELD_CONFIG = [
   ['setsuritsu_hi', 'text', 'D27', '様式1-1', 'AM62', '', '', '設立日'],
   ['minashi_daikigyo', 'checkln', 'D28', '様式1-1', '', '{"該当しない":"DI62","該当する":"BY62"}', '', 'みなし大企業。デフォルトは「該当しない」。楕円ではなくチェックマークを配置'],
   ['minashi_riyu', 'checkln', 'D29', '様式1-1', '', '{"発行済株式2分の1以上":"BV63","発行済株式3分の2以上":"BV64","役員兼務":"BV65"}', '', 'D28で「該当する」を選んだ場合のみ。該当理由の「・」にチェックマークを配置'],
+  ['tantosha_furigana', 'text', 'D30', '様式1-1', 'DL31', '', '', '担当者氏名ふりがな。当初FIELD_CONFIGに項目自体が抜けていた分を追加'],
 ];
 
 // ====== メニュー ======
@@ -98,6 +99,7 @@ function setup() {
   createInputGuideSheet_(ss);
   createInputFormSheet_(ss);
   extendInputFormSheetIfNeeded_(ss); // 既存の「入力フォーム」に後から項目が増えた場合、入力済みデータは消さずに追記する
+  extendInputFormSheetForTantoshaFurigana_(ss); // 項目26（担当者氏名ふりがな）の抜け漏れを追記
   createSettingsSheet_(ss);
   applyConditionalFormatting_(ss);
   protectMasterSheets_(ss);
@@ -208,6 +210,7 @@ function createInputFormSheet_(ss) {
     [23, '🟩直接入力', '設立日', '', '必須', ''],
     [24, '🟨選択式', 'みなし大企業', '', '必須', '通常は「該当しない」のままでOK'],
     [25, '🟨選択式', 'みなし大企業の該当理由', '', '任意', '24で「該当する」を選んだ場合のみ選択'],
+    [26, '🟩直接入力', '担当者氏名ふりがな（カタカナ）', '', '任意', ''],
   ];
   sheet.getRange(5, 1, rows.length, header.length).setValues(rows);
 
@@ -303,6 +306,16 @@ function extendInputFormSheetIfNeeded_(ss) {
   );
 }
 
+// 項目26（担当者氏名ふりがな）が抜けていた分の追記。既存の入力は一切触らない。
+function extendInputFormSheetForTantoshaFurigana_(ss) {
+  const sheet = ss.getSheetByName(SHEET_NAMES.form);
+  if (!sheet) return;
+  if (sheet.getRange('C30').getValue() !== '') return; // 既に項目26がある＝追加済み
+  sheet.getRange(30, 1, 1, 6).setValues([
+    [26, '🟩直接入力', '担当者氏名ふりがな（カタカナ）', '', '任意', ''],
+  ]);
+}
+
 // 未入力＝黄色ハイライト。設計書§3の通り、1セル＝1ルールで個別に作る（範囲まとめ・逆ルールは作らない）。
 function applyConditionalFormatting_(ss) {
   const sheet = ss.getSheetByName(SHEET_NAMES.form);
@@ -354,6 +367,7 @@ function transcribeToMaster() {
   let ovalCount = 0;
   let checkCount = 0;
   let charCount = 0;
+  const skipped = []; // 「入力はあるのに何も転記されなかった」ケースを可視化するための記録
 
   config.forEach((row) => {
     const [id, kind, formCell, sheetName, target, extra1, extra2] = row;
@@ -379,15 +393,27 @@ function transcribeToMaster() {
       removeExistingAutoImages_(masterSheet, id);
       if (value === '' || value === null) return;
       let optionMap;
-      try { optionMap = JSON.parse(extra1); } catch (e) { return; }
+      try {
+        optionMap = JSON.parse(extra1);
+      } catch (e) {
+        skipped.push(id + '：設定シートの選択肢データ(JSON)が壊れています');
+        return;
+      }
       const cellA1 = optionMap[String(value)];
-      if (!cellA1) return; // 想定外の値は安全側で何もしない
-      if (kind === 'ovaln') {
-        insertOvalAt_(masterSheet, id, cellA1);
-        ovalCount++;
-      } else {
-        insertCheckAt_(masterSheet, id, cellA1);
-        checkCount++;
+      if (!cellA1) {
+        skipped.push(id + '：入力値「' + value + '」が選択肢のどれとも一致しません');
+        return;
+      }
+      try {
+        if (kind === 'ovaln') {
+          insertOvalAt_(masterSheet, id, cellA1);
+          ovalCount++;
+        } else {
+          insertCheckAt_(masterSheet, id, cellA1);
+          checkCount++;
+        }
+      } catch (e) {
+        skipped.push(id + '：画像の配置に失敗しました（' + e.message + '）');
       }
     } else if (kind === 'textOrFallback') {
       let v = value;
@@ -404,10 +430,13 @@ function transcribeToMaster() {
     }
   });
 
-  SpreadsheetApp.getUi().alert(
+  let msg =
     '転記が完了しました。\nテキスト転記: ' + textCount + '件 / 楕円配置: ' + ovalCount + '件 / ' +
-    'チェック配置: ' + checkCount + '件 / 文字分解転記: ' + charCount + '件'
-  );
+    'チェック配置: ' + checkCount + '件 / 文字分解転記: ' + charCount + '件';
+  if (skipped.length > 0) {
+    msg += '\n\n⚠ 以下は転記されませんでした：\n' + skipped.join('\n');
+  }
+  SpreadsheetApp.getUi().alert(msg);
 }
 
 function insertOvalAt_(sheet, fieldId, targetCellA1) {
