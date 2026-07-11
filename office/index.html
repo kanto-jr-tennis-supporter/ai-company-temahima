@@ -842,11 +842,9 @@
         var askBlock = kind === "addone" ? "" : (st === "review"
           ? '<button class="tl-approve" data-tcmd="' + escAttr(cmd) + '">🖐 ' + esc(t.hint ? "中身を確認 → OKなら指示文をコピー" : "指示文をコピー") + '</button>'
           : '<div class="tl-ask"><span class="q">💬 ' + esc(cmd) + '</span><button class="tl-copy" data-tcmd="' + escAttr(cmd) + '">コピー</button></div>');
-        // review（社長の確認待ち）は「🖐 指示文をコピー」で正式に片づけるのが正しい流れなので、
-        // ここに完了ボタンを出すと中身を見ずに完了扱いできてしまう。todo/doing と addone だけに限定する。
         var completeBlock = st === "done"
           ? '<div class="tl-done-note">✓ 完了しました</div>'
-          : (st === "review" ? "" : '<button class="tl-complete" data-tcomplete="' + escAttr(kind + ":" + (t.id || "")) + '">✅ 完了にする</button>');
+          : '<button class="tl-complete" data-tcomplete="' + escAttr(kind + ":" + (t.id || "")) + '">✅ 完了にする</button>';
         var action = askBlock + completeBlock;
         return (
           '<div class="tl-item ' + st + (t.id === focusId ? " open" : "") + '" data-tid="' + escAttr(t.id || "") + '">' +

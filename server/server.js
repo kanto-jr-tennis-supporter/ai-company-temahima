@@ -298,8 +298,17 @@ app.post("/api/tasks/complete", async (req, res) => {
     const github = { attempted: false };
     if (GITHUB_TOKEN && GITHUB_REPO) {
       github.attempted = true;
-      try { await commitStateToGitHub(newCode, id); github.ok = true; }
-      catch (e) { github.ok = false; github.message = e.message; console.error("GitHubへの反映に失敗:", e.message); }
+      try {
+        await commitStateToGitHub(newCode, id);
+        github.ok = true;
+        console.log("✅ " + kind + ":" + id + " を完了にしました（GitHubにも反映OK）");
+      } catch (e) {
+        github.ok = false;
+        github.message = e.message;
+        console.error("⚠ " + kind + ":" + id + " は完了にしましたが、GitHubへの反映に失敗:", e.message);
+      }
+    } else {
+      console.log("✅ " + kind + ":" + id + " を完了にしました（GITHUB_TOKEN未設定のためGitHubへの反映はスキップ）");
     }
     res.json({ ok: true, id, kind, github });
   } catch (e) {
