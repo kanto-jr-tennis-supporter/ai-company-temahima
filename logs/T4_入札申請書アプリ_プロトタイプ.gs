@@ -92,6 +92,7 @@ function setup() {
 
   createInputGuideSheet_(ss);
   createInputFormSheet_(ss);
+  extendInputFormSheetIfNeeded_(ss); // 既存の「入力フォーム」に後から項目が増えた場合、入力済みデータは消さずに追記する
   createSettingsSheet_(ss);
   applyConditionalFormatting_(ss);
   protectMasterSheets_(ss);
@@ -244,6 +245,57 @@ function createInputFormSheet_(ss) {
   sheet.setColumnWidth(5, 50);
   sheet.setColumnWidth(6, 320);
   sheet.setFrozenRows(4);
+}
+
+// 「入力フォーム」が旧バージョン（項目1〜12＝D5〜D16まで）のまま残っている場合、
+// 項目13〜25（D17〜D29）を追記する。既に入力済みのD5〜D16の値は一切触らない。
+function extendInputFormSheetIfNeeded_(ss) {
+  const sheet = ss.getSheetByName(SHEET_NAMES.form);
+  if (!sheet) return;
+  if (sheet.getRange('C17').getValue() !== '') return; // 既に項目13以降がある＝拡張済み
+
+  const extraRows = [
+    [13, '🟩直接入力', '担当者氏名', '', '任意', '空欄なら代表者氏名と同じものを転記します'],
+    [14, '🟩直接入力', '本社（店）電話番号', '', '必須', ''],
+    [15, '🟩直接入力', '担当者電話番号', '', '任意', '空欄なら本社電話番号と同じものを転記します'],
+    [16, '🟩直接入力', '本社（店）ＦＡＸ番号', '', '必須', ''],
+    [17, '🟩直接入力', 'メールアドレス', '', '必須', ''],
+    [18, '🟩直接入力', '総職員数', '', '必須', '人数のみ入力'],
+    [19, '🟩直接入力', '営業年数', '', '必須', '総合評定値通知書に記載の数字をそのまま入力'],
+    [20, '🟨選択式', '設立年号（和暦）', '', '必須', 'プルダウンから選択'],
+    [21, '🟩直接入力', '設立年', '', '必須', '和暦の数字のみ（例：6）'],
+    [22, '🟩直接入力', '設立月', '', '必須', ''],
+    [23, '🟩直接入力', '設立日', '', '必須', ''],
+    [24, '🟨選択式', 'みなし大企業', '', '必須', '通常は「該当しない」のままでOK'],
+    [25, '🟨選択式', 'みなし大企業の該当理由', '', '任意', '24で「該当する」を選んだ場合のみ選択'],
+  ];
+  sheet.getRange(17, 1, extraRows.length, 6).setValues(extraRows);
+
+  sheet.getRange('D24').setDataValidation(
+    SpreadsheetApp.newDataValidation()
+      .requireValueInList(['明治', '大正', '昭和', '平成', '令和'], true)
+      .setAllowInvalid(false)
+      .build()
+  );
+  sheet.getRange('D28').setDataValidation(
+    SpreadsheetApp.newDataValidation()
+      .requireValueInList(['該当しない', '該当する'], true)
+      .setAllowInvalid(false)
+      .build()
+  );
+  if (sheet.getRange('D28').getValue() === '') sheet.getRange('D28').setValue('該当しない');
+  sheet.getRange('D29').setDataValidation(
+    SpreadsheetApp.newDataValidation()
+      .requireValueInList(['発行済株式2分の1以上', '発行済株式3分の2以上', '役員兼務'], true)
+      .setAllowInvalid(true)
+      .build()
+  );
+
+  // 進捗カウント式を、増えた必須項目数（REQUIRED_FORM_CELLS）で更新する。
+  const countBlankFormula = '=' + REQUIRED_FORM_CELLS.map((c) => 'COUNTBLANK(' + c + ')').join('+');
+  sheet.getRange('B2').setFormula(
+    '="未入力: " & (' + countBlankFormula.substring(1) + ') & " / ' + REQUIRED_FORM_CELLS.length + '件（必須項目）"'
+  );
 }
 
 // 未入力＝黄色ハイライト。設計書§3の通り、1セル＝1ルールで個別に作る（範囲まとめ・逆ルールは作らない）。
