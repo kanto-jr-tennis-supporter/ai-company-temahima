@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-14T09:15:00.000Z",
+  "updatedAt": "2026-07-14T09:45:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -587,60 +587,97 @@ window.AI_STATE = {
       "id": "T14",
       "title": "学級事務ひとまとめキット：新商品の設計（座席表・係一覧・部活動一覧など）",
       "owner": "サトル",
-      "status": "doing",
-      "progress": 0,
-      "hint": "",
-      "cmd": "T14の進み具合を見せて",
+      "status": "review",
+      "progress": 100,
+      "hint": "差別化の切り口と発売タイミングの決裁をお願いします",
+      "cmd": "T14の設計書見せて",
       "log": [
         {
           "time": "今日",
           "text": "社長発案。単品テンプレは無料競合が多いため、座席表・係一覧・部活動一覧などを「一式」でまとめる商品として、社長ならではの切り口をサトルが要件定義中"
+        },
+        {
+          "time": "今日",
+          "text": "設計書完成。コギト氏と丸かぶりする名札・出席チェック表はあえて外し、①年間運用型②部活動一覧（中学担任×部活顧問の切り口）の2軸で差別化。発売タイミング（4月商戦は既に過ぎている）含め社長の決裁待ち"
         }
       ],
-      "deliverables": []
+      "deliverables": [
+        {
+          "title": "T14_学級事務ひとまとめキット_商品設計書v1.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T14_学級事務ひとまとめキット_商品設計書v1.md",
+          "app": "Visual Studio Code"
+        }
+      ]
     },
     {
       "id": "T15",
       "title": "GoodNote対応テンプレ市場のリサーチ",
       "owner": "リサ",
-      "status": "doing",
-      "progress": 0,
+      "status": "done",
+      "progress": 100,
       "hint": "",
-      "cmd": "T15の進み具合を見せて",
+      "cmd": "",
       "log": [
         {
           "time": "今日",
           "text": "社長より、GAS×スプシとは別の市場（GoodNote等のノートアプリ向けテンプレ）が売れやすいか、という新しい問いを受けリサが調査開始"
+        },
+        {
+          "time": "今日",
+          "text": "調査完了・見送り推奨。TechScholar社「Digital Teacher's Planner」が2.4万人規模で既に押さえている専業市場で、勝負の決め手がデザインスキル（Canva/Procreate）＝社長の実績が活きない。GAS市場（T8）の空白地帯の方が有望"
+        }
+      ],
+      "deliverables": [
+        {
+          "title": "T15_GoodNote対応テンプレ市場リサーチ.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T15_GoodNote対応テンプレ市場リサーチ.md",
+          "app": "Visual Studio Code"
+        }
+      ]
+    },
+    {
+      "id": "T16",
+      "title": "案件パトロールの自動化（クラウドワークス新着を毎朝自動収集）",
+      "owner": "ハック",
+      "status": "doing",
+      "progress": 0,
+      "hint": "",
+      "cmd": "T16の進み具合を見せて",
+      "log": [
+        {
+          "time": "今日",
+          "text": "リサの提案「毎朝の自動案件パトロール」を社長が採用。T7（手動5分パトロール手順・検索URL8本＋足切り基準）を土台に、GASの時間主導トリガーで新着を自動収集しシートに一覧化する仕組みをハックが実装開始"
+        }
+      ],
+      "deliverables": []
+    },
+    {
+      "id": "T17",
+      "title": "納品後の定番メニュー「継続プラン」の設計",
+      "owner": "サトル",
+      "status": "doing",
+      "progress": 0,
+      "hint": "",
+      "cmd": "T17の進み具合を見せて",
+      "log": [
+        {
+          "time": "今日",
+          "text": "サトルの提案「納品後に必ず継続プランを添える型を作る」を社長が採用。単発受注を月額化する定番メニューの設計に着手"
         }
       ],
       "deliverables": []
     }
   ],
-  "proposals": [
-    {
-      "from": "リサ",
-      "title": "毎朝の自動案件パトロール",
-      "detail": "GAS・スプシ自動化の新着案件を毎朝リサーチして一覧化。応募の弾を切らさないのが今月6.5万の生命線です。",
-      "at": "12:00"
-    },
-    {
-      "from": "コトハ",
-      "title": "既存クライアントに月額サポートを提案",
-      "detail": "テレアポシートの納品先に「月額保守・改善サポート」を提案。単発で終わらせないのが月16.5万への一番の近道です。",
-      "at": "12:00"
-    },
-    {
-      "from": "サトル",
-      "title": "納品後の定番メニュー「継続プラン」を設計",
-      "detail": "受注のたびに月額プランを必ず添える型を作る。3社×3万円で毎月9万円の土台になります。",
-      "at": "12:00"
-    }
-  ],
+  "proposals": [],
   "employees": [
     {
       "name": "リサ",
-      "status": "working",
-      "taskId": "T15"
+      "status": "idle",
+      "taskId": ""
     },
     {
       "name": "コトハ",
@@ -650,12 +687,12 @@ window.AI_STATE = {
     {
       "name": "サトル",
       "status": "working",
-      "taskId": "T14"
+      "taskId": "T17"
     },
     {
       "name": "ハック",
       "status": "working",
-      "taskId": "T13"
+      "taskId": "T16"
     }
   ],
   "links": [
@@ -686,6 +723,21 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "アイ",
+      "text": "コトハの提案「月額サポート提案」は却下、リサ「自動案件パトロール」とサトル「継続プラン」は採用してT16・T17に起票しました💡"
+    },
+    {
+      "time": "今日",
+      "who": "リサ",
+      "text": "T15：GoodNoteテンプレ市場は見送り推奨。既に2.4万人規模の専業商品があり、勝負がデザインスキル勝負でGAS実績が活きません🔍"
+    },
+    {
+      "time": "今日",
+      "who": "サトル",
+      "text": "T14：学級事務ひとまとめキットの設計完了！コギト氏との丸かぶりを避け、部活動一覧という中学校ならではの切り口で差別化しました🧭"
+    },
     {
       "time": "今日",
       "who": "アイ",
