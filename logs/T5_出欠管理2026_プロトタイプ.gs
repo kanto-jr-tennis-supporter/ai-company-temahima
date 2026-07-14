@@ -54,17 +54,18 @@ function setup() {
   const studentCount = roster.getLastRow() - 1;
 
   createScheduleSheetIfNeeded_(ss);
-  createTodaySheetIfNeeded_(ss, studentCount);
+  rebuildTodaySheet_(ss, studentCount);
   createTemplateSheetIfNeeded_(ss);
-  createOverviewSheetIfNeeded_(ss, studentCount);
-  createRateSheetIfNeeded_(ss, studentCount);
+  rebuildOverviewSheet_(ss, studentCount);
+  rebuildRateSheet_(ss, studentCount);
   createStudentSheets_(ss, roster, studentCount);
 
   SpreadsheetApp.getUi().alert(
-    'セットアップが完了しました！\n\n' +
-    '・「名簿」の人数分だけ個人シートができています。\n' +
-    '・「予定」シートに活動日と予定内容を入れると、「出欠一覧」に自動で反映されます。\n' +
-    '・生徒には、それぞれの個人シートに「日付・状態（プルダウン）・理由」を入れてもらってください。'
+    'セットアップ（再）実行が完了しました！\n\n' +
+    '・「名簿」の人数分だけ個人シートができています（既存の個人シートの入力内容はそのままです）。\n' +
+    '・「予定」シートに活動日と予定内容を入れると、「出欠一覧」に自動で反映されます。「休み」と書いた日は集計対象から外れます。\n' +
+    '・生徒には、欠席・遅刻・早退・遅早のときだけ個人シートに記録してもらってください。何も記録しなければ「出席」として扱われます。\n' +
+    '・「出欠一覧」「出席率」「今日の一覧」は毎回作り直されるので、ロジックを直したときは setup を再実行するだけで反映されます。'
   );
 }
 
@@ -93,22 +94,30 @@ function createScheduleSheetIfNeeded_(ss) {
   sheet.setFrozenRows(1);
 }
 
-function createTodaySheetIfNeeded_(ss, studentCount) {
-  if (ss.getSheetByName(SHEET_NAMES.today)) return;
+// 「今日の一覧」は全部数式（ユーザーが直接データを書く場所ではない）ので、setup()を
+// 再実行するたびに作り直して、常に最新のロジックにする（名簿・予定・個人シートは触らない）。
+function rebuildTodaySheet_(ss, studentCount) {
+  const old = ss.getSheetByName(SHEET_NAMES.today);
+  if (old) ss.deleteSheet(old);
   const sheet = ss.insertSheet(SHEET_NAMES.today, 1);
 
   sheet.getRange('A1:E1').setValues([STATUS_OPTIONS]).setFontWeight('bold');
 
   const lastRow = studentCount + 1;
-  // H列=氏名、I列=今日の状態（各個人シートをTODAY()で引く）。表示上は隠し扱いの補助列。
+  // H列=氏名、I列=今日の状態（各個人シートをTODAY()で引く）。表示上は補助列。
+  // ・今日が「予定」で「休み」の日は、誰も表示しない（(休み)扱いにして5区分どれにも一致させない）
+  // ・今日が活動日で、本人シートに記録が無ければ「出席」とみなす
+  // ・今日がそもそも「予定」に無い日は、何も表示しない
   sheet.getRange('H1').setValue('（以下、補助列。消さないでください）');
   const namesFormulas = [];
   const statusFormulas = [];
   for (let i = 0; i < studentCount; i++) {
     const rosterRow = i + 2; // 名簿の実データ行
+    const helperRow = i + 2; // 今日の一覧の補助列の行
     namesFormulas.push(['=IFERROR(名簿!D' + rosterRow + ',"")']);
     statusFormulas.push([
-      '=IFERROR(VLOOKUP(TODAY(), INDIRECT("\'" & H' + (i + 2) + ' & "\'!A:C"), 2, FALSE), "")',
+      '=IFERROR(IF(VLOOKUP(TODAY(),' + SHEET_NAMES.schedule + '!$A$2:$B,2,FALSE)="休み","(休み)",' +
+      'IFERROR(VLOOKUP(TODAY(), INDIRECT("\'" & H' + helperRow + ' & "\'!A:C"), 2, FALSE), "出席")), "")',
     ]);
   }
   if (studentCount > 0) {
@@ -118,8 +127,7 @@ function createTodaySheetIfNeeded_(ss, studentCount) {
 
   // A2〜E2 に各区分のFILTER（該当者が0人でも空欄になるだけでエラーにならないようIFERRORでくるむ）
   const lastHelperRow = Math.max(lastRow, 2);
-  const filterFormulas = STATUS_OPTIONS.map((label, idx) => {
-    const col = String.fromCharCode(65 + idx); // A,B,C,D,E
+  const filterFormulas = STATUS_OPTIONS.map((label) => {
     return '=IFERROR(FILTER($H$2:$H$' + lastHelperRow + ', $I$2:$I$' + lastHelperRow + '="' + label + '"), "")';
   });
   sheet.getRange(2, 1, 1, STATUS_OPTIONS.length).setFormulas([filterFormulas]);
@@ -137,17 +145,19 @@ function createTemplateSheetIfNeeded_(ss) {
   sheet.setColumnWidth(3, 220);
   sheet.setFrozenRows(1);
 
-  // B列（状態）は「今日の一覧」の見出し（A1:E1）をそのまま選択肢にする。
-  // 「今日の一覧」側の区分を変えれば、ここの選択肢も自動で追従する。
+  // B列（状態）は5区分の固定リストから選ぶ（未入力＝出席とみなすので、
+  // 「出席」は基本選ばなくてよい。欠席・遅刻・早退・遅早のときだけ選ぶ運用）。
   const rule = SpreadsheetApp.newDataValidation()
-    .requireValueInRange(ss.getSheetByName(SHEET_NAMES.today).getRange('A1:E1'), true)
+    .requireValueInList(STATUS_OPTIONS, true)
     .setAllowInvalid(false)
     .build();
   sheet.getRange('B2:B1000').setDataValidation(rule);
 }
 
-function createOverviewSheetIfNeeded_(ss, studentCount) {
-  if (ss.getSheetByName(SHEET_NAMES.overview)) return;
+// 「出欠一覧」も全部数式なので、setup()のたびに作り直して最新ロジックにする。
+function rebuildOverviewSheet_(ss, studentCount) {
+  const old = ss.getSheetByName(SHEET_NAMES.overview);
+  if (old) ss.deleteSheet(old);
   const sheet = ss.insertSheet(SHEET_NAMES.overview, 3);
 
   sheet.getRange('A1:D1').setValues([['学年', 'クラス', '名前', '担任']]);
@@ -165,7 +175,12 @@ function createOverviewSheetIfNeeded_(ss, studentCount) {
   sheet.getRange(1, 5, 1, headerRow1.length).setFormulas([headerRow1]); // E1から
   sheet.getRange(2, 5, 1, headerRow2.length).setValues([headerRow2]); // E2から
 
-  // 学年・クラス・名前・担任（名簿から自動参照）＋ 各日付ペアの出欠・理由（本人シートをVLOOKUP）
+  // 学年・クラス・名前・担任（名簿から自動参照）＋ 各日付ペアの出欠・理由（本人シートをVLOOKUP）。
+  // ルール：
+  //  ・その日の「予定」が「休み」なら、出欠・理由とも空欄にする（誰も対象にしない）
+  //  ・予定が無い（未使用の列）場合も空欄にする
+  //  ・本人シートにその日の記録が無ければ「出席」とみなす（欠席・遅刻・早退・遅早が明示的に
+  //    記録されている日だけ、その内容を表示する）
   for (let i = 0; i < studentCount; i++) {
     const row = i + 3; // 出欠一覧の行（3行目から）
     const rosterRow = i + 2; // 名簿の行
@@ -178,11 +193,14 @@ function createOverviewSheetIfNeeded_(ss, studentCount) {
     const rowFormulas = [];
     for (let i2 = 1; i2 <= MAX_DATE_PAIRS; i2++) {
       const dateCol = columnToLetter_(5 + (i2 - 1) * 2);
+      const planCol = columnToLetter_(6 + (i2 - 1) * 2);
       rowFormulas.push(
-        '=IFERROR(VLOOKUP(' + dateCol + '$1, INDIRECT("\'" & $C' + row + ' & "\'!A:C"), 2, FALSE), "")'
+        '=IF(OR(' + planCol + '$1="休み",' + dateCol + '$1=""),"",' +
+        'IFERROR(VLOOKUP(' + dateCol + '$1, INDIRECT("\'" & $C' + row + ' & "\'!A:C"), 2, FALSE), "出席"))'
       );
       rowFormulas.push(
-        '=IFERROR(VLOOKUP(' + dateCol + '$1, INDIRECT("\'" & $C' + row + ' & "\'!A:C"), 3, FALSE), "")'
+        '=IF(OR(' + planCol + '$1="休み",' + dateCol + '$1=""),"",' +
+        'IFERROR(VLOOKUP(' + dateCol + '$1, INDIRECT("\'" & $C' + row + ' & "\'!A:C"), 3, FALSE), ""))'
       );
     }
     sheet.getRange(row, 5, 1, rowFormulas.length).setFormulas([rowFormulas]);
@@ -192,23 +210,29 @@ function createOverviewSheetIfNeeded_(ss, studentCount) {
   sheet.setFrozenColumns(4);
 }
 
-function createRateSheetIfNeeded_(ss, studentCount) {
-  if (ss.getSheetByName(SHEET_NAMES.rate)) return;
+// 「出席率」も全部数式なので、setup()のたびに作り直して最新ロジックにする。
+function rebuildRateSheet_(ss, studentCount) {
+  const old = ss.getSheetByName(SHEET_NAMES.rate);
+  if (old) ss.deleteSheet(old);
   const sheet = ss.insertSheet(SHEET_NAMES.rate, 4);
-  sheet.getRange('A1:D1').setValues([['氏名', '出席率', '出席数', '記録数']]).setFontWeight('bold');
+  sheet.getRange('A1:D1').setValues([['氏名', '出席率', '欠席数', '対象日数']]).setFontWeight('bold');
+
+  // 対象日数＝「予定」のうち日付があって「休み」でない件数（全員共通なので1回だけ組み立てる）
+  const targetDaysFormula =
+    '=COUNTIFS(' + SHEET_NAMES.schedule + '!$A$2:$A$1000,"<>",' +
+    SHEET_NAMES.schedule + '!$B$2:$B$1000,"<>休み")';
 
   for (let i = 0; i < studentCount; i++) {
     const row = i + 2;
     const rosterRow = i + 2;
     sheet.getRange(row, 1).setFormula('=IFERROR(名簿!D' + rosterRow + ',"")');
+    // 欠席数：本人シートで明示的に「欠席」を選んだ日数のみ（遅刻・早退・遅早は出席扱い）
     sheet.getRange(row, 3).setFormula(
-      '=IFERROR(COUNTIF(INDIRECT("\'" & A' + row + ' & "\'!B:B"),"出席"), 0)'
+      '=IFERROR(COUNTIF(INDIRECT("\'" & A' + row + ' & "\'!B:B"),"欠席"), 0)'
     );
-    sheet.getRange(row, 4).setFormula(
-      '=IFERROR(COUNTA(INDIRECT("\'" & A' + row + ' & "\'!B:B"))-1, 0)'
-    );
+    sheet.getRange(row, 4).setFormula(targetDaysFormula);
     sheet.getRange(row, 2).setFormula(
-      '=IFERROR(C' + row + '/D' + row + ',"")'
+      '=IFERROR((D' + row + '-C' + row + ')/D' + row + ',"")'
     );
     sheet.getRange(row, 2).setNumberFormat('0.0%');
   }
