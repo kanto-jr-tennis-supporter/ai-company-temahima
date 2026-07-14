@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-14T10:30:00.000Z",
+  "updatedAt": "2026-07-14T10:45:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -720,14 +720,30 @@ window.AI_STATE = {
           "app": "Visual Studio Code"
         }
       ]
+    },
+    {
+      "id": "T18",
+      "title": "ジュニアテニス大会カレンダー：保護者向け販売の市場調査",
+      "owner": "リサ",
+      "status": "doing",
+      "progress": 0,
+      "hint": "",
+      "cmd": "T18の進み具合を見せて",
+      "log": [
+        {
+          "time": "今日",
+          "text": "社長が運営する「関東ジュニアテニス大会カレンダー」(kanto-jr-tennis-supporter.github.io/tennis-calendar)を、ジュニアテニスの保護者向けに販売できないか、リサが市場調査を開始"
+        }
+      ],
+      "deliverables": []
     }
   ],
   "proposals": [],
   "employees": [
     {
       "name": "リサ",
-      "status": "idle",
-      "taskId": ""
+      "status": "working",
+      "taskId": "T18"
     },
     {
       "name": "コトハ",
@@ -773,6 +789,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "リサ",
+      "text": "T18：関東ジュニアテニス大会カレンダーを保護者向けに販売できないか、市場調査を始めました🔍"
+    },
     {
       "time": "今日",
       "who": "ハック",
