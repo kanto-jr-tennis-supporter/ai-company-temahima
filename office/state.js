@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-14T10:00:00.000Z",
+  "updatedAt": "2026-07-14T10:15:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -643,17 +643,36 @@ window.AI_STATE = {
       "id": "T16",
       "title": "案件パトロールの自動化（クラウドワークス新着を毎朝自動収集）",
       "owner": "ハック",
-      "status": "doing",
-      "progress": 0,
-      "hint": "",
-      "cmd": "T16の進み具合を見せて",
+      "status": "review",
+      "progress": 90,
+      "hint": "新しいスプレッドシートでコードを貼ってsetup実行→「🧪 接続テスト」を1回実行して結果を教えてください",
+      "cmd": "T16の接続テスト、成功した（/403だった）",
       "log": [
         {
           "time": "今日",
           "text": "リサの提案「毎朝の自動案件パトロール」を社長が採用。T7（手動5分パトロール手順・検索URL8本＋足切り基準）を土台に、GASの時間主導トリガーで新着を自動収集しシートに一覧化する仕組みをハックが実装開始"
+        },
+        {
+          "time": "今日",
+          "text": "実装完了。ただしcrowdworksのrobots.txt自体が別経路からも403だった点を正直に報告し、GASのUrlFetchAppなら通る可能性はあるが未確証として「🧪接続テスト」機能と、ブロック時の次善策（手動貼付→自動判定のみ）を組み込んだ。社長の接続テスト結果待ち"
         }
       ],
-      "deliverables": []
+      "deliverables": [
+        {
+          "title": "T16_案件パトロール自動化.gs",
+          "type": "コード",
+          "at": "今日",
+          "path": "logs/T16_案件パトロール自動化.gs",
+          "app": "Visual Studio Code"
+        },
+        {
+          "title": "T16_構築・検証手順.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T16_構築・検証手順.md",
+          "app": "Visual Studio Code"
+        }
+      ]
     },
     {
       "id": "T17",
@@ -704,7 +723,7 @@ window.AI_STATE = {
     {
       "name": "ハック",
       "status": "working",
-      "taskId": "T16"
+      "taskId": "T13"
     }
   ],
   "links": [
@@ -735,6 +754,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "ハック",
+      "text": "T16：案件パトロール自動化コード完成！ただしCW側のブロックが強い可能性を正直に報告済み。「🧪接続テスト」で社長の確認待ちです⚙️"
+    },
     {
       "time": "今日",
       "who": "サトル",
