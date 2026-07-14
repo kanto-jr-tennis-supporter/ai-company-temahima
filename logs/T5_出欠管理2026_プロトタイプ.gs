@@ -105,35 +105,43 @@ function rebuildTodaySheet_(ss, studentCount) {
 
   const lastRow = studentCount + 1;
   // H列=氏名、I列=今日の状態（各個人シートをTODAY()で引く）。表示上は補助列。
-  // ・今日が「予定」で「休み」の日は、誰も表示しない（(休み)扱いにして5区分どれにも一致させない）
-  // ・今日が活動日で、本人シートに記録が無ければ「出席」とみなす
-  // ・今日がそもそも「予定」に無い日は、何も表示しない
+  // ・今日の日付が「予定」にあって、かつ「休み」なら → 誰も対象にしない（(休み)扱い）
+  // ・今日の日付が「予定」に無い（＝まだ予定を入れていない）場合も、「休み」とは違うので
+  //   通常どおり判定する（＝本人シートに記録が無ければ「出席」とみなす）
+  // ・本人シートにその日の記録があれば、その内容（欠席／遅刻／早退／遅早）を表示する
   sheet.getRange('H1').setValue('（以下、補助列。消さないでください）');
   const namesFormulas = [];
   const statusFormulas = [];
   for (let i = 0; i < studentCount; i++) {
     const rosterRow = i + 2; // 名簿の実データ行
-    const helperRow = i + 2; // 今日の一覧の補助列の行
+    const helperRow = i + 3; // 今日の一覧の補助列の行（2行目はカウント行なので3行目から）
     namesFormulas.push(['=IFERROR(名簿!D' + rosterRow + ',"")']);
     statusFormulas.push([
-      '=IFERROR(IF(VLOOKUP(TODAY(),' + SHEET_NAMES.schedule + '!$A$2:$B,2,FALSE)="休み","(休み)",' +
-      'IFERROR(VLOOKUP(TODAY(), INDIRECT("\'" & H' + helperRow + ' & "\'!A:C"), 2, FALSE), "出席")), "")',
+      '=IF(IFERROR(VLOOKUP(TODAY(),' + SHEET_NAMES.schedule + '!$A$2:$B,2,FALSE),"")="休み","(休み)",' +
+      'IFERROR(VLOOKUP(TODAY(), INDIRECT("\'" & H' + helperRow + ' & "\'!A:C"), 2, FALSE), "出席"))',
     ]);
   }
   if (studentCount > 0) {
-    sheet.getRange(2, 8, studentCount, 1).setFormulas(namesFormulas); // H2から
-    sheet.getRange(2, 9, studentCount, 1).setFormulas(statusFormulas); // I2から
+    sheet.getRange(3, 8, studentCount, 1).setFormulas(namesFormulas); // H3から
+    sheet.getRange(3, 9, studentCount, 1).setFormulas(statusFormulas); // I3から
   }
 
-  // A2〜E2 に各区分のFILTER（該当者が0人でも空欄になるだけでエラーにならないようIFERRORでくるむ）
-  const lastHelperRow = Math.max(lastRow, 2);
-  const filterFormulas = STATUS_OPTIONS.map((label) => {
-    return '=IFERROR(FILTER($H$2:$H$' + lastHelperRow + ', $I$2:$I$' + lastHelperRow + '="' + label + '"), "")';
+  // 2行目：各区分に該当する人数
+  const lastHelperRow = Math.max(lastRow + 1, 3);
+  const countFormulas = STATUS_OPTIONS.map((label) => {
+    return '=COUNTIF($I$3:$I$' + lastHelperRow + ',"' + label + '")';
   });
-  sheet.getRange(2, 1, 1, STATUS_OPTIONS.length).setFormulas([filterFormulas]);
+  sheet.getRange(2, 1, 1, STATUS_OPTIONS.length).setFormulas([countFormulas]);
+  sheet.getRange(2, 1, 1, STATUS_OPTIONS.length).setFontColor('#666666');
+
+  // 3行目以降：各区分のFILTER（該当者が0人でも空欄になるだけでエラーにならないようIFERRORでくるむ）
+  const filterFormulas = STATUS_OPTIONS.map((label) => {
+    return '=IFERROR(FILTER($H$3:$H$' + lastHelperRow + ', $I$3:$I$' + lastHelperRow + '="' + label + '"), "")';
+  });
+  sheet.getRange(3, 1, 1, STATUS_OPTIONS.length).setFormulas([filterFormulas]);
 
   sheet.setColumnWidths(1, STATUS_OPTIONS.length, 110);
-  sheet.setFrozenRows(1);
+  sheet.setFrozenRows(2);
 }
 
 function createTemplateSheetIfNeeded_(ss) {
