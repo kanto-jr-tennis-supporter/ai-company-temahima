@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-14T09:00:00.000Z",
+  "updatedAt": "2026-07-14T09:15:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -566,6 +566,54 @@ window.AI_STATE = {
           "app": "Visual Studio Code"
         }
       ]
+    },
+    {
+      "id": "T13",
+      "title": "部活キット完全版：会計簿（部費管理）シートの実装",
+      "owner": "ハック",
+      "status": "doing",
+      "progress": 0,
+      "hint": "",
+      "cmd": "T13の進み具合を見せて",
+      "log": [
+        {
+          "time": "今日",
+          "text": "社長がT8の1位商品（部活動まるごと管理キット）の完全版制作を決定。T11設計書§3-B（会計簿・部費徴収・年度末報告）に沿ってハックが実装着手"
+        }
+      ],
+      "deliverables": []
+    },
+    {
+      "id": "T14",
+      "title": "学級事務ひとまとめキット：新商品の設計（座席表・係一覧・部活動一覧など）",
+      "owner": "サトル",
+      "status": "doing",
+      "progress": 0,
+      "hint": "",
+      "cmd": "T14の進み具合を見せて",
+      "log": [
+        {
+          "time": "今日",
+          "text": "社長発案。単品テンプレは無料競合が多いため、座席表・係一覧・部活動一覧などを「一式」でまとめる商品として、社長ならではの切り口をサトルが要件定義中"
+        }
+      ],
+      "deliverables": []
+    },
+    {
+      "id": "T15",
+      "title": "GoodNote対応テンプレ市場のリサーチ",
+      "owner": "リサ",
+      "status": "doing",
+      "progress": 0,
+      "hint": "",
+      "cmd": "T15の進み具合を見せて",
+      "log": [
+        {
+          "time": "今日",
+          "text": "社長より、GAS×スプシとは別の市場（GoodNote等のノートアプリ向けテンプレ）が売れやすいか、という新しい問いを受けリサが調査開始"
+        }
+      ],
+      "deliverables": []
     }
   ],
   "proposals": [
@@ -591,8 +639,8 @@ window.AI_STATE = {
   "employees": [
     {
       "name": "リサ",
-      "status": "idle",
-      "taskId": ""
+      "status": "working",
+      "taskId": "T15"
     },
     {
       "name": "コトハ",
@@ -601,13 +649,13 @@ window.AI_STATE = {
     },
     {
       "name": "サトル",
-      "status": "idle",
-      "taskId": ""
+      "status": "working",
+      "taskId": "T14"
     },
     {
       "name": "ハック",
-      "status": "idle",
-      "taskId": ""
+      "status": "working",
+      "taskId": "T13"
     }
   ],
   "links": [
@@ -638,6 +686,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "アイ",
+      "text": "リサ・サトル・ハックが同時に動き始めました（T15・T14・T13の並列進行）💨"
+    },
     {
       "time": "今日",
       "who": "ハック",
