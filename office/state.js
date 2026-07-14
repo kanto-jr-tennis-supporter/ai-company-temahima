@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-14T10:45:00.000Z",
+  "updatedAt": "2026-07-14T11:00:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -725,25 +725,37 @@ window.AI_STATE = {
       "id": "T18",
       "title": "ジュニアテニス大会カレンダー：保護者向け販売の市場調査",
       "owner": "リサ",
-      "status": "doing",
-      "progress": 0,
+      "status": "done",
+      "progress": 100,
       "hint": "",
-      "cmd": "T18の進み具合を見せて",
+      "cmd": "",
       "log": [
         {
           "time": "今日",
           "text": "社長が運営する「関東ジュニアテニス大会カレンダー」(kanto-jr-tennis-supporter.github.io/tennis-calendar)を、ジュニアテニスの保護者向けに販売できないか、リサが市場調査を開始"
+        },
+        {
+          "time": "今日",
+          "text": "調査完了・保護者への直接課金は見送り推奨。大会一覧はテニジュ・スポ人・テニスベア等の無料競合が既に複数ありレッドオーシャン。ただし「ダブルエントリー警告」機能は競合に見当たらず、コーチ・スクール向けB2B2Cとしての検証価値ありと判定。設計図のゴール（学校・教育向け）とはズレるため優先度は低めが妥当"
         }
       ],
-      "deliverables": []
+      "deliverables": [
+        {
+          "title": "T18_ジュニアテニス大会カレンダー市場調査.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T18_ジュニアテニス大会カレンダー市場調査.md",
+          "app": "Visual Studio Code"
+        }
+      ]
     }
   ],
   "proposals": [],
   "employees": [
     {
       "name": "リサ",
-      "status": "working",
-      "taskId": "T18"
+      "status": "idle",
+      "taskId": ""
     },
     {
       "name": "コトハ",
@@ -789,6 +801,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "リサ",
+      "text": "T18：保護者への直接販売は見送り推奨、ダブルエントリー警告機能を軸にしたコーチ・スクール向けB2B2Cなら検証価値ありと判定しました🔍"
+    },
     {
       "time": "今日",
       "who": "リサ",
