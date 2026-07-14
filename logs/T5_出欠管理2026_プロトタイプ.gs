@@ -59,14 +59,52 @@ function setup() {
   rebuildOverviewSheet_(ss, studentCount);
   rebuildRateSheet_(ss, studentCount);
   createStudentSheets_(ss, roster, studentCount);
+  ensureDailyHideTrigger_();
+  hidePastDateColumns(); // セットアップ時点でも一度、過去日を隠しておく
 
   SpreadsheetApp.getUi().alert(
     'セットアップ（再）実行が完了しました！\n\n' +
     '・「名簿」の人数分だけ個人シートができています（既存の個人シートの入力内容はそのままです）。\n' +
     '・「予定」シートに活動日と予定内容を入れると、「出欠一覧」に自動で反映されます。「休み」と書いた日は集計対象から外れます。\n' +
     '・生徒には、欠席・遅刻・早退・遅早のときだけ個人シートに記録してもらってください。何も記録しなければ「出席」として扱われます。\n' +
-    '・「出欠一覧」「出席率」「今日の一覧」は毎回作り直されるので、ロジックを直したときは setup を再実行するだけで反映されます。'
+    '・「出欠一覧」「出席率」「今日の一覧」は毎回作り直されるので、ロジックを直したときは setup を再実行するだけで反映されます。\n' +
+    '・過去の日付の列は、毎晩自動で非表示になります（生徒の入力操作とは関係なく、サーバー側で自動実行されるので、携帯が重くなることはありません）。'
   );
+}
+
+// 「出欠一覧」の日付ペアのうち、今日より前のものを毎晩自動で隠す（＝当日以降だけが見える状態を保つ）。
+// 時間主導トリガーで実行されるため、生徒がスマホで個人シートを触る動作とは完全に無関係。
+// 生徒の編集がきっかけで動くスクリプトでは無いので、携帯の動作が重くなることはない。
+function hidePastDateColumns() {
+  const ss = SpreadsheetApp.getActive();
+  const sheet = ss.getSheetByName(SHEET_NAMES.overview);
+  if (!sheet) return;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (let i = 1; i <= MAX_DATE_PAIRS; i++) {
+    const dateCol = 5 + (i - 1) * 2; // E,G,I...（1始まりの列番号）
+    const dateValue = sheet.getRange(1, dateCol).getValue();
+    if (!dateValue) continue; // まだ予定が入っていない列はそのまま（表示のまま）にする
+
+    const d = new Date(dateValue);
+    d.setHours(0, 0, 0, 0);
+    if (d.getTime() < today.getTime()) {
+      sheet.hideColumns(dateCol, 2);
+    } else {
+      sheet.showColumns(dateCol, 2);
+    }
+  }
+}
+
+// 毎晩1回、hidePastDateColumnsを自動実行するトリガーを用意する（無ければ作る。二重作成はしない）。
+function ensureDailyHideTrigger_() {
+  const already = ScriptApp.getProjectTriggers().some(
+    (t) => t.getHandlerFunction() === 'hidePastDateColumns'
+  );
+  if (already) return;
+  ScriptApp.newTrigger('hidePastDateColumns').timeBased().everyDays(1).atHour(4).create();
 }
 
 // 名簿に人数が増えたときだけ再実行する軽い版（個人シート追加のみ）
