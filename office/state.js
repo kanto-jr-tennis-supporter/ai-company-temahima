@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-14T10:15:00.000Z",
+  "updatedAt": "2026-07-14T10:30:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -571,17 +571,36 @@ window.AI_STATE = {
       "id": "T13",
       "title": "部活キット完全版：会計簿（部費管理）シートの実装",
       "owner": "ハック",
-      "status": "doing",
-      "progress": 0,
-      "hint": "",
-      "cmd": "T13の進み具合を見せて",
+      "status": "review",
+      "progress": 100,
+      "hint": "テニス部の実データで構築・検証手順を試して、現場目線の赤入れをお願いします",
+      "cmd": "T13を構築してみる。手順を1ステップずつ案内して",
       "log": [
         {
           "time": "今日",
           "text": "社長がT8の1位商品（部活動まるごと管理キット）の完全版制作を決定。T11設計書§3-B（会計簿・部費徴収・年度末報告）に沿ってハックが実装着手"
+        },
+        {
+          "time": "今日",
+          "text": "実装完了。T12（出欠管理）に会計簿・部費徴収（未納者自動表示）・年度末報告（A4印刷レイアウト自動生成）を追加した1本のGASに。匿名販売方針も踏襲。社長の実地検証待ち"
         }
       ],
-      "deliverables": []
+      "deliverables": [
+        {
+          "title": "T13_部活キット_会計簿.gs（会計簿・部費徴収・年度末報告つき完全版）",
+          "type": "コード",
+          "at": "今日",
+          "path": "logs/T13_部活キット_会計簿.gs",
+          "app": "Visual Studio Code"
+        },
+        {
+          "title": "T13_構築・検証手順.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T13_構築・検証手順.md",
+          "app": "Visual Studio Code"
+        }
+      ]
     },
     {
       "id": "T14",
@@ -722,8 +741,8 @@ window.AI_STATE = {
     },
     {
       "name": "ハック",
-      "status": "working",
-      "taskId": "T13"
+      "status": "idle",
+      "taskId": ""
     }
   ],
   "links": [
@@ -754,6 +773,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "ハック",
+      "text": "T13：部活キット完全版、会計簿・部費徴収（未納者自動表示）・年度末報告まで実装完了！テニス部での実地検証をお願いします⚙️"
+    },
     {
       "time": "今日",
       "who": "ハック",
