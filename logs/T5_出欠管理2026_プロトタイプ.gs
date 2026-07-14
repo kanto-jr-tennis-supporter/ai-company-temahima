@@ -54,6 +54,7 @@ function setup() {
   const studentCount = roster.getLastRow() - 1;
 
   createScheduleSheetIfNeeded_(ss);
+  applyScheduleDateFormat_(ss);
   rebuildTodaySheet_(ss, studentCount);
   createTemplateSheetIfNeeded_(ss);
   rebuildOverviewSheet_(ss, studentCount);
@@ -88,7 +89,11 @@ function hidePastDateColumns() {
     const dateValue = sheet.getRange(1, dateCol).getValue();
     if (!dateValue) continue; // まだ予定が入っていない列はそのまま（表示のまま）にする
 
-    const d = new Date(dateValue);
+    // 「予定」の日付が文字列（テキスト）で入っていて日付として認識できていない場合、
+    // 誤って全部隠してしまう事故を防ぐため、本物の日付だと確認できた列だけを判定する。
+    if (!(dateValue instanceof Date)) continue;
+
+    const d = new Date(dateValue.getTime());
     d.setHours(0, 0, 0, 0);
     if (d.getTime() < today.getTime()) {
       sheet.hideColumns(dateCol, 2);
@@ -130,6 +135,16 @@ function createScheduleSheetIfNeeded_(ss) {
   sheet.setColumnWidth(1, 100);
   sheet.setColumnWidth(2, 220);
   sheet.setFrozenRows(1);
+}
+
+// 「予定」のA列（日付）の表示形式を「7/20(月)」のような形に統一する。
+// 表示形式を変えるだけで中身（値）は変えないので、既存データがあっても毎回実行して問題ない。
+// ここで見た目が変わらない（M/D(曜)にならない）セルがあれば、それは日付として認識されて
+// いない「文字列」の可能性が高いサイン（手順書参照）。
+function applyScheduleDateFormat_(ss) {
+  const sheet = ss.getSheetByName(SHEET_NAMES.schedule);
+  if (!sheet) return;
+  sheet.getRange('A2:A1000').setNumberFormat('M/D(aaa)');
 }
 
 // 「今日の一覧」は全部数式（ユーザーが直接データを書く場所ではない）ので、setup()を
@@ -219,6 +234,7 @@ function rebuildOverviewSheet_(ss, studentCount) {
     headerRow2.push('理由');
   }
   sheet.getRange(1, 5, 1, headerRow1.length).setFormulas([headerRow1]); // E1から
+  sheet.getRange(1, 5, 1, headerRow1.length).setNumberFormat('M/D(aaa)'); // 予定列(文字列)には影響しない
   sheet.getRange(2, 5, 1, headerRow2.length).setValues([headerRow2]); // E2から
 
   // 学年・クラス・名前・担任（名簿から自動参照）＋ 各日付ペアの出欠・理由（本人シートをVLOOKUP）。
