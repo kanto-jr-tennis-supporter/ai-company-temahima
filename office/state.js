@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-14T09:45:00.000Z",
+  "updatedAt": "2026-07-14T10:00:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -659,17 +659,29 @@ window.AI_STATE = {
       "id": "T17",
       "title": "納品後の定番メニュー「継続プラン」の設計",
       "owner": "サトル",
-      "status": "doing",
-      "progress": 0,
-      "hint": "",
-      "cmd": "T17の進み具合を見せて",
+      "status": "review",
+      "progress": 100,
+      "hint": "「3社×3万円」が単発額か継続月額かの意図確認と、プラン段数・提案の押し方の決裁をお願いします",
+      "cmd": "T17の設計書見せて",
       "log": [
         {
           "time": "今日",
           "text": "サトルの提案「納品後に必ず継続プランを添える型を作る」を社長が採用。単発受注を月額化する定番メニューの設計に着手"
+        },
+        {
+          "time": "今日",
+          "text": "設計完了。見守り¥3,000／おまかせ¥8,000〜10,000／伴走¥15,000〜30,000の3段プランと、納品直後ではなく1〜2週間後に提案するタイミング設計、押し売り感を消す提案文2種を用意。3つの論点は社長の決裁待ち"
         }
       ],
-      "deliverables": []
+      "deliverables": [
+        {
+          "title": "T17_継続プランメニュー設計.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T17_継続プランメニュー設計.md",
+          "app": "Visual Studio Code"
+        }
+      ]
     }
   ],
   "proposals": [],
@@ -686,8 +698,8 @@ window.AI_STATE = {
     },
     {
       "name": "サトル",
-      "status": "working",
-      "taskId": "T17"
+      "status": "idle",
+      "taskId": ""
     },
     {
       "name": "ハック",
@@ -723,6 +735,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "サトル",
+      "text": "T17：継続プランの型が完成！3段プラン＋押し売り感を消す提案文まで用意しました。3つの論点は社長の決裁待ちです🧭"
+    },
     {
       "time": "今日",
       "who": "アイ",
