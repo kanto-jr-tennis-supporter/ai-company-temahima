@@ -249,15 +249,9 @@ function createTemplateSheetIfNeeded_(ss) {
   sheet.setColumnWidth(2, 90);
   sheet.setColumnWidth(3, 220);
   sheet.setFrozenRows(1);
+  // A列（日付）とB列（状態。5区分の固定リストから選択。未入力＝出席とみなすので、
+  // 「出席」は基本選ばなくてよい。欠席・遅刻・早退・遅早のときだけ選ぶ運用）のバリデーションを設定。
   applyStudentSheetDateValidation_(sheet);
-
-  // B列（状態）は5区分の固定リストから選ぶ（未入力＝出席とみなすので、
-  // 「出席」は基本選ばなくてよい。欠席・遅刻・早退・遅早のときだけ選ぶ運用）。
-  const rule = SpreadsheetApp.newDataValidation()
-    .requireValueInList(STATUS_OPTIONS, true)
-    .setAllowInvalid(false)
-    .build();
-  sheet.getRange('B2:B1000').setDataValidation(rule);
 }
 
 // A列（日付）を「本物の日付」に固定する。文字列で入力されると、今日の一覧・出欠一覧の
@@ -270,11 +264,20 @@ function applyStudentSheetDateValidation_(sheet) {
     .setHelpText('日付の形式で入力してください（例：2026/7/20）。文字として入力すると、出欠一覧・今日の一覧に反映されません。')
     .build();
   sheet.getRange('A2:A1000').setDataValidation(dateRule);
+
+  // B列（状態）。旧バージョンでは「今日の一覧」のセル範囲を直接参照する方式だったため、
+  // 「今日の一覧」を作り直す（setup再実行のたび）とその参照が壊れ、正しい値（欠席等）を
+  // 選んでも「データ入力規則に違反しています」となる不具合があった。固定リスト参照に統一して直す。
+  const statusRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(STATUS_OPTIONS, true)
+    .setAllowInvalid(false)
+    .build();
+  sheet.getRange('B2:B1000').setDataValidation(statusRule);
 }
 
-// 既存の個人シート（名簿の人数分）にも同じ日付バリデーションを後付けする。
+// 既存の個人シート（名簿の人数分）にも同じバリデーション（日付・状態プルダウン）を後付けする。
 // テンプレートの変更は「これから新しく作る個人シート」にしか効かないため、
-// 既にできている個人シートにも同じ安全策を反映させる。
+// 既にできている個人シートにも同じ安全策・修正を反映させる。
 function applyDateValidationToAllStudentSheets_(ss, roster, studentCount) {
   const names = roster.getRange(2, 4, studentCount, 1).getValues().flat().filter((n) => n);
   names.forEach((name) => {
