@@ -211,13 +211,18 @@ function rebuildOverviewSheet_(ss, studentCount) {
 }
 
 // 「出席率」も全部数式なので、setup()のたびに作り直して最新ロジックにする。
+// 列構成：A氏名 / B練習日数 / C出席日数 / D欠席日数 / E遅刻日数 / F早退日数 / G遅早日数 /
+//        H全部含めた率（遅刻・早退・遅早は出席扱い）/ I出席だけの率（完全に出席のみ）
 function rebuildRateSheet_(ss, studentCount) {
   const old = ss.getSheetByName(SHEET_NAMES.rate);
   if (old) ss.deleteSheet(old);
   const sheet = ss.insertSheet(SHEET_NAMES.rate, 4);
-  sheet.getRange('A1:D1').setValues([['氏名', '出席率', '欠席数', '対象日数']]).setFontWeight('bold');
+  sheet.getRange('A1:I1').setValues([[
+    '氏名', '練習日数', '出席日数', '欠席日数', '遅刻日数', '早退日数', '遅早日数',
+    '全部含めた率', '出席だけの率',
+  ]]).setFontWeight('bold');
 
-  // 対象日数＝「予定」のうち日付があって「休み」でない件数（全員共通なので1回だけ組み立てる）
+  // 練習日数＝「予定」のうち日付があって「休み」でない件数（全員共通なので1回だけ組み立てる）
   const targetDaysFormula =
     '=COUNTIFS(' + SHEET_NAMES.schedule + '!$A$2:$A$1000,"<>",' +
     SHEET_NAMES.schedule + '!$B$2:$B$1000,"<>休み")';
@@ -226,15 +231,23 @@ function rebuildRateSheet_(ss, studentCount) {
     const row = i + 2;
     const rosterRow = i + 2;
     sheet.getRange(row, 1).setFormula('=IFERROR(名簿!D' + rosterRow + ',"")');
-    // 欠席数：本人シートで明示的に「欠席」を選んだ日数のみ（遅刻・早退・遅早は出席扱い）
+    sheet.getRange(row, 2).setFormula(targetDaysFormula); // 練習日数
+    STATUS_OPTIONS.filter((s) => s !== '出席').forEach((label, idx) => {
+      // D=欠席日数 E=遅刻日数 F=早退日数 G=遅早日数（本人シートで明示的に選んだ日数）
+      sheet.getRange(row, 4 + idx).setFormula(
+        '=IFERROR(COUNTIF(INDIRECT("\'" & A' + row + ' & "\'!B:B"),"' + label + '"), 0)'
+      );
+    });
+    // 出席日数＝練習日数から欠席・遅刻・早退・遅早を引いた残り（＝記録なしの日）
     sheet.getRange(row, 3).setFormula(
-      '=IFERROR(COUNTIF(INDIRECT("\'" & A' + row + ' & "\'!B:B"),"欠席"), 0)'
+      '=IFERROR(B' + row + '-D' + row + '-E' + row + '-F' + row + '-G' + row + ', "")'
     );
-    sheet.getRange(row, 4).setFormula(targetDaysFormula);
-    sheet.getRange(row, 2).setFormula(
-      '=IFERROR((D' + row + '-C' + row + ')/D' + row + ',"")'
-    );
-    sheet.getRange(row, 2).setNumberFormat('0.0%');
+    // 全部含めた率：欠席だけを引く（遅刻・早退・遅早は出席扱い）
+    sheet.getRange(row, 8).setFormula('=IFERROR((B' + row + '-D' + row + ')/B' + row + ',"")');
+    // 出席だけの率：完全に出席（遅刻等も無し）だった日だけを分子にする
+    sheet.getRange(row, 9).setFormula('=IFERROR(C' + row + '/B' + row + ',"")');
+    sheet.getRange(row, 8).setNumberFormat('0.0%');
+    sheet.getRange(row, 9).setNumberFormat('0.0%');
   }
   sheet.setFrozenRows(1);
 }
