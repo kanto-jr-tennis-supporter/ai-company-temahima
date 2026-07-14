@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-14T08:10:00.000Z",
+  "updatedAt": "2026-07-14T09:00:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -501,10 +501,10 @@ window.AI_STATE = {
       "id": "T5",
       "title": "部活動出欠管理：今年度版を作り直す（個人シート＋数式の1ファイル方式）",
       "owner": "ハック",
-      "status": "doing",
-      "progress": 90,
+      "status": "done",
+      "progress": 100,
       "hint": "",
-      "cmd": "T5、続きをお願い",
+      "cmd": "",
       "log": [
         {
           "time": "今日",
@@ -537,6 +537,10 @@ window.AI_STATE = {
         {
           "time": "07:23",
           "text": "ダッシュボードの完了ボタンでまた完了扱いになっていましたが、新方式は現在進行形で作業中のため「進行中」に戻しました"
+        },
+        {
+          "time": "今日",
+          "text": "実運用で気になった点（未入力=出席／休みの除外／出席率の内訳／今日の一覧のバグ／過去列の自動非表示／日付の文字列化事故）を全部修正し、社長からOK。今後は実運用しながら不具合が出たら都度修正する運用フェーズへ"
         }
       ],
       "deliverables": [
@@ -634,6 +638,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "ハック",
+      "text": "T5：部活動出欠管理の今年度版が完成！社長のOKをいただきました。今後は運用しながら不具合を都度直します⚙️"
+    },
     {
       "time": "11:00",
       "who": "アイ",
