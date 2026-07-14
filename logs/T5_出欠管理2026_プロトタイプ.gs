@@ -36,7 +36,50 @@ function onOpen() {
     .createMenu('出欠管理')
     .addItem('① 初期セットアップ実行（setup）', 'setup')
     .addItem('② 個人シートを作り直す（新入部員が増えたとき）', 'addNewStudentSheets')
+    .addItem('③ 日付の入力ミスをチェックする', 'checkDateEntries')
     .addToUi();
+}
+
+// 全個人シートのA列（日付）を走査し、「本物の日付」になっていないセルを報告する。
+// これらは今日の一覧・出欠一覧に反映されない（欠席等が出席扱いになってしまう）ので、
+// 見つかったセルは日付形式（例：2026/7/20）で入力し直してもらう。
+function checkDateEntries() {
+  const ss = SpreadsheetApp.getActive();
+  const roster = ss.getSheetByName(SHEET_NAMES.roster);
+  if (!roster || roster.getLastRow() < 2) {
+    SpreadsheetApp.getUi().alert('「名簿」シートが見つからないか、名簿が空です。');
+    return;
+  }
+  const studentCount = roster.getLastRow() - 1;
+  const names = roster.getRange(2, 4, studentCount, 1).getValues().flat().filter((n) => n);
+
+  const problems = [];
+  names.forEach((name) => {
+    const sheet = ss.getSheetByName(name);
+    if (!sheet) return;
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) return;
+    const values = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    values.forEach((row, i) => {
+      const v = row[0];
+      if (v === '' || v === null) return;
+      if (!(v instanceof Date)) {
+        problems.push(name + '：' + (i + 2) + '行目「' + v + '」');
+      }
+    });
+  });
+
+  if (problems.length === 0) {
+    SpreadsheetApp.getUi().alert('日付の入力ミスは見つかりませんでした。全員、日付として正しく入力されています。');
+    return;
+  }
+  const shown = problems.slice(0, 30).join('\n');
+  const extra = problems.length > 30 ? '\n…ほか' + (problems.length - 30) + '件' : '';
+  SpreadsheetApp.getUi().alert(
+    '日付が「文字列」になっているセルが' + problems.length + '件見つかりました。\n' +
+    '（今日の一覧・出欠一覧に反映されません。日付形式(例:2026/7/20)で入力し直してください）\n\n' +
+    shown + extra
+  );
 }
 
 // ====== メイン ======
@@ -60,6 +103,7 @@ function setup() {
   rebuildOverviewSheet_(ss, studentCount);
   rebuildRateSheet_(ss, studentCount);
   createStudentSheets_(ss, roster, studentCount);
+  applyDateValidationToAllStudentSheets_(ss, roster, studentCount);
   ensureDailyHideTrigger_();
   hidePastDateColumns(); // セットアップ時点でも一度、過去日を隠しておく
 
@@ -205,6 +249,7 @@ function createTemplateSheetIfNeeded_(ss) {
   sheet.setColumnWidth(2, 90);
   sheet.setColumnWidth(3, 220);
   sheet.setFrozenRows(1);
+  applyStudentSheetDateValidation_(sheet);
 
   // B列（状態）は5区分の固定リストから選ぶ（未入力＝出席とみなすので、
   // 「出席」は基本選ばなくてよい。欠席・遅刻・早退・遅早のときだけ選ぶ運用）。
@@ -213,6 +258,30 @@ function createTemplateSheetIfNeeded_(ss) {
     .setAllowInvalid(false)
     .build();
   sheet.getRange('B2:B1000').setDataValidation(rule);
+}
+
+// A列（日付）を「本物の日付」に固定する。文字列で入力されると、今日の一覧・出欠一覧の
+// 日付照合（TODAY()やVLOOKUP）が一致しなくなり、「欠席のはずが出席と表示される」事故につながるため。
+function applyStudentSheetDateValidation_(sheet) {
+  sheet.getRange('A2:A1000').setNumberFormat('M/D(aaa)');
+  const dateRule = SpreadsheetApp.newDataValidation()
+    .requireDate()
+    .setAllowInvalid(false)
+    .setHelpText('日付の形式で入力してください（例：2026/7/20）。文字として入力すると、出欠一覧・今日の一覧に反映されません。')
+    .build();
+  sheet.getRange('A2:A1000').setDataValidation(dateRule);
+}
+
+// 既存の個人シート（名簿の人数分）にも同じ日付バリデーションを後付けする。
+// テンプレートの変更は「これから新しく作る個人シート」にしか効かないため、
+// 既にできている個人シートにも同じ安全策を反映させる。
+function applyDateValidationToAllStudentSheets_(ss, roster, studentCount) {
+  const names = roster.getRange(2, 4, studentCount, 1).getValues().flat().filter((n) => n);
+  names.forEach((name) => {
+    const sheet = ss.getSheetByName(name);
+    if (!sheet) return;
+    applyStudentSheetDateValidation_(sheet);
+  });
 }
 
 // 「出欠一覧」も全部数式なので、setup()のたびに作り直して最新ロジックにする。
