@@ -104,6 +104,7 @@ function setup() {
   rebuildRateSheet_(ss, studentCount);
   createStudentSheets_(ss, roster, studentCount);
   applyDateValidationToAllStudentSheets_(ss, roster, studentCount);
+  reorderSheets_(ss, roster, studentCount);
   ensureDailyHideTrigger_();
   hidePastDateColumns(); // セットアップ時点でも一度、過去日を隠しておく
 
@@ -340,8 +341,61 @@ function rebuildOverviewSheet_(ss, studentCount) {
     sheet.getRange(row, 5, 1, rowFormulas.length).setFormulas([rowFormulas]);
   }
 
+  applyOverviewConditionalFormatting_(sheet, studentCount);
+
   sheet.setFrozenRows(2);
   sheet.setFrozenColumns(4);
+}
+
+// 出欠一覧の色付け：
+// ・1行目の予定（P/A/休み）を文字色で色分け（P=青、A=オレンジ、休み=赤）
+// ・本文の出欠セルで「欠席」をほんのり赤い背景に
+function applyOverviewConditionalFormatting_(sheet, studentCount) {
+  const planRanges = [];
+  const absentRanges = [];
+  const lastRow = studentCount > 0 ? 2 + studentCount : 3; // 3行目〜最終生徒行
+
+  for (let i2 = 1; i2 <= MAX_DATE_PAIRS; i2++) {
+    const dateCol = columnToLetter_(5 + (i2 - 1) * 2);
+    const planCol = columnToLetter_(6 + (i2 - 1) * 2);
+    planRanges.push(sheet.getRange(planCol + '1'));
+    if (studentCount > 0) {
+      absentRanges.push(sheet.getRange(dateCol + '3:' + dateCol + lastRow));
+    }
+  }
+
+  const rules = [];
+  rules.push(
+    SpreadsheetApp.newConditionalFormatRule()
+      .whenTextEqualTo('P')
+      .setFontColor('#1155cc')
+      .setRanges(planRanges)
+      .build()
+  );
+  rules.push(
+    SpreadsheetApp.newConditionalFormatRule()
+      .whenTextEqualTo('A')
+      .setFontColor('#e69138')
+      .setRanges(planRanges)
+      .build()
+  );
+  rules.push(
+    SpreadsheetApp.newConditionalFormatRule()
+      .whenTextEqualTo('休み')
+      .setFontColor('#cc0000')
+      .setRanges(planRanges)
+      .build()
+  );
+  if (absentRanges.length > 0) {
+    rules.push(
+      SpreadsheetApp.newConditionalFormatRule()
+        .whenTextEqualTo('欠席')
+        .setBackground('#fce8e6')
+        .setRanges(absentRanges)
+        .build()
+    );
+  }
+  sheet.setConditionalFormatRules(rules);
 }
 
 // 「出席率」も全部数式なので、setup()のたびに作り直して最新ロジックにする。
@@ -393,6 +447,32 @@ function createStudentSheets_(ss, roster, studentCount) {
     if (ss.getSheetByName(name)) return; // 既にあればスキップ（生徒の入力を消さない）
     const newSheet = template.copyTo(ss);
     newSheet.setName(name);
+  });
+}
+
+// タブの並び順を毎回きっちり揃え直す。「出欠一覧」等は setup() のたびに削除→再作成しているため、
+// insertSheet(index) だけに頼ると、既存シートの数や並びによって最終的な位置がズレていく
+// （これが「セットアップのたびに順番がリセットされる」不具合の原因）。最後にまとめて
+// 正しい位置へ並べ直すことで、毎回必ず同じ順番になるようにする。
+// 順番：名簿 → 予定 → 今日の一覧 → 出欠一覧 → 出席率 → テンプレート → 個人シート（名簿の順）
+function reorderSheets_(ss, roster, studentCount) {
+  const names = roster.getRange(2, 4, studentCount, 1).getValues().flat().filter((n) => n);
+  const order = [
+    SHEET_NAMES.roster,
+    SHEET_NAMES.schedule,
+    SHEET_NAMES.today,
+    SHEET_NAMES.overview,
+    SHEET_NAMES.rate,
+    SHEET_NAMES.template,
+  ].concat(names);
+
+  let position = 1; // moveActiveSheetは1始まり
+  order.forEach((name) => {
+    const sheet = ss.getSheetByName(name);
+    if (!sheet) return; // 名簿が無い等、想定外はスキップ（setup冒頭で名簿チェック済みだが念のため）
+    ss.setActiveSheet(sheet);
+    ss.moveActiveSheet(position);
+    position++;
   });
 }
 
