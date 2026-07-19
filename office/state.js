@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-14T11:20:00.000Z",
+  "updatedAt": "2026-07-14T11:35:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -765,6 +765,10 @@ window.AI_STATE = {
         {
           "time": "今日",
           "text": "ヘラルボニー・Good Job!センター香芝・スワン等、同じ社会的文脈の実例を中心に、デザインギャラリーまとめサイトも添えて整理完了"
+        },
+        {
+          "time": "今日",
+          "text": "社長から実サイト（yurarite.jp/works.html）のスクリーンショットを受領。珊瑚色×パステル丸×丸みのある形と判明。実際の広告・バナー・チラシ・パンフレット実例を10件追加収集"
         }
       ],
       "deliverables": [
