@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-14T11:00:00.000Z",
+  "updatedAt": "2026-07-14T11:20:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -748,6 +748,34 @@ window.AI_STATE = {
           "app": "Visual Studio Code"
         }
       ]
+    },
+    {
+      "id": "T19",
+      "title": "クライアント案件（yurarite.jp）：メルマガ広告デザイン参考の収集",
+      "owner": "アイ",
+      "status": "review",
+      "progress": 100,
+      "hint": "10点のうちどれを軸にするか、コトハへの広告コピー発注に進んでよいか確認をお願いします",
+      "cmd": "T19の資料、コトハに広告コピーの草案を書かせて",
+      "log": [
+        {
+          "time": "今日",
+          "text": "クライアント（障がい者雇用・各種販促物を安価で制作）向けメルマガ広告の「優しくスタイリッシュ」なデザイン参考を10点収集。yurarite.jp本体はこの環境から403でアクセスできず未確認"
+        },
+        {
+          "time": "今日",
+          "text": "ヘラルボニー・Good Job!センター香芝・スワン等、同じ社会的文脈の実例を中心に、デザインギャラリーまとめサイトも添えて整理完了"
+        }
+      ],
+      "deliverables": [
+        {
+          "title": "T19_yurarite_メルマガ広告デザイン参考.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T19_yurarite_メルマガ広告デザイン参考.md",
+          "app": "Visual Studio Code"
+        }
+      ]
     }
   ],
   "proposals": [],
@@ -801,6 +829,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "アイ",
+      "text": "T19：クライアント（yurarite.jp）向けメルマガ広告のデザイン参考を10点集めました。ヘラルボニーなど同じ文脈の実例を中心にご用意しています🏢"
+    },
     {
       "time": "今日",
       "who": "リサ",
