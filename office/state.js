@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-24T00:10:00.000Z",
+  "updatedAt": "2026-07-24T01:00:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -125,65 +125,113 @@ window.AI_STATE = {
       "id": "T20",
       "title": "即金ルート：教育・個人事業主向け追加案件リサーチ",
       "owner": "リサ",
-      "status": "doing",
-      "progress": 10,
-      "hint": "",
-      "cmd": "",
+      "status": "review",
+      "progress": 60,
+      "hint": "新着案件0件でした。クラウドワークス等の新着案件URLをコピペで送ってもらえれば、その場でGO/検討/NG判定します",
+      "cmd": "この案件、GOかどうか判定して：（クラウドワークス等のURLを貼り付け）",
       "log": [
         {
           "time": "今日",
           "text": "8/31までに10万円達成のため着手。新着案件を5〜10件リサーチ中"
+        },
+        {
+          "time": "今日",
+          "text": "クラウドワークス／ランサーズへの直接アクセスが403でブロックされ、Web検索経由では新着・未応募・単価明確という条件を満たす案件が0件だった。古い/終了済み案件が混在するため、推測で埋めず正直に0件と報告"
         }
       ],
-      "deliverables": []
+      "deliverables": [
+        {
+          "title": "T20_追加案件リサーチ.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T20_追加案件リサーチ.md",
+          "app": "Visual Studio Code"
+        }
+      ]
     },
     {
       "id": "T21",
       "title": "即金ルート：応募文の量産・使い回せる型づくり",
       "owner": "コトハ",
-      "status": "doing",
-      "progress": 10,
+      "status": "done",
+      "progress": 100,
       "hint": "",
       "cmd": "",
       "log": [
         {
           "time": "今日",
           "text": "8/31までに10万円達成のため着手。複数案件に使い回せる応募文テンプレートを作成中"
+        },
+        {
+          "time": "今日",
+          "text": "過去の応募文の型を踏襲し、「業務効率化・自動化」「教育・学校関係」「個人事業主・店舗」の3種類（各フル版/ショート版）＋送信前チェックリストを整備して完了"
         }
       ],
-      "deliverables": []
+      "deliverables": [
+        {
+          "title": "T21_応募文テンプレート集.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T21_応募文テンプレート集.md",
+          "app": "Visual Studio Code"
+        }
+      ]
     },
     {
       "id": "T22",
       "title": "資産づくりルート：note記事の企画・ネタ出しと構成案",
       "owner": "サトル",
-      "status": "doing",
-      "progress": 10,
+      "status": "done",
+      "progress": 100,
       "hint": "",
       "cmd": "",
       "log": [
         {
           "time": "今日",
           "text": "社長の強み（元教員・学校現場知見）を軸に、書けるnote記事のテーマと構成案を企画中"
+        },
+        {
+          "time": "今日",
+          "text": "記事テーマ候補10個と有望3テーマの構成案を作成。特に「体育祭・文化祭の段取り術」は下書き本文（約1,300字）まで書き上げて完了"
         }
       ],
-      "deliverables": []
+      "deliverables": [
+        {
+          "title": "T22_note記事企画_構成案.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T22_note記事企画_構成案.md",
+          "app": "Visual Studio Code"
+        }
+      ]
     },
     {
       "id": "T23",
       "title": "資産づくりルート：楽天ROOM・SNS運用の型設計",
       "owner": "ハック",
-      "status": "doing",
-      "progress": 10,
+      "status": "done",
+      "progress": 100,
       "hint": "",
       "cmd": "",
       "log": [
         {
           "time": "今日",
           "text": "楽天ROOMのジャンル選定と、投稿ネタ・カレンダーをテンプレ化する仕組みを設計中"
+        },
+        {
+          "time": "今日",
+          "text": "ジャンル候補3つ（イチ推し：ジュニアテニス・部活動グッズ）、投稿テンプレ3種、週3投稿カレンダー、note→SNS→楽天ROOMの使い回し導線、投稿前チェックリストを整備して完了"
         }
       ],
-      "deliverables": []
+      "deliverables": [
+        {
+          "title": "T23_楽天ROOM_SNS運用型設計.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T23_楽天ROOM_SNS運用型設計.md",
+          "app": "Visual Studio Code"
+        }
+      ]
     },
     {
       "id": "T12",
@@ -865,23 +913,23 @@ window.AI_STATE = {
   "employees": [
     {
       "name": "リサ",
-      "status": "working",
-      "taskId": "T20"
+      "status": "idle",
+      "taskId": ""
     },
     {
       "name": "コトハ",
-      "status": "working",
-      "taskId": "T21"
+      "status": "idle",
+      "taskId": ""
     },
     {
       "name": "サトル",
-      "status": "working",
-      "taskId": "T22"
+      "status": "idle",
+      "taskId": ""
     },
     {
       "name": "ハック",
-      "status": "working",
-      "taskId": "T23"
+      "status": "idle",
+      "taskId": ""
     }
   ],
   "links": [
@@ -912,6 +960,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "アイ",
+      "text": "T20〜T23、4人全員の作業が完了しました。T20（案件0件・社長のURL提供待ち）以外は納品済みです🏢"
+    },
     {
       "time": "今日",
       "who": "アイ",
