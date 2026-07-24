@@ -102,8 +102,8 @@ window.AI_STATE = {
     ]
   },
   "business": {
-    "goalLabel": "7月の売上目標 6.5万円（→安定月16.5万円へ）",
-    "goalAmount": 65000,
+    "goalLabel": "8/31までに10万円（この夏の最優先目標）",
+    "goalAmount": 100000,
     "current": 0,
     "pipeline": [
       {
@@ -848,6 +848,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "アイ",
+      "text": "売上目標を「8/31までに10万円」に更新。今夏の最優先目標として全社で取り組みます🏢"
+    },
     {
       "time": "今日",
       "who": "アイ",
