@@ -122,6 +122,70 @@ window.AI_STATE = {
   },
   "tasks": [
     {
+      "id": "T20",
+      "title": "即金ルート：教育・個人事業主向け追加案件リサーチ",
+      "owner": "リサ",
+      "status": "doing",
+      "progress": 10,
+      "hint": "",
+      "cmd": "",
+      "log": [
+        {
+          "time": "今日",
+          "text": "8/31までに10万円達成のため着手。新着案件を5〜10件リサーチ中"
+        }
+      ],
+      "deliverables": []
+    },
+    {
+      "id": "T21",
+      "title": "即金ルート：応募文の量産・使い回せる型づくり",
+      "owner": "コトハ",
+      "status": "doing",
+      "progress": 10,
+      "hint": "",
+      "cmd": "",
+      "log": [
+        {
+          "time": "今日",
+          "text": "8/31までに10万円達成のため着手。複数案件に使い回せる応募文テンプレートを作成中"
+        }
+      ],
+      "deliverables": []
+    },
+    {
+      "id": "T22",
+      "title": "資産づくりルート：note記事の企画・ネタ出しと構成案",
+      "owner": "サトル",
+      "status": "doing",
+      "progress": 10,
+      "hint": "",
+      "cmd": "",
+      "log": [
+        {
+          "time": "今日",
+          "text": "社長の強み（元教員・学校現場知見）を軸に、書けるnote記事のテーマと構成案を企画中"
+        }
+      ],
+      "deliverables": []
+    },
+    {
+      "id": "T23",
+      "title": "資産づくりルート：楽天ROOM・SNS運用の型設計",
+      "owner": "ハック",
+      "status": "doing",
+      "progress": 10,
+      "hint": "",
+      "cmd": "",
+      "log": [
+        {
+          "time": "今日",
+          "text": "楽天ROOMのジャンル選定と、投稿ネタ・カレンダーをテンプレ化する仕組みを設計中"
+        }
+      ],
+      "deliverables": []
+    },
+    {
       "id": "T12",
       "title": "部活キット製造・工程2：出欠管理シートの実装（ハック）",
       "owner": "ハック",
@@ -801,23 +865,23 @@ window.AI_STATE = {
   "employees": [
     {
       "name": "リサ",
-      "status": "idle",
-      "taskId": ""
+      "status": "working",
+      "taskId": "T20"
     },
     {
       "name": "コトハ",
-      "status": "idle",
-      "taskId": ""
+      "status": "working",
+      "taskId": "T21"
     },
     {
       "name": "サトル",
-      "status": "idle",
-      "taskId": ""
+      "status": "working",
+      "taskId": "T22"
     },
     {
       "name": "ハック",
-      "status": "idle",
-      "taskId": ""
+      "status": "working",
+      "taskId": "T23"
     }
   ],
   "links": [
@@ -848,6 +912,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "アイ",
+      "text": "「即金ルート」と「資産づくりルート」を同時始動。リサ・コトハ・サトル・ハックの4人が同時に動き始めました🏢"
+    },
     {
       "time": "今日",
       "who": "アイ",
