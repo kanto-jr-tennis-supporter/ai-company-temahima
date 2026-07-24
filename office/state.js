@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-24T00:00:00.000Z",
+  "updatedAt": "2026-07-24T00:10:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -753,10 +753,10 @@ window.AI_STATE = {
       "id": "T19",
       "title": "クライアント案件（yurarite.jp）：メルマガ広告デザイン参考の収集",
       "owner": "アイ",
-      "status": "review",
+      "status": "done",
       "progress": 100,
-      "hint": "デザイン案（HTML）を実際に見て、この方向性でコピーもコトハに発注してよいか確認をお願いします",
-      "cmd": "T19のデザイン案でOK。コトハに広告コピーの草案を書かせて",
+      "hint": "",
+      "cmd": "",
       "log": [
         {
           "time": "今日",
@@ -773,6 +773,10 @@ window.AI_STATE = {
         {
           "time": "今日",
           "text": "収集した参考をもとに、メルマガ広告デザイン案（HTML1点・ダミー電話番号／担当者名）を作成。コーラル1色＋パステルの控えめな差し色で「優しさ」と「スタイリッシュさ」の両立を狙った"
+        },
+        {
+          "time": "今日",
+          "text": "社長よりデザイン案でOKをいただき、完了"
         }
       ],
       "deliverables": [
@@ -844,6 +848,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "アイ",
+      "text": "T19：メルマガ広告デザイン案、社長のOKをいただき完了しました🏢"
+    },
     {
       "time": "今日",
       "who": "アイ",
