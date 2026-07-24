@@ -1,0 +1,382 @@
+<title>ゆらりて岐阜駅前｜メルマガ広告案</title>
+<style>
+  :root {
+    --coral: #E37A5E;
+    --coral-deep: #C8623F;
+    --ink: #3D2C24;
+    --ink-soft: #6B5850;
+    --cream: #FBF1E6;
+    --card: #FFFCF8;
+    --blush: #F3D9CE;
+    --sage: #9EC0BE;
+    --sage-deep: #6E9C99;
+    --gold: #D3A25B;
+    --rule: #E9DACD;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: "Hiragino Sans", "Yu Gothic Medium", "Yu Gothic", "Noto Sans JP", sans-serif;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    padding: 48px 20px 72px;
+  }
+
+  .note {
+    max-width: 640px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 13.5px;
+    line-height: 1.7;
+  }
+
+  .note strong { color: var(--ink); }
+
+  /* ---------- flyer card ---------- */
+  .flyer {
+    width: 640px;
+    max-width: 100%;
+    background: var(--card);
+    border-radius: 28px;
+    box-shadow: 0 30px 60px -30px rgba(61, 44, 36, 0.35), 0 2px 10px rgba(61, 44, 36, 0.08);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .flyer::before {
+    /* soft coral wave footer, echoes the brand's rounded shapes */
+    content: "";
+    position: absolute;
+    left: -10%;
+    right: -10%;
+    bottom: -6%;
+    height: 34%;
+    background: var(--blush);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    z-index: 0;
+  }
+
+  .flyer-inner {
+    position: relative;
+    z-index: 1;
+    padding: 40px 44px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  /* ---------- brand mark ---------- */
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brand svg { flex: none; }
+
+  .brand-text { display: flex; flex-direction: column; line-height: 1.15; }
+
+  .brand-name {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--coral-deep);
+    font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", sans-serif;
+  }
+
+  .brand-sub {
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+
+  .tag {
+    margin-left: auto;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--sage-deep);
+    background: rgba(158, 192, 190, 0.18);
+    border: 1px solid rgba(158, 192, 190, 0.5);
+    border-radius: 999px;
+    padding: 5px 12px;
+    white-space: nowrap;
+  }
+
+  /* ---------- headline ---------- */
+  .headline-block { display: flex; flex-direction: column; gap: 10px; }
+
+  .eyebrow {
+    font-size: 13px;
+    color: var(--coral-deep);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  h1 {
+    margin: 0;
+    font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", sans-serif;
+    font-weight: 700;
+    font-size: 34px;
+    line-height: 1.42;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--coral-deep);
+    background: linear-gradient(transparent 62%, rgba(227, 122, 94, 0.22) 62%);
+  }
+
+  .lede {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.9;
+    color: var(--ink-soft);
+    max-width: 46ch;
+  }
+
+  /* ---------- decorative motif (replaces stock photography) ---------- */
+  .motif {
+    position: relative;
+    height: 132px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .motif .blob {
+    position: absolute;
+    border-radius: 50%;
+  }
+
+  .motif .blob.b1 { width: 150px; height: 150px; background: var(--blush); left: 6%; top: -6px; }
+  .motif .blob.b2 { width: 96px; height: 96px; background: rgba(158, 192, 190, 0.55); right: 14%; top: 6px; }
+  .motif .blob.b3 { width: 60px; height: 60px; background: rgba(211, 162, 91, 0.35); right: 30%; bottom: -10px; }
+
+  .motif .mark { position: relative; z-index: 1; }
+
+  /* ---------- price list ---------- */
+  .menu {
+    border-top: 1px solid var(--rule);
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .menu-title {
+    font-size: 12.5px;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+  }
+
+  .menu-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 11px 0;
+    border-bottom: 1px dashed var(--rule);
+    font-size: 15px;
+  }
+
+  .menu-row:last-child { border-bottom: none; }
+
+  .menu-row .item { color: var(--ink); font-weight: 600; }
+  .menu-row .item span { font-weight: 400; color: var(--ink-soft); font-size: 12.5px; margin-left: 6px; }
+
+  .menu-row .price {
+    font-variant-numeric: tabular-nums;
+    color: var(--coral-deep);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* ---------- CTA ---------- */
+  .cta {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: var(--coral);
+    border-radius: 20px;
+    padding: 18px 22px;
+    color: #FFF6F0;
+  }
+
+  .cta .phone-icon {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cta .num {
+    font-size: 25px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .cta .num-label { font-size: 11px; opacity: 0.85; margin-bottom: 4px; letter-spacing: 0.06em; }
+
+  .cta .staff {
+    margin-left: auto;
+    text-align: right;
+    font-size: 12px;
+    line-height: 1.6;
+    opacity: 0.92;
+  }
+
+  .cta .staff b { display: block; font-size: 13.5px; }
+
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: var(--ink);
+    color: #FBF1E6;
+    border-radius: 999px;
+    padding: 13px 20px;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-align: center;
+  }
+
+  /* ---------- footer ---------- */
+  .flyer-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 11px;
+    color: var(--ink-soft);
+    line-height: 1.7;
+  }
+
+  .flyer-foot .facility { color: var(--ink); font-weight: 600; }
+
+  @media (max-width: 520px) {
+    .flyer-inner { padding: 30px 26px 28px; }
+    h1 { font-size: 27px; }
+    .cta { flex-wrap: wrap; }
+    .cta .staff { margin-left: 0; text-align: left; }
+  }
+</style>
+
+<p class="note">
+  <strong>メルマガ広告案（デザイン1点・ダミー電話番号／担当者名）。</strong>
+  実際の紙面や写真は御社の素材に差し替え前提のたたき台です。コーラル1色＋パステルの控えめな差し色に絞り、
+  情報のかたまりごとに余白を空けて「優しさ」と「読みやすさ（スタイリッシュさ）」を両立させています。
+</p>
+
+<div class="flyer">
+  <div class="flyer-inner">
+
+    <div class="brand">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+        <g opacity="0.9">
+          <circle cx="17" cy="9" r="6.4" fill="none" stroke="#E37A5E" stroke-width="1.6"/>
+          <circle cx="24.5" cy="20" r="6.4" fill="none" stroke="#E37A5E" stroke-width="1.6"/>
+          <circle cx="9.5" cy="20" r="6.4" fill="none" stroke="#E37A5E" stroke-width="1.6"/>
+        </g>
+      </svg>
+      <div class="brand-text">
+        <span class="brand-name">yurarite</span>
+        <span class="brand-sub">ゆらりて｜岐阜駅前</span>
+      </div>
+      <span class="tag">就労継続支援B型事業所</span>
+    </div>
+
+    <div class="headline-block">
+      <p class="eyebrow">販促物のご相談は、やさしく、たしかに。</p>
+      <h1>その一枚に、<br /><em>やさしさ</em>を、のせて。</h1>
+      <p class="lede">
+        ゆらりて岐阜駅前では、地域の仲間たちが、名刺やチラシを一つひとつ丁寧に仕上げています。
+        あたたかいものづくりを、あなたの手元へ。
+      </p>
+    </div>
+
+    <div class="motif">
+      <div class="blob b1"></div>
+      <div class="blob b2"></div>
+      <div class="blob b3"></div>
+      <svg class="mark" width="118" height="106" viewBox="0 0 118 106" fill="none">
+        <circle cx="59" cy="34" r="22" stroke="#C8623F" stroke-width="2"/>
+        <circle cx="82" cy="66" r="22" stroke="#C8623F" stroke-width="2"/>
+        <circle cx="36" cy="66" r="22" stroke="#C8623F" stroke-width="2"/>
+      </svg>
+    </div>
+
+    <div class="menu">
+      <p class="menu-title">MENU ── ご相談いただける主な作業</p>
+      <div class="menu-row">
+        <span class="item">名刺制作<span>100枚</span></span>
+        <span class="price">1,500円〜</span>
+      </div>
+      <div class="menu-row">
+        <span class="item">リーフレット<span>A4片面</span></span>
+        <span class="price">15,000円〜</span>
+      </div>
+      <div class="menu-row">
+        <span class="item">データ入力・校正</span>
+        <span class="price">ご相談ください</span>
+      </div>
+      <div class="menu-row">
+        <span class="item">検品・軽作業（内職）</span>
+        <span class="price">ご相談ください</span>
+      </div>
+    </div>
+
+    <div class="cta">
+      <div class="phone-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.5.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.5.1.4 0 .8-.2 1L6.6 10.8Z" fill="#FFF6F0"/>
+        </svg>
+      </div>
+      <div>
+        <div class="num-label">お電話でのお問い合わせ</div>
+        <div class="num">000-000-0000</div>
+      </div>
+      <div class="staff">
+        <b>担当：〇〇</b>
+        受付 9:30〜16:00
+      </div>
+    </div>
+
+    <div class="flyer-foot">
+      <div>
+        <span class="facility">就労継続支援B型事業所　ゆらりて岐阜駅前</span><br />
+        〒500-8854　岐阜県岐阜市花園町14番地
+      </div>
+      <svg width="28" height="28" viewBox="0 0 34 34" fill="none">
+        <circle cx="17" cy="9" r="6.4" fill="none" stroke="#9EC0BE" stroke-width="1.6"/>
+        <circle cx="24.5" cy="20" r="6.4" fill="none" stroke="#9EC0BE" stroke-width="1.6"/>
+        <circle cx="9.5" cy="20" r="6.4" fill="none" stroke="#9EC0BE" stroke-width="1.6"/>
+      </svg>
+    </div>
+
+  </div>
+</div>

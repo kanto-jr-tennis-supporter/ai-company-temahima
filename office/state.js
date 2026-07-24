@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-14T11:35:00.000Z",
+  "updatedAt": "2026-07-24T00:00:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -755,8 +755,8 @@ window.AI_STATE = {
       "owner": "アイ",
       "status": "review",
       "progress": 100,
-      "hint": "10点のうちどれを軸にするか、コトハへの広告コピー発注に進んでよいか確認をお願いします",
-      "cmd": "T19の資料、コトハに広告コピーの草案を書かせて",
+      "hint": "デザイン案（HTML）を実際に見て、この方向性でコピーもコトハに発注してよいか確認をお願いします",
+      "cmd": "T19のデザイン案でOK。コトハに広告コピーの草案を書かせて",
       "log": [
         {
           "time": "今日",
@@ -769,6 +769,10 @@ window.AI_STATE = {
         {
           "time": "今日",
           "text": "社長から実サイト（yurarite.jp/works.html）のスクリーンショットを受領。珊瑚色×パステル丸×丸みのある形と判明。実際の広告・バナー・チラシ・パンフレット実例を10件追加収集"
+        },
+        {
+          "time": "今日",
+          "text": "収集した参考をもとに、メルマガ広告デザイン案（HTML1点・ダミー電話番号／担当者名）を作成。コーラル1色＋パステルの控えめな差し色で「優しさ」と「スタイリッシュさ」の両立を狙った"
         }
       ],
       "deliverables": [
@@ -778,6 +782,13 @@ window.AI_STATE = {
           "at": "今日",
           "path": "logs/T19_yurarite_メルマガ広告デザイン参考.md",
           "app": "Visual Studio Code"
+        },
+        {
+          "title": "T19_yurarite_メルマガ広告デザイン案.html",
+          "type": "ファイル",
+          "at": "今日",
+          "path": "logs/T19_yurarite_メルマガ広告デザイン案.html",
+          "app": "Google Chrome"
         }
       ]
     }
@@ -833,6 +844,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "アイ",
+      "text": "T19：集めた参考をもとに、メルマガ広告のデザイン案を1点作りました。コーラル色×パステルで「優しさ」と「スタイリッシュさ」の両立を狙っています🏢"
+    },
     {
       "time": "今日",
       "who": "アイ",
