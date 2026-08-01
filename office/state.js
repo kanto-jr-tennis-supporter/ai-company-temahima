@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-24T01:00:00.000Z",
+  "updatedAt": "2026-07-24T01:15:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -121,6 +121,22 @@ window.AI_STATE = {
     ]
   },
   "tasks": [
+    {
+      "id": "T24",
+      "title": "懸賞サイトの比較リサーチ（iPhone・MacBook・旅行券・商品券）",
+      "owner": "リサ",
+      "status": "doing",
+      "progress": 10,
+      "hint": "",
+      "cmd": "",
+      "log": [
+        {
+          "time": "今日",
+          "text": "着手。安全な懸賞サイトの比較リストを作成中（詐欺・個人情報収集目的のサイトを見分けることを最優先）"
+        }
+      ],
+      "deliverables": []
+    },
     {
       "id": "T20",
       "title": "即金ルート：教育・個人事業主向け追加案件リサーチ",
@@ -913,8 +929,8 @@ window.AI_STATE = {
   "employees": [
     {
       "name": "リサ",
-      "status": "idle",
-      "taskId": ""
+      "status": "working",
+      "taskId": "T24"
     },
     {
       "name": "コトハ",
