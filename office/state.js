@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-24T01:15:00.000Z",
+  "updatedAt": "2026-07-24T01:30:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -125,17 +125,29 @@ window.AI_STATE = {
       "id": "T24",
       "title": "懸賞サイトの比較リサーチ（iPhone・MacBook・旅行券・商品券）",
       "owner": "リサ",
-      "status": "doing",
-      "progress": 10,
-      "hint": "",
-      "cmd": "",
+      "status": "review",
+      "progress": 100,
+      "hint": "8サイトの比較と詐欺の見分け方をまとめました。どのサイトに登録するか○×を教えてください",
+      "cmd": "T24、①③④に登録して。懸賞専用メールアドレスの作り方も教えて",
       "log": [
         {
           "time": "今日",
           "text": "着手。安全な懸賞サイトの比較リストを作成中（詐欺・個人情報収集目的のサイトを見分けることを最優先）"
+        },
+        {
+          "time": "今日",
+          "text": "実在8サイト（フルーツメール／チャンスイット／懸賞生活／ドリームメール／懸賞なび／キャンなび／企業公式キャンペーン／SNS懸賞）を比較し、詐欺の見分け方9項目と、応募用の空欄コピペテンプレを整理して完了"
         }
       ],
-      "deliverables": []
+      "deliverables": [
+        {
+          "title": "T24_懸賞サイト比較リサーチ.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T24_懸賞サイト比較リサーチ.md",
+          "app": "Visual Studio Code"
+        }
+      ]
     },
     {
       "id": "T20",
@@ -929,8 +941,8 @@ window.AI_STATE = {
   "employees": [
     {
       "name": "リサ",
-      "status": "working",
-      "taskId": "T24"
+      "status": "idle",
+      "taskId": ""
     },
     {
       "name": "コトハ",
@@ -976,6 +988,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "リサ",
+      "text": "T24：懸賞サイト8件を比較し、詐欺の見分け方もまとめました。社長の○×判断待ちです🔍"
+    },
     {
       "time": "今日",
       "who": "アイ",
