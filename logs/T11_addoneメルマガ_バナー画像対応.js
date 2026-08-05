@@ -15,6 +15,9 @@
  *   （「ご担当者様」はスプレッドシートには持たず、スクリプト側の固定文言として追加）
  * ・連続した「様」（例：「ご担当者様様」）を自動で1個に畳み込む保険を追加
  *   （collapseDuplicateHonorific_）。ただし根本原因はA2側の手入力なので、下記も確認すること
+ * ・本文中で強調したい部分を **文章** のようにアスタリスク2つで囲むと、
+ *   オレンジ・太字・少し大きめの文字で表示されるようにした（applyHighlightMarkup_）
+ *   例：⭐**建設会社様向け**⭐ のお知らせになります。
  *
  * 【事前準備・注意点】
  * ・バナー・フッターどちらの画像ファイルも、Googleドライブで
@@ -215,6 +218,18 @@ function escapeHtml_(text) {
 }
 
 /**
+ * 本文中の **強調したい文章** を、オレンジ・太字・少し大きめの文字に変換する。
+ * A2セルの本文中で、目立たせたい部分をアスタリスク2つ（**）で囲むだけでOK。
+ * 例：⭐**建設会社様向け**⭐ のお知らせになります。
+ */
+function applyHighlightMarkup_(escapedText) {
+  return escapedText.replace(
+    /\*\*([\s\S]+?)\*\*/g,
+    '<span style="color:#e2551c;font-weight:bold;font-size:1.15em;">$1</span>'
+  );
+}
+
+/**
  * プレーン本文＋バナー画像URL＋フッター画像URLから、HTMLメール本文を組み立てる
  */
 function buildHtmlBody_(plainBody, bannerImageUrl, footerImageUrl) {
@@ -226,7 +241,9 @@ function buildHtmlBody_(plainBody, bannerImageUrl, footerImageUrl) {
     ? `<img src="${footerImageUrl}" alt="フッター" style="max-width:600px;width:100%;height:auto;display:block;margin:16px 0 0 0;border:0;">`
     : "";
 
-  const textHtml = escapeHtml_(plainBody).replace(/\n/g, "<br>");
+  let textHtml = escapeHtml_(plainBody);
+  textHtml = applyHighlightMarkup_(textHtml);
+  textHtml = textHtml.replace(/\n/g, "<br>");
 
   return (
     `<div style="font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;` +
