@@ -1,17 +1,19 @@
 /****************************************************
- * 再アプローチリスト直接参照メルマガ送信 完全版（バナー画像対応）
+ * 再アプローチリスト直接参照メルマガ送信 完全版（バナー画像・フッター画像対応）
  * add one様向け／テマヒマ・ラボ ハック作成 / 2026-08-05
  *
  * 【変更点（元スクリプトからの差分）】
- * ・メルマガ用シートに H2：バナー画像URL を追加
- *   （Googleドライブの共有リンクをそのまま貼ってOK。中でファイルIDを抽出して変換します）
+ * ・メルマガ用シートに H2：バナー画像URL（本文の上）を追加
+ * ・メルマガ用シートに I2：フッター画像URL（本文の下）を追加
+ *   （どちらもGoogleドライブの共有リンクをそのまま貼ってOK。中でファイルIDを抽出して変換します）
  * ・本文をプレーンテキストではなく HTML メールとして送信するように変更
- *   → バナー画像がメール本文の一番上に表示される
+ *   → 本文の一番上にバナー画像、一番下にフッター画像が表示される
  * ・plainBody（画像非表示の環境向けの文字だけ版）は今まで通り自動生成されるので、
  *   万一画像が読み込めない受信環境でも本文は読める
  *
  * 【事前準備・唯一の注意点】
- * バナー画像のGoogleドライブファイルを「リンクを知っている全員が閲覧可」に共有設定してください。
+ * バナー・フッターどちらの画像ファイルも、Googleドライブで
+ * 「リンクを知っている全員が閲覧可」に共有設定してください。
  * （限定公開のままだと相手のメールで画像が表示されません＝赤い×アイコンになります）
  *
  * 再アプローチリスト：
@@ -28,7 +30,8 @@
  * E2：テスト送信先
  * F2：テスト用 商号
  * G2：テスト用 代表者名
- * H2：バナー画像URL（新規追加・Googleドライブの共有リンクを貼る）
+ * H2：バナー画像URL（本文の上・Googleドライブの共有リンクを貼る）
+ * I2：フッター画像URL（本文の下・Googleドライブの共有リンクを貼る）
  ****************************************************/
 
 const SHEET_REAPPROACH = "再アプローチリスト";
@@ -66,6 +69,7 @@ function getMailSettings_() {
     testCompany: String(sheet.getRange("F2").getValue() || "").trim(),
     testRepresentative: String(sheet.getRange("G2").getValue() || "").trim(),
     bannerImageUrl: String(sheet.getRange("H2").getValue() || "").trim(),
+    footerImageUrl: String(sheet.getRange("I2").getValue() || "").trim(),
     sheet,
   };
 }
@@ -180,11 +184,15 @@ function escapeHtml_(text) {
 }
 
 /**
- * プレーン本文＋バナー画像URLから、HTMLメール本文を組み立てる
+ * プレーン本文＋バナー画像URL＋フッター画像URLから、HTMLメール本文を組み立てる
  */
-function buildHtmlBody_(plainBody, bannerImageUrl) {
+function buildHtmlBody_(plainBody, bannerImageUrl, footerImageUrl) {
   const bannerHtml = bannerImageUrl
     ? `<img src="${bannerImageUrl}" alt="バナー" style="max-width:600px;width:100%;height:auto;display:block;margin:0 0 16px 0;border:0;">`
+    : "";
+
+  const footerHtml = footerImageUrl
+    ? `<img src="${footerImageUrl}" alt="フッター" style="max-width:600px;width:100%;height:auto;display:block;margin:16px 0 0 0;border:0;">`
     : "";
 
   const textHtml = escapeHtml_(plainBody).replace(/\n/g, "<br>");
@@ -192,7 +200,7 @@ function buildHtmlBody_(plainBody, bannerImageUrl) {
   return (
     `<div style="font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;` +
     `font-size:14px;line-height:1.8;color:#333333;max-width:600px;">` +
-    `${bannerHtml}${textHtml}</div>`
+    `${bannerHtml}${textHtml}${footerHtml}</div>`
   );
 }
 
@@ -303,7 +311,8 @@ function sendTestMail() {
     const subject = applyTemplate_(settings.subject, testTarget);
     const plainBody = applyTemplate_(settings.body, testTarget);
     const bannerUrl = buildBannerImageUrl_(settings.bannerImageUrl);
-    const htmlBody = buildHtmlBody_(plainBody, bannerUrl);
+    const footerUrl = buildBannerImageUrl_(settings.footerImageUrl);
+    const htmlBody = buildHtmlBody_(plainBody, bannerUrl, footerUrl);
     const attachments = getAttachments_(settings.attachmentUrl);
 
     const confirm = ui.alert(
@@ -315,6 +324,7 @@ function sendTestMail() {
       `代表者名：${addSama_(testTarget.representative)}\n` +
       `件名：${subject}\n` +
       `バナー画像：${bannerUrl ? "あり" : "なし（H2が未設定 or URLを認識できません）"}\n` +
+      `フッター画像：${footerUrl ? "あり" : "なし（I2が未設定 or URLを認識できません）"}\n` +
       `添付ファイル数：${attachments.length}件\n\n` +
       `この内容でテスト送信しますか？`,
       ui.ButtonSet.YES_NO
@@ -371,6 +381,7 @@ function sendMainMail() {
 
     const attachments = getAttachments_(settings.attachmentUrl);
     const bannerUrl = buildBannerImageUrl_(settings.bannerImageUrl);
+    const footerUrl = buildBannerImageUrl_(settings.footerImageUrl);
     const sample = targets[0];
 
     const sampleSubject = applyTemplate_(settings.subject, sample);
@@ -382,6 +393,7 @@ function sendMainMail() {
       `このアカウントから送信されます。\n\n` +
       `送信対象件数：${targets.length}件\n` +
       `バナー画像：${bannerUrl ? "あり" : "なし（H2が未設定 or URLを認識できません）"}\n` +
+      `フッター画像：${footerUrl ? "あり" : "なし（I2が未設定 or URLを認識できません）"}\n` +
       `添付ファイル数：${attachments.length}件\n\n` +
       `【1件目サンプル】\n` +
       `商号：${sample.company}\n` +
@@ -412,7 +424,7 @@ function sendMainMail() {
       try {
         const subject = applyTemplate_(settings.subject, target);
         const plainBody = applyTemplate_(settings.body, target);
-        const htmlBody = buildHtmlBody_(plainBody, bannerUrl);
+        const htmlBody = buildHtmlBody_(plainBody, bannerUrl, footerUrl);
 
         GmailApp.sendEmail(target.email, subject, plainBody, {
           htmlBody: htmlBody,

@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-08-05T12:10:00+09:00",
+  updatedAt: "2026-08-05T12:25:00+09:00",
 
   setup: {
     completed: true,
@@ -198,15 +198,16 @@ window.AI_STATE = {
     },
     {
       id: "T11",
-      title: "add oneメルマガ：バナー画像を入れる（HTMLメール化）",
+      title: "add oneメルマガ：バナー画像・フッター画像を入れる（HTMLメール化）",
       owner: "ハック",
       status: "review",
       progress: 100,
-      hint: "GASスクリプトを貼り替え、メルマガ用シートのH2にバナー画像URLを入れてテスト送信して見え方を確認してください",
+      hint: "GASスクリプトを貼り替え、メルマガ用シートのH2（バナー）とI2（フッター）に画像URLを入れてテスト送信して見え方を確認してください",
       cmd: "T11のスクリプトを見せて",
       log: [
         { time: "今日", text: "社長からバナーPNG（Googleドライブ）を受領。HTMLメール化＋バナー画像URL差し込み対応のスクリプトを作成" },
-        { time: "今日", text: "完成。H2セルにバナー画像URLを入れるだけで反映される形に。ドライブ側の共有設定を「リンクを知っている全員」にする必要あり" }
+        { time: "今日", text: "完成。H2セルにバナー画像URLを入れるだけで反映される形に。ドライブ側の共有設定を「リンクを知っている全員」にする必要あり" },
+        { time: "今日", text: "追加依頼：本文の最後にも画像を入れたい→I2「フッター画像URL」を新設し、本文下部にも表示できるよう対応完了" }
       ],
       deliverables: [
         { title: "T11_addoneメルマガ_バナー画像対応.js", type: "コード", at: "8/5", path: "logs/T11_addoneメルマガ_バナー画像対応.js", app: "Visual Studio Code" }
@@ -233,6 +234,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "今日", who: "ハック", text: "T11：フッター画像にも対応完了！本文の上下どちらにも画像を出せるようになりました💻" },
     { time: "今日", who: "ハック", text: "T11：add oneメルマガにバナー画像を入れるスクリプト完成！HTMLメール化してURL方式で画像表示💻" },
     { time: "今日", who: "コトハ", text: "T10：SNS立ち上げキット完成！名前・プロフ・アイコン・初週7投稿を、スマホで番号を返すだけで確定できる形に✍️" },
     { time: "今日", who: "ハック", text: "T9：部活キット3点セット完成！商品設計・GAS一式・note販売ページ。価格は¥1,980/¥2,980の2段構え💻" },
