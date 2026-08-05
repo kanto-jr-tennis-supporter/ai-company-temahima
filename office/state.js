@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T15:30:00+09:00",
+  updatedAt: "2026-08-05T12:10:00+09:00",
 
   setup: {
     completed: true,
@@ -196,6 +196,22 @@ window.AI_STATE = {
       log: [{ time: "今日", text: "着手方針が決定。社長の準備（今年のメンバー情報など）が整い次第、開始" }],
       deliverables: []
     },
+    {
+      id: "T11",
+      title: "add oneメルマガ：バナー画像を入れる（HTMLメール化）",
+      owner: "ハック",
+      status: "review",
+      progress: 100,
+      hint: "GASスクリプトを貼り替え、メルマガ用シートのH2にバナー画像URLを入れてテスト送信して見え方を確認してください",
+      cmd: "T11のスクリプトを見せて",
+      log: [
+        { time: "今日", text: "社長からバナーPNG（Googleドライブ）を受領。HTMLメール化＋バナー画像URL差し込み対応のスクリプトを作成" },
+        { time: "今日", text: "完成。H2セルにバナー画像URLを入れるだけで反映される形に。ドライブ側の共有設定を「リンクを知っている全員」にする必要あり" }
+      ],
+      deliverables: [
+        { title: "T11_addoneメルマガ_バナー画像対応.js", type: "コード", at: "8/5", path: "logs/T11_addoneメルマガ_バナー画像対応.js", app: "Visual Studio Code" }
+      ]
+    },
   ],
   proposals: [
     { from: "サトル", title: "納品後の定番メニュー「継続プラン」を設計", detail: "受注のたびに月額プランを必ず添える型を作る。3社×3万円で毎月9万円の土台になります。", at: "12:00" },
@@ -217,6 +233,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "今日", who: "ハック", text: "T11：add oneメルマガにバナー画像を入れるスクリプト完成！HTMLメール化してURL方式で画像表示💻" },
     { time: "今日", who: "コトハ", text: "T10：SNS立ち上げキット完成！名前・プロフ・アイコン・初週7投稿を、スマホで番号を返すだけで確定できる形に✍️" },
     { time: "今日", who: "ハック", text: "T9：部活キット3点セット完成！商品設計・GAS一式・note販売ページ。価格は¥1,980/¥2,980の2段構え💻" },
     { time: "今日", who: "アイ", text: "T9（部活キット商品化）とT10（SNS立ち上げ）が同時始動。ハックとコトハが並列で作業中💻" },
