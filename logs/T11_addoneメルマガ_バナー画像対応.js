@@ -16,8 +16,9 @@
  * ・連続した「様」（例：「ご担当者様様」）を自動で1個に畳み込む保険を追加
  *   （collapseDuplicateHonorific_）。ただし根本原因はA2側の手入力なので、下記も確認すること
  * ・本文中の装飾記法を追加（applyHighlightMarkup_）：
- *     **文章** → オレンジ・太字・少し大きめ（色も変えて強調）
- *     *文章*  → 色はそのまま（黒字）・太字・少し大きめ（色は変えず大きさだけ強調）
+ *     **文章** → オレンジ・太字・大きめ（色も変えて強調）
+ *     *文章*  → 色はそのまま（黒字）・太字・大きめ（色は変えず大きさだけ強調）
+ *   文字サイズは applyHighlightMarkup_ 内の font-size（例：1.6em）を変えるだけで調整可
  *
  * 【事前準備・注意点】
  * ・バナー・フッターどちらの画像ファイルも、Googleドライブで
@@ -219,21 +220,22 @@ function escapeHtml_(text) {
 
 /**
  * 本文中の記号で囲まれた部分を装飾する。
- * ・**文章**（アスタリスク2つ）→ オレンジ・太字・少し大きめ（色も変えて強調したいとき）
- * ・*文章*（アスタリスク1つ）  → 色はそのまま（黒字）・太字・少し大きめ（色は変えず大きさだけ目立たせたいとき）
- * 例：⭐*建設会社様向け*⭐のお知らせになります。（黒字のまま少し大きく）
+ * ・**文章**（アスタリスク2つ）→ オレンジ・太字・大きめ（色も変えて強調したいとき）
+ * ・*文章*（アスタリスク1つ）  → 色はそのまま（黒字）・太字・大きめ（色は変えず大きさだけ目立たせたいとき）
+ * 例：⭐*建設会社様向け*⭐のお知らせになります。（黒字のまま大きく）
  *     **最低利用6ヶ月から始められるキャンペーンを実施いたします。**（オレンジで強調）
  * ※ ** を先に処理してから残った単独の * を処理するので、**と*を混ぜて使っても崩れない
+ * ※ サイズは font-size の倍率（例：1.6em）を変えるだけで簡単に調整できる
  */
 function applyHighlightMarkup_(escapedText) {
   let result = escapedText.replace(
     /\*\*([\s\S]+?)\*\*/g,
-    '<span style="color:#e2551c;font-weight:bold;font-size:1.15em;">$1</span>'
+    '<span style="color:#e2551c;font-weight:bold;font-size:1.6em;line-height:1.4;">$1</span>'
   );
 
   result = result.replace(
     /\*([\s\S]+?)\*/g,
-    '<span style="font-weight:bold;font-size:1.15em;">$1</span>'
+    '<span style="font-weight:bold;font-size:1.6em;line-height:1.4;">$1</span>'
   );
 
   return result;
