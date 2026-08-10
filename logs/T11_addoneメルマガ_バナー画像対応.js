@@ -19,6 +19,8 @@
  *     **文章** → オレンジ・太字（サイズは本文と同じ・色だけ変えたいとき）
  *     *文章*  → 色はそのまま（黒字）・太字・大きめ（サイズだけ大きくしたいとき）
  *   *文章* の文字サイズは applyHighlightMarkup_ 内の font-size（例：1.6em）を変えるだけで調整可
+ * ・本文中に [[ボタンの文字|URL]] と書くと、オレンジ背景の目立つボタンリンクに変換される
+ *   （applyButtonMarkup_）。例：[[お申し込みはこちら|https://forms.gle/xxxxxxxx]]
  *
  * 【事前準備・注意点】
  * ・バナー・フッターどちらの画像ファイルも、Googleドライブで
@@ -242,6 +244,30 @@ function applyHighlightMarkup_(escapedText) {
 }
 
 /**
+ * 本文中の [[ボタンの文字|URL]] を、オレンジ背景の目立つボタンリンクに変換する。
+ * 例：[[お申し込みはこちら|https://forms.gle/xxxxxxxx]]
+ * 前後に余白が入り、中央寄せの単独ブロックとして表示される（フォームへの誘導などに）。
+ * ※ Outlookデスクトップ版など一部メーラーでは角丸（border-radius）が四角のまま
+ *   表示されることがあるが、ボタンとしての見た目・クリックは問題なく機能する。
+ */
+function applyButtonMarkup_(escapedText) {
+  return escapedText.replace(
+    /\[\[([^|\]]+)\|([^\]]+)\]\]/g,
+    (match, label, url) => {
+      const safeUrl = url.trim();
+      const safeLabel = label.trim();
+      return (
+        `<div style="text-align:center;margin:24px 0;">` +
+        `<a href="${safeUrl}" target="_blank" style="display:inline-block;background-color:#e2551c;` +
+        `color:#ffffff;font-weight:bold;font-size:16px;padding:14px 36px;border-radius:6px;` +
+        `text-decoration:none;">${safeLabel}</a>` +
+        `</div>`
+      );
+    }
+  );
+}
+
+/**
  * プレーン本文＋バナー画像URL＋フッター画像URLから、HTMLメール本文を組み立てる
  */
 function buildHtmlBody_(plainBody, bannerImageUrl, footerImageUrl) {
@@ -254,6 +280,7 @@ function buildHtmlBody_(plainBody, bannerImageUrl, footerImageUrl) {
     : "";
 
   let textHtml = escapeHtml_(plainBody);
+  textHtml = applyButtonMarkup_(textHtml);
   textHtml = applyHighlightMarkup_(textHtml);
   textHtml = textHtml.replace(/\n/g, "<br>");
 
