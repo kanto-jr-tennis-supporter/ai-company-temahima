@@ -21,6 +21,7 @@
  *   *文章* の文字サイズは applyHighlightMarkup_ 内の font-size（例：1.6em）を変えるだけで調整可
  * ・本文中に [[ボタンの文字|URL]] と書くと、オレンジ背景の目立つボタンリンクに変換される
  *   （applyButtonMarkup_）。例：[[お申し込みはこちら|https://forms.gle/xxxxxxxx]]
+ *   揃え位置は左揃え（デフォルト）。applyButtonMarkup_ 内の text-align を変えれば調整可
  *
  * 【事前準備・注意点】
  * ・バナー・フッターどちらの画像ファイルも、Googleドライブで
@@ -246,7 +247,8 @@ function applyHighlightMarkup_(escapedText) {
 /**
  * 本文中の [[ボタンの文字|URL]] を、オレンジ背景の目立つボタンリンクに変換する。
  * 例：[[お申し込みはこちら|https://forms.gle/xxxxxxxx]]
- * 前後に余白が入り、中央寄せの単独ブロックとして表示される（フォームへの誘導などに）。
+ * 前後に余白が入ったブロックとして表示される（フォームへの誘導などに）。
+ * 揃え位置は下の text-align（現在は "left"）を "center" や "right" に変えれば調整できる。
  * ※ Outlookデスクトップ版など一部メーラーでは角丸（border-radius）が四角のまま
  *   表示されることがあるが、ボタンとしての見た目・クリックは問題なく機能する。
  */
@@ -257,7 +259,7 @@ function applyButtonMarkup_(escapedText) {
       const safeUrl = url.trim();
       const safeLabel = label.trim();
       return (
-        `<div style="text-align:center;margin:24px 0;">` +
+        `<div style="text-align:left;margin:24px 0;">` +
         `<a href="${safeUrl}" target="_blank" style="display:inline-block;background-color:#e2551c;` +
         `color:#ffffff;font-weight:bold;font-size:16px;padding:14px 36px;border-radius:6px;` +
         `text-decoration:none;">${safeLabel}</a>` +
