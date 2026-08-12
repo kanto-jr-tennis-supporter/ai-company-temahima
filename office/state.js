@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-24T01:45:00.000Z",
+  "updatedAt": "2026-07-24T02:00:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -125,17 +125,29 @@ window.AI_STATE = {
       "id": "T25",
       "title": "資産づくりルート：インスタ投稿ネタ企画（AI活用×失敗談）",
       "owner": "サトル",
-      "status": "doing",
-      "progress": 10,
-      "hint": "",
-      "cmd": "",
+      "status": "review",
+      "progress": 100,
+      "hint": "ネタ10個と、うち1本（クラウドワークス403アクセス拒否）はスライド文言まで完成。中身を見てOKか、残り2本（AI二重課金／動画生成の肩透かし）を実話に寄せる確認をお願いします",
+      "cmd": "T25、③③③の内容でOK。①「403アクセス拒否」の投稿から始めよう",
       "log": [
         {
           "time": "今日",
           "text": "着手。テマヒマ・ラボの実際のタスク履歴（案件検索の空振り・ChatGPT解約判断・自動化の限界など）から実話ベースのネタを企画中"
+        },
+        {
+          "time": "今日",
+          "text": "実タスク履歴からネタ10個を企画。特に強い3つ（クラウドワークス403アクセス拒否／懸賞詐欺の見分け方／AI二重課金の棚卸し）にカルーセル構成案を作成し、「403アクセス拒否」はスライド文言7枚分＋キャプションまで書き切って完了"
         }
       ],
-      "deliverables": []
+      "deliverables": [
+        {
+          "title": "T25_インスタ投稿ネタ企画.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T25_インスタ投稿ネタ企画.md",
+          "app": "Visual Studio Code"
+        }
+      ]
     },
     {
       "id": "T24",
@@ -967,8 +979,8 @@ window.AI_STATE = {
     },
     {
       "name": "サトル",
-      "status": "working",
-      "taskId": "T25"
+      "status": "idle",
+      "taskId": ""
     },
     {
       "name": "ハック",
@@ -1004,6 +1016,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "サトル",
+      "text": "T25：実話ベースのインスタネタを10個企画。「403アクセス拒否」の1本はスライド文言まで書き切りました🧭"
+    },
     {
       "time": "今日",
       "who": "リサ",
