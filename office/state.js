@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-24T01:30:00.000Z",
+  "updatedAt": "2026-07-24T01:45:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -121,6 +121,22 @@ window.AI_STATE = {
     ]
   },
   "tasks": [
+    {
+      "id": "T25",
+      "title": "資産づくりルート：インスタ投稿ネタ企画（AI活用×失敗談）",
+      "owner": "サトル",
+      "status": "doing",
+      "progress": 10,
+      "hint": "",
+      "cmd": "",
+      "log": [
+        {
+          "time": "今日",
+          "text": "着手。テマヒマ・ラボの実際のタスク履歴（案件検索の空振り・ChatGPT解約判断・自動化の限界など）から実話ベースのネタを企画中"
+        }
+      ],
+      "deliverables": []
+    },
     {
       "id": "T24",
       "title": "懸賞サイトの比較リサーチ（iPhone・MacBook・旅行券・商品券）",
@@ -951,8 +967,8 @@ window.AI_STATE = {
     },
     {
       "name": "サトル",
-      "status": "idle",
-      "taskId": ""
+      "status": "working",
+      "taskId": "T25"
     },
     {
       "name": "ハック",
