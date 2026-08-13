@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-24T02:55:00.000Z",
+  "updatedAt": "2026-07-24T03:05:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -122,13 +122,29 @@ window.AI_STATE = {
   },
   "tasks": [
     {
+      "id": "T28",
+      "title": "100均輸出：アジア圏（台湾・香港・韓国・タイ等）追加リサーチ",
+      "owner": "リサ",
+      "status": "doing",
+      "progress": 10,
+      "hint": "",
+      "cmd": "",
+      "log": [
+        {
+          "time": "今日",
+          "text": "着手。台湾・香港・韓国・タイ等、アジア圏の関税制度・市場性を調査中"
+        }
+      ],
+      "deliverables": []
+    },
+    {
       "id": "T27",
       "title": "100均輸出：米国以外の有望な販売先国リサーチ",
       "owner": "リサ",
-      "status": "review",
+      "status": "done",
       "progress": 100,
-      "hint": "イギリスを軸に、オーストラリアも並行がおすすめとのこと。この方針でテスト出品を進めていいか決めてください",
-      "cmd": "T27、イギリス・オーストラリア向けで進めよう。文房具ノートと手ぬぐいから出品してみる",
+      "hint": "",
+      "cmd": "",
       "log": [
         {
           "time": "今日",
@@ -137,6 +153,10 @@ window.AI_STATE = {
         {
           "time": "今日",
           "text": "英・EU・豪・加・シンガポールを比較。英国・豪州はVAT/GSTがプラットフォーム自動徴収で出品者負担が軽いと判明。カナダは免税枠CAD20と極端に低く要注意、EUは2026年7月から新関税(€3/品目)開始予定と判明。英国を軸に豪州を並行でテスト出品を推奨して完了"
+        },
+        {
+          "time": "今日",
+          "text": "社長より④文房具ノート・⑤手ぬぐいで英国・豪州向けに進める方針を承認。アジア圏の追加リサーチはT28へ"
         }
       ],
       "deliverables": [
@@ -1033,8 +1053,8 @@ window.AI_STATE = {
   "employees": [
     {
       "name": "リサ",
-      "status": "idle",
-      "taskId": ""
+      "status": "working",
+      "taskId": "T28"
     },
     {
       "name": "コトハ",
@@ -1080,6 +1100,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "アイ",
+      "text": "T28：アジア圏（台湾・香港・韓国・タイ等）の追加リサーチに着手しました🏢"
+    },
     {
       "time": "今日",
       "who": "リサ",
