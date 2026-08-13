@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-24T02:40:00.000Z",
+  "updatedAt": "2026-07-24T02:55:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -125,17 +125,29 @@ window.AI_STATE = {
       "id": "T27",
       "title": "100均輸出：米国以外の有望な販売先国リサーチ",
       "owner": "リサ",
-      "status": "doing",
-      "progress": 10,
-      "hint": "",
-      "cmd": "",
+      "status": "review",
+      "progress": 100,
+      "hint": "イギリスを軸に、オーストラリアも並行がおすすめとのこと。この方針でテスト出品を進めていいか決めてください",
+      "cmd": "T27、イギリス・オーストラリア向けで進めよう。文房具ノートと手ぬぐいから出品してみる",
       "log": [
         {
           "time": "今日",
           "text": "着手。社長より米国以外の市場を検討したいとの意向。EU・英国・豪州・カナダ等の関税制度と市場性を調査中"
+        },
+        {
+          "time": "今日",
+          "text": "英・EU・豪・加・シンガポールを比較。英国・豪州はVAT/GSTがプラットフォーム自動徴収で出品者負担が軽いと判明。カナダは免税枠CAD20と極端に低く要注意、EUは2026年7月から新関税(€3/品目)開始予定と判明。英国を軸に豪州を並行でテスト出品を推奨して完了"
         }
       ],
-      "deliverables": []
+      "deliverables": [
+        {
+          "title": "T27_輸出先国リサーチ.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T27_輸出先国リサーチ.md",
+          "app": "Visual Studio Code"
+        }
+      ]
     },
     {
       "id": "T26",
@@ -1021,8 +1033,8 @@ window.AI_STATE = {
   "employees": [
     {
       "name": "リサ",
-      "status": "working",
-      "taskId": "T27"
+      "status": "idle",
+      "taskId": ""
     },
     {
       "name": "コトハ",
@@ -1068,6 +1080,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "リサ",
+      "text": "T27：米国以外の輸出先を比較し、英国を軸に豪州を並行するのがおすすめと分かりました🔍"
+    },
     {
       "time": "今日",
       "who": "リサ",
