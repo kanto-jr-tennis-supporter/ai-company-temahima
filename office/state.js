@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-24T02:35:00.000Z",
+  "updatedAt": "2026-07-24T02:40:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -122,13 +122,29 @@ window.AI_STATE = {
   },
   "tasks": [
     {
+      "id": "T27",
+      "title": "100均輸出：米国以外の有望な販売先国リサーチ",
+      "owner": "リサ",
+      "status": "doing",
+      "progress": 10,
+      "hint": "",
+      "cmd": "",
+      "log": [
+        {
+          "time": "今日",
+          "text": "着手。社長より米国以外の市場を検討したいとの意向。EU・英国・豪州・カナダ等の関税制度と市場性を調査中"
+        }
+      ],
+      "deliverables": []
+    },
+    {
       "id": "T26",
       "title": "100均せどり×輸出の実現性リサーチ（利益・購入しやすさ）",
       "owner": "リサ",
-      "status": "review",
+      "status": "done",
       "progress": 100,
-      "hint": "米国向けは免税枠廃止で関税がかかる制度変更が進行中。この前提込みで、少量テスト出品するかどうかの判断をお願いします",
-      "cmd": "T26、この5点で少量テスト出品してみよう",
+      "hint": "",
+      "cmd": "",
       "log": [
         {
           "time": "今日",
@@ -137,6 +153,10 @@ window.AI_STATE = {
         {
           "time": "今日",
           "text": "eBayでの実売実例（折り紙・和柄マステ・箸・ノート・手ぬぐい等）5点の利益試算、定番/限定の分類、発送規制品を整理。2026年8月時点で米国の少額免税（デミニミス）廃止が進行中で採算に直結する重要な前提として明記して完了"
+        },
+        {
+          "time": "今日",
+          "text": "社長より少量テスト出品の方針で承認。ただし販売先は米国以外を検討したいとのことで、T27で追加リサーチへ"
         }
       ],
       "deliverables": [
@@ -1001,8 +1021,8 @@ window.AI_STATE = {
   "employees": [
     {
       "name": "リサ",
-      "status": "idle",
-      "taskId": ""
+      "status": "working",
+      "taskId": "T27"
     },
     {
       "name": "コトハ",
