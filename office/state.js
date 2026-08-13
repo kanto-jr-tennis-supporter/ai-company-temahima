@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-24T03:30:00.000Z",
+  "updatedAt": "2026-07-24T03:45:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -125,17 +125,29 @@ window.AI_STATE = {
       "id": "T29",
       "title": "100均輸出：文房具ノート・手ぬぐいの売れ筋デザインリサーチ",
       "owner": "リサ",
-      "status": "doing",
-      "progress": 10,
-      "hint": "",
-      "cmd": "",
+      "status": "review",
+      "progress": 100,
+      "hint": "店頭チェックリスト8項目が完成。ここからは実店舗でチェックリストを持って買ってくる、社長の実地アクションの番です",
+      "cmd": "T29のチェックリスト持って、ダイソーで買ってきたよ",
       "log": [
         {
           "time": "今日",
           "text": "着手。英国・豪州向けEtsy/eBayで実際に売れている文房具ノート・手ぬぐいのデザイン傾向を調査中"
+        },
+        {
+          "time": "今日",
+          "text": "ノート系は桜・和柄／kawaii動物／ジブリ風／昭和レトロ／ミニマル和紙風の5系統、手ぬぐいは青海波等の伝統和柄／猫／桜×富士山が海外で刺さる傾向と判明。著作権リスクのあるジブリ風は除外し、店頭で使える見た目チェックリスト8項目を作成して完了。Etsy本体は直接アクセスできず検索エンジン経由の分析にとどまる点は正直に明記"
         }
       ],
-      "deliverables": []
+      "deliverables": [
+        {
+          "title": "T29_売れ筋デザインリサーチ.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T29_売れ筋デザインリサーチ.md",
+          "app": "Visual Studio Code"
+        }
+      ]
     },
     {
       "id": "T28",
@@ -1081,8 +1093,8 @@ window.AI_STATE = {
   "employees": [
     {
       "name": "リサ",
-      "status": "working",
-      "taskId": "T29"
+      "status": "idle",
+      "taskId": ""
     },
     {
       "name": "コトハ",
@@ -1128,6 +1140,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "リサ",
+      "text": "T29：売れ筋デザインと、店頭で使える見た目チェックリスト8項目をまとめました🔍"
+    },
     {
       "time": "今日",
       "who": "リサ",
