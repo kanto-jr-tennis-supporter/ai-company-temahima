@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-24T02:10:00.000Z",
+  "updatedAt": "2026-07-24T02:20:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -121,6 +121,22 @@ window.AI_STATE = {
     ]
   },
   "tasks": [
+    {
+      "id": "T26",
+      "title": "100均せどり×輸出の実現性リサーチ（利益・購入しやすさ）",
+      "owner": "リサ",
+      "status": "doing",
+      "progress": 10,
+      "hint": "",
+      "cmd": "",
+      "log": [
+        {
+          "time": "今日",
+          "text": "着手。海外で売れている100均商品の実例・利益が出るか・普通に買えるかをリサーチ中"
+        }
+      ],
+      "deliverables": []
+    },
     {
       "id": "T25",
       "title": "資産づくりルート：インスタ投稿ネタ企画（AI活用×失敗談）",
@@ -973,8 +989,8 @@ window.AI_STATE = {
   "employees": [
     {
       "name": "リサ",
-      "status": "idle",
-      "taskId": ""
+      "status": "working",
+      "taskId": "T26"
     },
     {
       "name": "コトハ",
