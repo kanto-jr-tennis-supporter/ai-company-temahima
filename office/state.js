@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-24T02:20:00.000Z",
+  "updatedAt": "2026-07-24T02:35:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -125,17 +125,29 @@ window.AI_STATE = {
       "id": "T26",
       "title": "100均せどり×輸出の実現性リサーチ（利益・購入しやすさ）",
       "owner": "リサ",
-      "status": "doing",
-      "progress": 10,
-      "hint": "",
-      "cmd": "",
+      "status": "review",
+      "progress": 100,
+      "hint": "米国向けは免税枠廃止で関税がかかる制度変更が進行中。この前提込みで、少量テスト出品するかどうかの判断をお願いします",
+      "cmd": "T26、この5点で少量テスト出品してみよう",
       "log": [
         {
           "time": "今日",
           "text": "着手。海外で売れている100均商品の実例・利益が出るか・普通に買えるかをリサーチ中"
+        },
+        {
+          "time": "今日",
+          "text": "eBayでの実売実例（折り紙・和柄マステ・箸・ノート・手ぬぐい等）5点の利益試算、定番/限定の分類、発送規制品を整理。2026年8月時点で米国の少額免税（デミニミス）廃止が進行中で採算に直結する重要な前提として明記して完了"
         }
       ],
-      "deliverables": []
+      "deliverables": [
+        {
+          "title": "T26_100均輸出せどりリサーチ.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T26_100均輸出せどりリサーチ.md",
+          "app": "Visual Studio Code"
+        }
+      ]
     },
     {
       "id": "T25",
@@ -989,8 +1001,8 @@ window.AI_STATE = {
   "employees": [
     {
       "name": "リサ",
-      "status": "working",
-      "taskId": "T26"
+      "status": "idle",
+      "taskId": ""
     },
     {
       "name": "コトハ",
@@ -1036,6 +1048,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "リサ",
+      "text": "T26：100均輸出の利益試算をまとめました。米国の免税枠廃止が進行中という重要な前提も見つけています🔍"
+    },
     {
       "time": "今日",
       "who": "サトル",
