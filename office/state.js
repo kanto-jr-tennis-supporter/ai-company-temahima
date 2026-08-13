@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-24T03:05:00.000Z",
+  "updatedAt": "2026-07-24T03:20:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -125,17 +125,29 @@ window.AI_STATE = {
       "id": "T28",
       "title": "100均輸出：アジア圏（台湾・香港・韓国・タイ等）追加リサーチ",
       "owner": "リサ",
-      "status": "doing",
-      "progress": 10,
-      "hint": "",
-      "cmd": "",
+      "status": "review",
+      "progress": 100,
+      "hint": "英国・豪州優先の結論は変わらず、アジアで明確に上げるべき国はなし（次点は香港）。ここでリサーチを打ち止めにして実際のテスト出品に進んでいいか決めてください",
+      "cmd": "T28了解。もうリサーチはOK、英国・豪州向けにテスト出品の準備を始めよう",
       "log": [
         {
           "time": "今日",
           "text": "着手。台湾・香港・韓国・タイ等、アジア圏の関税制度・市場性を調査中"
+        },
+        {
+          "time": "今日",
+          "text": "台湾・香港・韓国は関税面は良好だがeBay/Etsyでの買い手規模の裏付けなし（自国モール・代購文化が強い）。タイは2026年1月に少額免税廃止で条件悪化。NZは制度良好だが市場が小さい。英国・豪州優先の結論は変わらず、次点は香港と判定して完了"
         }
       ],
-      "deliverables": []
+      "deliverables": [
+        {
+          "title": "T28_アジア圏輸出先リサーチ.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T28_アジア圏輸出先リサーチ.md",
+          "app": "Visual Studio Code"
+        }
+      ]
     },
     {
       "id": "T27",
@@ -1053,8 +1065,8 @@ window.AI_STATE = {
   "employees": [
     {
       "name": "リサ",
-      "status": "working",
-      "taskId": "T28"
+      "status": "idle",
+      "taskId": ""
     },
     {
       "name": "コトハ",
@@ -1100,6 +1112,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "リサ",
+      "text": "T28：アジア圏を調査。結論は英国・豪州優先のまま変わらずでした🔍"
+    },
     {
       "time": "今日",
       "who": "アイ",
