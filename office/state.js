@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-24T03:20:00.000Z",
+  "updatedAt": "2026-07-24T03:30:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -122,13 +122,29 @@ window.AI_STATE = {
   },
   "tasks": [
     {
+      "id": "T29",
+      "title": "100均輸出：文房具ノート・手ぬぐいの売れ筋デザインリサーチ",
+      "owner": "リサ",
+      "status": "doing",
+      "progress": 10,
+      "hint": "",
+      "cmd": "",
+      "log": [
+        {
+          "time": "今日",
+          "text": "着手。英国・豪州向けEtsy/eBayで実際に売れている文房具ノート・手ぬぐいのデザイン傾向を調査中"
+        }
+      ],
+      "deliverables": []
+    },
+    {
       "id": "T28",
       "title": "100均輸出：アジア圏（台湾・香港・韓国・タイ等）追加リサーチ",
       "owner": "リサ",
-      "status": "review",
+      "status": "done",
       "progress": 100,
-      "hint": "英国・豪州優先の結論は変わらず、アジアで明確に上げるべき国はなし（次点は香港）。ここでリサーチを打ち止めにして実際のテスト出品に進んでいいか決めてください",
-      "cmd": "T28了解。もうリサーチはOK、英国・豪州向けにテスト出品の準備を始めよう",
+      "hint": "",
+      "cmd": "",
       "log": [
         {
           "time": "今日",
@@ -1065,8 +1081,8 @@ window.AI_STATE = {
   "employees": [
     {
       "name": "リサ",
-      "status": "idle",
-      "taskId": ""
+      "status": "working",
+      "taskId": "T29"
     },
     {
       "name": "コトハ",
