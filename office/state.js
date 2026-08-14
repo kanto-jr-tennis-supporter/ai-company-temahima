@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-24T03:45:00.000Z",
+  "updatedAt": "2026-07-24T04:00:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -122,13 +122,29 @@ window.AI_STATE = {
   },
   "tasks": [
     {
+      "id": "T30",
+      "title": "100均輸出：Etsy/eBay英語出品文テンプレート作成",
+      "owner": "コトハ",
+      "status": "doing",
+      "progress": 10,
+      "hint": "",
+      "cmd": "",
+      "log": [
+        {
+          "time": "今日",
+          "text": "着手。文房具ノート・手ぬぐい向けの英語出品文テンプレートを作成中"
+        }
+      ],
+      "deliverables": []
+    },
+    {
       "id": "T29",
       "title": "100均輸出：文房具ノート・手ぬぐいの売れ筋デザインリサーチ",
       "owner": "リサ",
-      "status": "review",
+      "status": "done",
       "progress": 100,
-      "hint": "店頭チェックリスト8項目が完成。ここからは実店舗でチェックリストを持って買ってくる、社長の実地アクションの番です",
-      "cmd": "T29のチェックリスト持って、ダイソーで買ってきたよ",
+      "hint": "",
+      "cmd": "",
       "log": [
         {
           "time": "今日",
@@ -1098,8 +1114,8 @@ window.AI_STATE = {
     },
     {
       "name": "コトハ",
-      "status": "idle",
-      "taskId": ""
+      "status": "working",
+      "taskId": "T30"
     },
     {
       "name": "サトル",
@@ -1140,6 +1156,11 @@ window.AI_STATE = {
     }
   ],
   "activity": [
+    {
+      "time": "今日",
+      "who": "アイ",
+      "text": "T30：コトハが英語の出品文テンプレート作成に着手しました。社長は店舗調達をお願いします🏢"
+    },
     {
       "time": "今日",
       "who": "リサ",
