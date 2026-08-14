@@ -45,7 +45,7 @@
 //               { company, contact, tasks: [{ id, source, text, url, receivedAt, status: "open"|"done", note }] }
 
 window.AI_STATE = {
-  "updatedAt": "2026-07-24T04:00:00.000Z",
+  "updatedAt": "2026-07-24T04:15:00.000Z",
   "addone": {
     "company": "add one",
     "contact": "Shingo Tezuka",
@@ -125,17 +125,29 @@ window.AI_STATE = {
       "id": "T30",
       "title": "100均輸出：Etsy/eBay英語出品文テンプレート作成",
       "owner": "コトハ",
-      "status": "doing",
-      "progress": 10,
+      "status": "done",
+      "progress": 100,
       "hint": "",
       "cmd": "",
       "log": [
         {
           "time": "今日",
           "text": "着手。文房具ノート・手ぬぐい向けの英語出品文テンプレートを作成中"
+        },
+        {
+          "time": "今日",
+          "text": "タイトル型・商品説明文・タグ13個候補を柄/サイズ/送料はプレースホルダーで作成。「Made in Japan」を誠実に使う一文の書き方も添えて完了。社長が実物を買ってきたら埋める段取り"
         }
       ],
-      "deliverables": []
+      "deliverables": [
+        {
+          "title": "T30_英語出品文テンプレート.md",
+          "type": "ドキュメント",
+          "at": "今日",
+          "path": "logs/T30_英語出品文テンプレート.md",
+          "app": "Visual Studio Code"
+        }
+      ]
     },
     {
       "id": "T29",
@@ -1114,8 +1126,8 @@ window.AI_STATE = {
     },
     {
       "name": "コトハ",
-      "status": "working",
-      "taskId": "T30"
+      "status": "idle",
+      "taskId": ""
     },
     {
       "name": "サトル",
@@ -1158,8 +1170,8 @@ window.AI_STATE = {
   "activity": [
     {
       "time": "今日",
-      "who": "アイ",
-      "text": "T30：コトハが英語の出品文テンプレート作成に着手しました。社長は店舗調達をお願いします🏢"
+      "who": "コトハ",
+      "text": "T30：英語の出品文テンプレートが完成しました。実物が来たら埋めるだけです✍️"
     },
     {
       "time": "今日",
