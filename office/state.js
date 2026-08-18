@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-08-05T14:08:00+09:00",
+  updatedAt: "2026-08-05T14:20:00+09:00",
 
   setup: {
     completed: true,
@@ -197,6 +197,22 @@ window.AI_STATE = {
       deliverables: []
     },
     {
+      id: "T12",
+      title: "架電管理スクリプトのメルマガ送信にも文字装飾を追加",
+      owner: "ハック",
+      status: "review",
+      progress: 100,
+      hint: "K2の本文で*文章*（大きめ）・**文章**（赤字＋大きめ）が使えるようになったので、貼り替えてテスト送信してください",
+      cmd: "T12のスクリプトを見せて",
+      log: [
+        { time: "今日", text: "社長から架電管理＋メルマガ送信の別スクリプトを共有。sendNewsletter()がプレーンテキスト送信のみだったのでHTMLメール化" },
+        { time: "今日", text: "完成：*文章*でサイズだけ大きく、**文章**で赤字＋大きめ、の2段階の装飾に対応" }
+      ],
+      deliverables: [
+        { title: "T12_メルマガ送信スクリプト_装飾追加.js", type: "コード", at: "8/5", path: "logs/T12_メルマガ送信スクリプト_装飾追加.js", app: "Visual Studio Code" }
+      ]
+    },
+    {
       id: "T11",
       title: "add oneメルマガ：バナー画像・フッター画像を入れる（HTMLメール化）",
       owner: "ハック",
@@ -244,6 +260,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "今日", who: "ハック", text: "T12：架電管理の方のメルマガ送信もHTML化！*で大きめ・**で赤字＋大きめの装飾ができるようになりました🎨" },
     { time: "今日", who: "ハック", text: "T11：****文章****（アスタリスク4つ）で太字だけの装飾も追加！全部で4段階の使い分けが完成しました🎨" },
     { time: "今日", who: "ハック", text: "T11：***文章***（アスタリスク3つ）でオレンジ＋大きめを同時に使えるようにしました🎨" },
     { time: "今日", who: "ハック", text: "T11：お問い合わせボタンを左揃えに変更しました🔘" },
