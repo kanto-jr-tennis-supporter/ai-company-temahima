@@ -209,17 +209,17 @@ function escapeMailHtml_(text) {
  * 例：本日はお時間いただきありがとうございました。**先着5社様限定**のご案内です。
  *     *来月から新プランを開始します*
  * ※ ** を先に処理してから残った単独の * を処理するので、**と*を混ぜて使っても崩れない
- * ※ 文字サイズは font-size の倍率（例：1.4em）を変えるだけで簡単に調整できる
+ * ※ 文字サイズは font-size の倍率（例：1.6em）を変えるだけで簡単に調整できる
  */
 function applyMailHighlightMarkup_(escapedText) {
   let result = escapedText.replace(
     /\*\*([\s\S]+?)\*\*/g,
-    '<span style="color:#d32f2f;font-weight:bold;font-size:1.4em;line-height:1.4;">$1</span>'
+    '<span style="color:#d32f2f;font-weight:bold;font-size:1.6em;line-height:1.4;">$1</span>'
   );
 
   result = result.replace(
     /\*([\s\S]+?)\*/g,
-    '<span style="font-weight:bold;font-size:1.4em;line-height:1.4;">$1</span>'
+    '<span style="font-weight:bold;font-size:1.6em;line-height:1.4;">$1</span>'
   );
 
   return result;
