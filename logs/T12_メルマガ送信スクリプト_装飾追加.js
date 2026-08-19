@@ -21,6 +21,7 @@ const TEST_MODE_CELL = 'M2';
 const TEST_EMAIL_CELL = 'N2';
 const TEST_COMPANY_CELL = 'O2';
 const TEST_PERSON_CELL = 'P2';
+const MAIL_HEADER_IMAGE_CELL = 'Q2'; // ヘッダー画像：Googleドライブの共有リンクを貼る
 
 const CALL_STATUS_LIST = [
   '【関心あり】',
@@ -267,9 +268,25 @@ function applyMailButtonMarkup_(escapedText) {
 }
 
 /**
- * プレーン本文（挨拶文込み）から、装飾込みのHTMLメール本文を組み立てる
+ * Q2に貼られたヘッダー画像のGoogleドライブ共有リンクを、メール本文に埋め込める直リンクに変換する。
+ * ※ 変換前に、対象ファイルを「リンクを知っている全員が閲覧可」に設定しておくこと
+ *   （限定公開のままだと相手のメールで画像が表示されません＝赤い×アイコンになります）
  */
-function buildMailHtmlBody_(plainBody) {
+function buildHeaderImageUrl_(link) {
+  if (!link) return '';
+  const fileId = extractDriveFileId_(link);
+  if (!fileId) return '';
+  return 'https://drive.google.com/uc?export=view&id=' + fileId;
+}
+
+/**
+ * プレーン本文（挨拶文込み）とヘッダー画像URLから、装飾込みのHTMLメール本文を組み立てる
+ */
+function buildMailHtmlBody_(plainBody, headerImageUrl) {
+  const headerHtml = headerImageUrl
+    ? `<img src="${headerImageUrl}" alt="ヘッダー" style="max-width:600px;width:100%;height:auto;display:block;margin:0 0 16px 0;border:0;">`
+    : '';
+
   let html = escapeMailHtml_(plainBody);
   html = applyMailButtonMarkup_(html);
   html = applyMailHighlightMarkup_(html);
@@ -277,7 +294,7 @@ function buildMailHtmlBody_(plainBody) {
 
   return (
     `<div style="font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;` +
-    `font-size:14px;line-height:1.8;color:#333333;">${html}</div>`
+    `font-size:14px;line-height:1.8;color:#333333;">${headerHtml}${html}</div>`
   );
 }
 
@@ -293,16 +310,18 @@ function sendNewsletter() {
   const testEmail = sheet.getRange(TEST_EMAIL_CELL).getValue();
   const bodyText = sheet.getRange(MAIL_BODY_CELL).getValue();
   const fileLink = sheet.getRange(MAIL_FILE_LINK_CELL).getValue();
+  const headerImageLink = sheet.getRange(MAIL_HEADER_IMAGE_CELL).getValue();
 
   const subject = '【件名】';
   const attachments = getAttachmentsFromDriveLink_(fileLink);
+  const headerImageUrl = buildHeaderImageUrl_(headerImageLink);
 
   if (testMode) {
     const testCompany = sheet.getRange(TEST_COMPANY_CELL).getValue();
     const testPerson = sheet.getRange(TEST_PERSON_CELL).getValue();
 
     const body = `${testCompany}\n${testPerson} 様\n\n${bodyText}`;
-    const htmlBody = buildMailHtmlBody_(body);
+    const htmlBody = buildMailHtmlBody_(body, headerImageUrl);
 
     GmailApp.sendEmail(testEmail, subject, body, {
       attachments: attachments,
@@ -331,7 +350,7 @@ function sendNewsletter() {
     if (sentDate || !email) return;
 
     const body = `${company}\n${person} 様\n\n${bodyText}`;
-    const htmlBody = buildMailHtmlBody_(body);
+    const htmlBody = buildMailHtmlBody_(body, headerImageUrl);
 
     GmailApp.sendEmail(email, subject, body, {
       attachments: attachments,
