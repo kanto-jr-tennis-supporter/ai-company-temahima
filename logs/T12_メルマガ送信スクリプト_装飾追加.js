@@ -321,7 +321,7 @@ function sendNewsletter() {
     const testCompany = sheet.getRange(TEST_COMPANY_CELL).getValue();
     const testPerson = sheet.getRange(TEST_PERSON_CELL).getValue();
 
-    const body = `${testCompany}\n${testPerson} 様\n\n${bodyText}`;
+    const body = `${testCompany}\n${buildGreeting_(testPerson)}\n\n${bodyText}`;
     const htmlBody = buildMailHtmlBody_(body, headerImageUrl);
 
     GmailApp.sendEmail(testEmail, subject, body, {
@@ -361,7 +361,7 @@ function sendNewsletter() {
 
   const senderEmail = getSenderEmail_();
   const sample = targets[0];
-  const sampleBody = `${sample.company}\n${sample.person} 様\n\n${bodyText}`;
+  const sampleBody = `${sample.company}\n${buildGreeting_(sample.person)}\n\n${bodyText}`;
 
   const confirm = ui.alert(
     '本送信 最終確認',
@@ -389,7 +389,7 @@ function sendNewsletter() {
   let sentCount = 0;
 
   targets.forEach(target => {
-    const body = `${target.company}\n${target.person} 様\n\n${bodyText}`;
+    const body = `${target.company}\n${buildGreeting_(target.person)}\n\n${bodyText}`;
     const htmlBody = buildMailHtmlBody_(body, headerImageUrl);
 
     GmailApp.sendEmail(target.email, subject, body, {
@@ -403,6 +403,17 @@ function sendNewsletter() {
 
   sheet.getRange(TEST_MODE_CELL).setValue(true);
   ui.alert(`${sentCount}件送信しました。\n\nM2を自動でテストモードに戻しました。`);
+}
+
+/**
+ * 宛名の敬称部分を組み立てる。
+ * 担当者名が入っていれば「名前 様」、空欄なら「ご担当者様」にする
+ * （「様」は自動で付くので、名前セル側に手入力しないこと）。
+ */
+function buildGreeting_(person) {
+  const name = String(person || '').trim();
+  if (!name) return 'ご担当者様';
+  return name + ' 様';
 }
 
 /**
