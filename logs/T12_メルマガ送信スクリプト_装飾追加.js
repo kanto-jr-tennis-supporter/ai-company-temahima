@@ -339,26 +339,40 @@ function sendNewsletter() {
   const values = sheet.getRange(2, 1, lastRow - 1, 10).getValues();
 
   // 送信対象を先に洗い出す（確認ダイアログに使う）
+  // J列に「メール1（ブランドA）／メール2（ブランドB）」のような形で複数・注釈付きで
+  // 入っていても、有効なメールアドレスだけを全部拾い出して個別に送る。
   const targets = [];
+  const skippedRows = [];
   values.forEach((row, i) => {
     const rowNumber = i + 2;
 
-    const sentDate = row[0]; // A
-    const company = row[5];  // F
-    const person = row[6];   // G
-    const email = row[9];    // J
+    const sentDate = row[0];    // A
+    const company = row[5];     // F
+    const person = row[6];      // G
+    const emailCell = row[9];   // J
 
-    if (sentDate || !email) return;
+    if (sentDate) return;
 
-    targets.push({ rowNumber, company, person, email });
+    const emails = extractEmailsFromCell_(emailCell);
+    if (emails.length === 0) {
+      if (String(emailCell || '').trim()) skippedRows.push({ rowNumber, company, raw: emailCell });
+      return;
+    }
+
+    targets.push({ rowNumber, company, person, emails });
   });
 
   if (targets.length === 0) {
-    ui.alert('送信対象が0件です（すでに送信済み、またはメールアドレスが未入力です）。');
+    let msg = '送信対象が0件です（すでに送信済み、またはメールアドレスが未入力です）。';
+    if (skippedRows.length > 0) {
+      msg += `\n\n⚠️メールアドレスの形式が読み取れず除外した行：${skippedRows.length}件`;
+    }
+    ui.alert(msg);
     sheet.getRange(TEST_MODE_CELL).setValue(true);
     return;
   }
 
+  const totalEmailCount = targets.reduce((sum, t) => sum + t.emails.length, 0);
   const senderEmail = getSenderEmail_();
   const sample = targets[0];
   const sampleBody = `${sample.company}\n${buildGreeting_(sample.person)}\n\n${bodyText}`;
@@ -367,14 +381,15 @@ function sendNewsletter() {
     '本送信 最終確認',
     `現在ログインしているアカウント：\n${senderEmail}\n\n` +
     `このアカウントから送信されます。\n\n` +
-    `送信対象件数：${targets.length}件\n` +
+    `送信対象：${targets.length}行（メールアドレス${totalEmailCount}件）\n` +
+    (skippedRows.length > 0 ? `⚠️メール形式が読み取れず除外：${skippedRows.length}行\n` : '') +
     `件名：${subject}\n` +
     `ヘッダー画像：${headerImageUrl ? 'あり' : 'なし（Q2が未設定 or URLを認識できません）'}\n` +
     `添付ファイル数：${attachments.length}件\n\n` +
     `【1件目サンプル】\n` +
     `会社名：${sample.company}\n` +
     `担当者名：${sample.person}\n` +
-    `送信先：${sample.email}\n\n` +
+    `送信先：${sample.emails.join(', ')}\n\n` +
     `本文冒頭：\n${sampleBody.substring(0, 300)}\n\n` +
     `この内容で本送信しますか？`,
     ui.ButtonSet.YES_NO
@@ -387,22 +402,52 @@ function sendNewsletter() {
 
   const today = new Date();
   let sentCount = 0;
+  const failedSends = [];
 
   targets.forEach(target => {
     const body = `${target.company}\n${buildGreeting_(target.person)}\n\n${bodyText}`;
     const htmlBody = buildMailHtmlBody_(body, headerImageUrl);
 
-    GmailApp.sendEmail(target.email, subject, body, {
-      attachments: attachments,
-      htmlBody: htmlBody
+    target.emails.forEach(email => {
+      try {
+        GmailApp.sendEmail(email, subject, body, {
+          attachments: attachments,
+          htmlBody: htmlBody
+        });
+        sentCount++;
+      } catch (e) {
+        failedSends.push(`${target.company} / ${email}：${e.message}`);
+      }
     });
 
     sheet.getRange(target.rowNumber, 1).setValue(today);
-    sentCount++;
   });
 
   sheet.getRange(TEST_MODE_CELL).setValue(true);
-  ui.alert(`${sentCount}件送信しました。\n\nM2を自動でテストモードに戻しました。`);
+
+  let message = `${sentCount}件送信しました。`;
+  if (skippedRows.length > 0) {
+    message += `\n\n⚠️メール形式が読み取れず除外した行：${skippedRows.length}件`;
+  }
+  if (failedSends.length > 0) {
+    message += `\n\n送信に失敗したもの（${failedSends.length}件）：\n${failedSends.join('\n')}`;
+  }
+  message += `\n\nM2を自動でテストモードに戻しました。`;
+
+  ui.alert(message);
+}
+
+/**
+ * セルの中身から、有効なメールアドレスをすべて抜き出す。
+ * 「メール1（ブランドA）／メール2（ブランドB）」のように、
+ * 全角スラッシュや会社名の注釈が混ざっていても、メールアドレスの形をした部分だけを拾う。
+ * 重複は除去する。
+ */
+function extractEmailsFromCell_(cellValue) {
+  const text = String(cellValue || '');
+  const matches = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g);
+  if (!matches) return [];
+  return [...new Set(matches)];
 }
 
 /**
