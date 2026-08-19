@@ -234,10 +234,36 @@ function applyMailHighlightMarkup_(escapedText) {
 }
 
 /**
+ * 本文中の [[ボタンの文字|URL]] を、オレンジ背景の目立つボタンリンクに変換する。
+ * 例：[[お申し込みはこちら|https://forms.gle/xxxxxxxx]]
+ * URLの部分には、申し込んでほしいページ（Googleフォームの共有リンクなど）を直接書き込む。
+ * 別セルに貼る必要はなく、K2の本文中の好きな場所にこの1行を書くだけでボタンになる。
+ * ※ Outlookデスクトップ版など一部メーラーでは角丸（border-radius）が四角のまま
+ *   表示されることがあるが、ボタンとしての見た目・クリックは問題なく機能する。
+ */
+function applyMailButtonMarkup_(escapedText) {
+  return escapedText.replace(
+    /\[\[([^|\]]+)\|([^\]]+)\]\]/g,
+    (match, label, url) => {
+      const safeUrl = url.trim();
+      const safeLabel = label.trim();
+      return (
+        `<div style="text-align:left;margin:24px 0;">` +
+        `<a href="${safeUrl}" target="_blank" style="display:inline-block;background-color:#e2551c;` +
+        `color:#ffffff;font-weight:bold;font-size:16px;padding:14px 36px;border-radius:6px;` +
+        `text-decoration:none;">${safeLabel}</a>` +
+        `</div>`
+      );
+    }
+  );
+}
+
+/**
  * プレーン本文（挨拶文込み）から、装飾込みのHTMLメール本文を組み立てる
  */
 function buildMailHtmlBody_(plainBody) {
   let html = escapeMailHtml_(plainBody);
+  html = applyMailButtonMarkup_(html);
   html = applyMailHighlightMarkup_(html);
   html = html.replace(/\n/g, '<br>');
 
