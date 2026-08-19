@@ -305,6 +305,7 @@ function buildMailHtmlBody_(plainBody, headerImageUrl) {
 function sendNewsletter() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName(MAIL_SHEET);
+  const ui = SpreadsheetApp.getUi();
 
   const testMode = sheet.getRange(TEST_MODE_CELL).getValue() === true;
   const testEmail = sheet.getRange(TEST_EMAIL_CELL).getValue();
@@ -312,7 +313,7 @@ function sendNewsletter() {
   const fileLink = sheet.getRange(MAIL_FILE_LINK_CELL).getValue();
   const headerImageLink = sheet.getRange(MAIL_HEADER_IMAGE_CELL).getValue();
 
-  const subject = '【件名】';
+  const subject = '【圧倒的コスト削減！だけど良い商品がほしい！】';
   const attachments = getAttachmentsFromDriveLink_(fileLink);
   const headerImageUrl = buildHeaderImageUrl_(headerImageLink);
 
@@ -328,7 +329,7 @@ function sendNewsletter() {
       htmlBody: htmlBody
     });
 
-    SpreadsheetApp.getUi().alert('テストメールを送信しました。');
+    ui.alert('テストメールを送信しました。');
     return;
   }
 
@@ -336,9 +337,9 @@ function sendNewsletter() {
   if (lastRow < 2) return;
 
   const values = sheet.getRange(2, 1, lastRow - 1, 10).getValues();
-  const today = new Date();
-  let sentCount = 0;
 
+  // 送信対象を先に洗い出す（確認ダイアログに使う）
+  const targets = [];
   values.forEach((row, i) => {
     const rowNumber = i + 2;
 
@@ -349,20 +350,70 @@ function sendNewsletter() {
 
     if (sentDate || !email) return;
 
-    const body = `${company}\n${person} 様\n\n${bodyText}`;
+    targets.push({ rowNumber, company, person, email });
+  });
+
+  if (targets.length === 0) {
+    ui.alert('送信対象が0件です（すでに送信済み、またはメールアドレスが未入力です）。');
+    sheet.getRange(TEST_MODE_CELL).setValue(true);
+    return;
+  }
+
+  const senderEmail = getSenderEmail_();
+  const sample = targets[0];
+  const sampleBody = `${sample.company}\n${sample.person} 様\n\n${bodyText}`;
+
+  const confirm = ui.alert(
+    '本送信 最終確認',
+    `現在ログインしているアカウント：\n${senderEmail}\n\n` +
+    `このアカウントから送信されます。\n\n` +
+    `送信対象件数：${targets.length}件\n` +
+    `件名：${subject}\n` +
+    `ヘッダー画像：${headerImageUrl ? 'あり' : 'なし（Q2が未設定 or URLを認識できません）'}\n` +
+    `添付ファイル数：${attachments.length}件\n\n` +
+    `【1件目サンプル】\n` +
+    `会社名：${sample.company}\n` +
+    `担当者名：${sample.person}\n` +
+    `送信先：${sample.email}\n\n` +
+    `本文冒頭：\n${sampleBody.substring(0, 300)}\n\n` +
+    `この内容で本送信しますか？`,
+    ui.ButtonSet.YES_NO
+  );
+
+  if (confirm !== ui.Button.YES) {
+    sheet.getRange(TEST_MODE_CELL).setValue(true);
+    return;
+  }
+
+  const today = new Date();
+  let sentCount = 0;
+
+  targets.forEach(target => {
+    const body = `${target.company}\n${target.person} 様\n\n${bodyText}`;
     const htmlBody = buildMailHtmlBody_(body, headerImageUrl);
 
-    GmailApp.sendEmail(email, subject, body, {
+    GmailApp.sendEmail(target.email, subject, body, {
       attachments: attachments,
       htmlBody: htmlBody
     });
 
-    sheet.getRange(rowNumber, 1).setValue(today);
+    sheet.getRange(target.rowNumber, 1).setValue(today);
     sentCount++;
   });
 
   sheet.getRange(TEST_MODE_CELL).setValue(true);
-  SpreadsheetApp.getUi().alert(`${sentCount}件送信しました。`);
+  ui.alert(`${sentCount}件送信しました。\n\nM2を自動でテストモードに戻しました。`);
+}
+
+/**
+ * 送信元アカウント取得（確認ダイアログで「どのアカウントから送るか」を表示するため）
+ */
+function getSenderEmail_() {
+  return (
+    Session.getActiveUser().getEmail() ||
+    Session.getEffectiveUser().getEmail() ||
+    '取得できませんでした'
+  );
 }
 
 /* =========================
