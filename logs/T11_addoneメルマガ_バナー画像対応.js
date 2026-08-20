@@ -1,6 +1,14 @@
 /****************************************************
- * 再アプローチリスト直接参照メルマガ送信 完全版（バナー画像・フッター画像・宛名修正対応）
- * add one様向け／テマヒマ・ラボ ハック作成 / 2026-08-05
+ * 再アプローチリスト直接参照メルマガ送信 完全版（バナー画像・フッター画像・宛名修正・送信済み管理対応）
+ * add one様向け／テマヒマ・ラボ ハック作成 / 2026-08-05（2026-08-20 送信済み管理を追加）
+ *
+ * 【今回の変更点】
+ * ・再アプローチリストにA列（新設）「送信日」を追加。本送信で送ったらこの列に自動で日付が入り、
+ *   次回実行時はこの列に日付が入っている行を自動でスキップするようにした
+ *   → 送信の途中でGoogleの実行時間の上限（数分）に達して止まってしまっても、
+ *     もう一度「③ 本送信」を押すだけで、送り終えた分は飛ばして続きから安全に再開できる
+ * ・A列を新設した分、これまでC/D/G/K/P/U/Z列だった項目はすべて1つ右にずれて
+ *   D/E/H/L/Q/V/AA列になった（下記「再アプローチリスト」の欄を参照）
  *
  * 【変更点（元スクリプトからの差分）】
  * ・メルマガ用シートに H2：バナー画像URL（本文の上）を追加
@@ -32,12 +40,19 @@
  * ・メルマガ用シートA2の本文で、{{代表者名}} の前後に「様」や「ご担当者様」を手入力していないか
  *   必ず確認してください。プレースホルダーだけを単独で置き、前後には何も書かないのが正解です
  *   （敬称も「ご担当者様」も、このスクリプトが自動で付けます）
+ * ・再アプローチリストの一番左（今のA列より左）に新しい列を1本挿入し、空欄のままにしておいてください
+ *   （右クリック→「左に1列挿入」）。挿入すると元々あった列がすべて1つ右にずれるので、
+ *   もし架電スタッフなどが商号・代表者名・メール・アポ状況を手入力している場合は、
+ *   新しい列の位置（下記）を必ず共有してください。新しいA列自体には何も入力しないでください
+ *   （このスクリプトが送信後に自動で日付を書き込みます）
  *
  * 再アプローチリスト：
- * C列：商号
- * D列：代表者名
- * G列：メールアドレス
- * K/P/U/Z列：「アポ」を含む場合は除外
+ * A列：送信日（新設・空欄のままにしておく。送信後にスクリプトが自動で記入。ここに日付がある行は次回スキップ）
+ * B列：転記した日（元々のA列がここにずれる）
+ * D列：商号（元C列）
+ * E列：代表者名（元D列）
+ * H列：メールアドレス（元G列）
+ * L/Q/V/AA列：「アポ」を含む場合は除外（元K/P/U/Z列）
  *
  * メルマガ用シート：
  * A2：本文
@@ -93,6 +108,9 @@ function getMailSettings_() {
 
 /**
  * 送信対象取得
+ * A列（送信日）に既に日付が入っている行は「送信済み」として自動的にスキップする。
+ * これにより、本送信が途中で止まっても再実行すれば続きから安全に送れる。
+ * 戻り値は { targets, alreadySentCount } の形（送信対象一覧と、スキップした送信済み件数）
  */
 function getMailTargets_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -100,24 +118,31 @@ function getMailTargets_() {
   if (!sheet) throw new Error("再アプローチリストが見つかりません");
 
   const lastRow = sheet.getLastRow();
-  if (lastRow < 2) return [];
+  if (lastRow < 2) return { targets: [], alreadySentCount: 0 };
 
-  const data = sheet.getRange(2, 1, lastRow - 1, 26).getDisplayValues();
+  const data = sheet.getRange(2, 1, lastRow - 1, 27).getDisplayValues();
   const targets = [];
+  let alreadySentCount = 0;
 
   data.forEach((row, i) => {
     const rowNumber = i + 2;
-    const company = String(row[2] || "").trim();        // C
-    const representative = String(row[3] || "").trim(); // D
-    const email = String(row[6] || "").trim();          // G
+    const sentDate = row[0];                             // A：送信日
+    const company = String(row[3] || "").trim();         // D（元C）
+    const representative = String(row[4] || "").trim();  // E（元D）
+    const email = String(row[7] || "").trim();           // H（元G）
+
+    if (sentDate) {
+      if (email) alreadySentCount++;
+      return;
+    }
 
     if (!email) return;
 
     const statusText = [
-      row[10], // K
-      row[15], // P
-      row[20], // U
-      row[25], // Z
+      row[11], // L（元K）
+      row[16], // Q（元P）
+      row[21], // V（元U）
+      row[26], // AA（元Z）
     ].join(" ");
 
     if (statusText.includes("アポ")) return;
@@ -130,7 +155,7 @@ function getMailTargets_() {
     });
   });
 
-  return targets;
+  return { targets, alreadySentCount };
 }
 
 /**
@@ -352,10 +377,13 @@ function checkMailTargets() {
   const ui = SpreadsheetApp.getUi();
 
   try {
-    const targets = getMailTargets_();
+    const { targets, alreadySentCount } = getMailTargets_();
 
     if (targets.length === 0) {
-      ui.alert("送信対象件数：0件");
+      ui.alert(
+        `送信対象件数：0件` +
+        (alreadySentCount > 0 ? `\n\n（送信済みでスキップ：${alreadySentCount}件）` : "")
+      );
       return;
     }
 
@@ -363,8 +391,9 @@ function checkMailTargets() {
 
     ui.alert(
       "送信対象確認",
-      `送信対象件数：${targets.length}件\n\n` +
-      `【1件目サンプル】\n` +
+      `送信対象件数：${targets.length}件\n` +
+      (alreadySentCount > 0 ? `送信済みでスキップ：${alreadySentCount}件\n` : "") +
+      `\n【1件目サンプル】\n` +
       `商号：${sample.company}\n` +
       `代表者名：${addSama_(sample.representative)}\n` +
       `メール：${sample.email}`,
@@ -476,10 +505,14 @@ function sendMainMail() {
     }
 
     const senderEmail = getSenderEmail_();
-    const targets = getMailTargets_();
+    const { targets, alreadySentCount } = getMailTargets_();
 
     if (targets.length === 0) {
-      ui.alert("送信対象が0件です。");
+      let msg = "送信対象が0件です。";
+      if (alreadySentCount > 0) {
+        msg += `\n\n（送信済みでスキップ：${alreadySentCount}件。全件送信済みかもしれません）`;
+      }
+      ui.alert(msg);
       settings.sheet.getRange("D2").setValue(true);
       return;
     }
@@ -497,6 +530,7 @@ function sendMainMail() {
       `現在ログインしているアカウント：\n${senderEmail}\n\n` +
       `このアカウントから送信されます。\n\n` +
       `送信対象件数：${targets.length}件\n` +
+      (alreadySentCount > 0 ? `送信済みでスキップ：${alreadySentCount}件\n` : "") +
       `バナー画像：${bannerUrl ? "あり" : "なし（H2が未設定 or URLを認識できません）"}\n` +
       `フッター画像：${footerUrl ? "あり" : "なし（I2が未設定 or URLを認識できません）"}\n` +
       `添付ファイル数：${attachments.length}件\n\n` +
@@ -506,7 +540,7 @@ function sendMainMail() {
       `送信先：${sample.email}\n` +
       `件名：${sampleSubject}\n\n` +
       `本文冒頭：\n${sampleBody.substring(0, 300)}\n\n` +
-      `この内容で本送信しますか？`,
+      `この内容で本送信しますか？\n（送信済みの行は自動でスキップされるので、途中で止まっても再実行すれば続きから送れます）`,
       ui.ButtonSet.YES_NO
     );
 
@@ -520,6 +554,10 @@ function sendMainMail() {
       settings.sheet.getRange("D2").setValue(true);
       return;
     }
+
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const reapproachSheet = ss.getSheetByName(SHEET_REAPPROACH);
+    const today = new Date();
 
     let sent = 0;
     let failed = 0;
@@ -536,6 +574,8 @@ function sendMainMail() {
           attachments,
         });
 
+        // A列に送信日を記録。ここに日付が入った行は次回実行時にスキップされる
+        reapproachSheet.getRange(target.rowNumber, 1).setValue(today);
         sent++;
 
       } catch (e) {
@@ -677,10 +717,10 @@ function checkExcludedApoRows() {
     "商号",
     "代表者名",
     "メールアドレス",
-    "K列",
-    "P列",
-    "U列",
-    "Z列"
+    "L列",
+    "Q列",
+    "V列",
+    "AA列"
   ]);
 
   const lastRow = sourceSheet.getLastRow();
@@ -689,30 +729,48 @@ function checkExcludedApoRows() {
     return;
   }
 
-  const data = sourceSheet.getRange(2, 1, lastRow - 1, 26).getDisplayValues();
+  const data = sourceSheet.getRange(2, 1, lastRow - 1, 27).getDisplayValues();
 
   let sendCount = 0;
   let apoExcludedCount = 0;
   let noEmailCount = 0;
+  let alreadySentCount = 0;
 
   const output = [];
 
   data.forEach((row, i) => {
     const rowNumber = i + 2;
-    const company = String(row[2] || "").trim();        // C
-    const representative = String(row[3] || "").trim(); // D
-    const email = String(row[6] || "").trim();          // G
+    const sentDate = row[0];                             // A：送信日
+    const company = String(row[3] || "").trim();         // D（元C）
+    const representative = String(row[4] || "").trim();  // E（元D）
+    const email = String(row[7] || "").trim();           // H（元G）
 
-    const k = String(row[10] || "").trim();
-    const p = String(row[15] || "").trim();
-    const u = String(row[20] || "").trim();
-    const z = String(row[25] || "").trim();
+    const l = String(row[11] || "").trim();  // 元K
+    const q = String(row[16] || "").trim();  // 元P
+    const v = String(row[21] || "").trim();  // 元U
+    const aa = String(row[26] || "").trim(); // 元Z
 
-    const statusText = [k, p, u, z].join(" ");
+    const statusText = [l, q, v, aa].join(" ");
     const hasApo = statusText.includes("アポ");
 
     if (!email) {
       noEmailCount++;
+      return;
+    }
+
+    if (sentDate) {
+      alreadySentCount++;
+      output.push([
+        "除外：送信済み",
+        rowNumber,
+        company,
+        representative,
+        email,
+        l,
+        q,
+        v,
+        aa
+      ]);
       return;
     }
 
@@ -724,10 +782,10 @@ function checkExcludedApoRows() {
         company,
         representative,
         email,
-        k,
-        p,
-        u,
-        z
+        l,
+        q,
+        v,
+        aa
       ]);
       return;
     }
@@ -744,8 +802,9 @@ function checkExcludedApoRows() {
   SpreadsheetApp.getUi().alert(
     `アポ除外チェック完了\n\n` +
     `送信対象：${sendCount}件\n` +
+    `送信済み除外：${alreadySentCount}件\n` +
     `アポ除外：${apoExcludedCount}件\n` +
     `メールなし除外：${noEmailCount}件\n\n` +
-    `「メルマガ除外確認」シートにアポ除外分を出力しました。`
+    `「メルマガ除外確認」シートに送信済み・アポ除外分を出力しました。`
   );
 }
