@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T15:30:00+09:00",
+  updatedAt: "2026-08-25T00:00:00+09:00",
 
   setup: {
     completed: true,
@@ -182,7 +182,7 @@ window.AI_STATE = {
       progress: 0,
       hint: "",
       cmd: "T4を始めて",
-      log: [],
+      log: [{ time: "8/25", text: "対象確定：関東設備工業／申請先＝国立印刷局・経済産業省" }],
       deliverables: []
     },
     {
@@ -195,6 +195,20 @@ window.AI_STATE = {
       cmd: "T5を始めて",
       log: [{ time: "今日", text: "着手方針が決定。社長の準備（今年のメンバー情報など）が整い次第、開始" }],
       deliverables: []
+    },
+    {
+      id: "T11",
+      title: "経済産業省・国立印刷局：入札参加資格の情報まとめ（関東設備工業向け）",
+      owner: "リサ",
+      status: "review",
+      progress: 90,
+      hint: "内容を確認して、続けてアプリ化するか・書類作成に進むか教えてください",
+      cmd: "T11の内容でOK。書類作成に進んで",
+      log: [
+        { time: "8/25", text: "経済産業省（全省庁統一資格／建設工事資格）・国立印刷局（建設工事競争参加資格）の申請窓口・申請方法を調査してまとめた" },
+        { time: "8/25", text: "各省庁ドメインへの直接アクセスができず検索エンジンの要約止まり。締切・必要書類の最終確認は社長側での裏取りをお願いしたい" }
+      ],
+      deliverables: [{ title: "経済産業省・国立印刷局_入札参加資格まとめ", type: "ドキュメント", at: "8/25", path: "logs/T11_経済産業省・国立印刷局_入札参加資格まとめ.md", app: "Visual Studio Code" }]
     },
   ],
   proposals: [
@@ -217,6 +231,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "今日", who: "リサ", text: "T11：経済産業省・国立印刷局の入札参加資格まとめが完成！社長の確認待ちです🔍" },
     { time: "今日", who: "コトハ", text: "T10：SNS立ち上げキット完成！名前・プロフ・アイコン・初週7投稿を、スマホで番号を返すだけで確定できる形に✍️" },
     { time: "今日", who: "ハック", text: "T9：部活キット3点セット完成！商品設計・GAS一式・note販売ページ。価格は¥1,980/¥2,980の2段構え💻" },
     { time: "今日", who: "アイ", text: "T9（部活キット商品化）とT10（SNS立ち上げ）が同時始動。ハックとコトハが並列で作業中💻" },
