@@ -110,6 +110,39 @@ LINEの「外出先から指示」は、PCを閉じても動くよう**公開サ
 
 ---
 
+# Slack秘書（未対応タスクの洗い出し・任意・約10分）
+
+Slackで「相手からのメッセージのうち、まだ自分が返していない／片づけていないもの」を自動で洗い出します。
+デプロイ不要・自分のPCで動かすだけ。過去2か月ぶんのやり取りから、放置しているスレッドを一覧にします。
+
+> Slackのメッセージ検索には **search:read スコープの「ユーザートークン(xoxp-)」** が必要です。
+> このトークンは社長本人のものなので、検索結果の「自分」＝社長本人になります。
+
+## S-1. Slackアプリを作ってユーザートークンを取る
+🙋 ブラウザで：
+1. https://api.slack.com/apps を開く →「Create New App」→「From scratch」
+2. アプリ名（例：`AI秘書`）と、対象の **addone** ワークスペースを選んで作成
+3. 左メニュー「OAuth & Permissions」を開く
+4. 「Scopes」→ **User Token Scopes**（Botではなく **User** の方）に **`search:read`** を追加
+   - スレッドの中身まで読みたい場合は、任意で `channels:history`・`groups:history`・`im:history`・
+     `users:read` も User Token Scopes に追加すると精度が上がります（無くても単発判定で動きます）
+5. ページ上部「Install to Workspace」→ 許可
+6. 表示された **User OAuth Token（`xoxp-` で始まる）** をコピー
+7. 🙋 そのトークンをこのチャットに貼る
+- 🤖 受け取った値を `server/.env` の `SLACK_USER_TOKEN` に書き込む
+  （必要なら `SLACK_TARGET_USER`・`SLACK_LOOKBACK_DAYS` も設定）
+
+## S-2. 実行する
+- 🤖 `cd server && node scripts/slack-followups.mjs`
+- ✅ `logs/slack-未対応タスク.md` にレポートが保存され、画面にも表示されます
+  （会話ごとに、日時・相手の発言・Slackへのリンク・「なぜ未対応か」を一覧化）
+
+> 本体を起動していれば `http://localhost:3000/api/slack/followups` でも同じ結果をJSONで取得できます。
+> 「`missing_scope` / `not_allowed_token_type`」と出たら、トークンが `search:read` を持つ
+> **ユーザートークン(xoxp-)** か確認してください（ボットトークン xoxb- では検索できません）。
+
+---
+
 ## つまずいたら
 
 `http://localhost:3000/health`（または RenderのURL + `/health`）を開いて、

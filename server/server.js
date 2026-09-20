@@ -16,6 +16,7 @@ import {
   lineConfigured, verifySignature, replyText, pushRecent, getRecent, isOwner,
 } from "./lib/line.js";
 import { handleInstruction } from "./lib/ai.js";
+import { collectFollowups, buildReport } from "./scripts/slack-followups.mjs";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -67,6 +68,24 @@ app.get("/api/calendar", async (_req, res) => {
 
 app.get("/api/line", (_req, res) => {
   res.json(getRecent());
+});
+
+// ---- Slack秘書：相手（既定 U07G2BM07LZ）宛ての「未対応タスク」を洗い出す ----
+// SLACK_USER_TOKEN（search:read のユーザートークン xoxp-）が無ければ configured:false。
+app.get("/api/slack/followups", async (_req, res) => {
+  const token = process.env.SLACK_USER_TOKEN;
+  if (!token) return res.json({ configured: false, items: [] });
+  try {
+    const data = await collectFollowups({
+      token,
+      target: process.env.SLACK_TARGET_USER || "U07G2BM07LZ",
+      lookbackDays: Number(process.env.SLACK_LOOKBACK_DAYS || 60) || 60,
+    });
+    res.json({ configured: true, ...data, markdown: buildReport(data) });
+  } catch (e) {
+    console.error(e.message);
+    res.status(400).json({ configured: true, error: e.message, items: [] });
+  }
 });
 
 // ---- ローカルファイルを「コンピューター上で」開く ----
@@ -214,6 +233,7 @@ app.get("/health", (_req, res) => {
     port: app.get("port"),
     google: !!(process.env.GOOGLE_REFRESH_TOKEN),
     line: lineConfigured(),
+    slack: !!process.env.SLACK_USER_TOKEN,
     ai: !!process.env.ANTHROPIC_API_KEY,
     requireApproval: REQUIRE_APPROVAL,
   });
