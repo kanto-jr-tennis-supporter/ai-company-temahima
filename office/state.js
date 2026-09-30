@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T15:30:00+09:00",
+  updatedAt: "2026-09-30T12:00:00+09:00",
 
   setup: {
     completed: true,
@@ -70,6 +70,23 @@ window.AI_STATE = {
   },
 
   tasks: [
+    {
+      id: "T15",
+      title: "資料請求／送付の自動通知（アド・クリックス様スプシ → LINE・メール・Slack）",
+      owner: "ハック",
+      status: "review",
+      progress: 90,
+      hint: "コード完成。①CONFIGにメール宛先とSlack Webhookを入れる ②LINEはMessaging API設定後に有効化。手順書どおり設定→testNotifyで確認",
+      cmd: "T15のセットアップ手順を見せて",
+      log: [
+        { time: "今日", text: "設計確定（Q1=資料請求/送付の両方・Q2=LINE未設定・Q3=出し分け・Q4=アド社のみ）。onEdit型GAS本体と手順書を作成" },
+        { time: "今日", text: "メール・Slackは設定即稼働／LINEはMessaging API＋グループID取得後に有効化する2段構え" }
+      ],
+      deliverables: [
+        { title: "資料請求通知_GAS.js（本体）", type: "コード", at: "今日", path: "logs/資料請求通知_GAS.js", app: "Visual Studio Code" },
+        { title: "資料請求通知_セットアップ手順.md", type: "ドキュメント", at: "今日", path: "logs/資料請求通知_セットアップ手順.md", app: "Google Chrome" }
+      ]
+    },
     {
       id: "T9",
       title: "商品化第1弾：部活動まるごと管理キット（設計・GAS・note販売ページ）",
@@ -267,6 +284,7 @@ window.AI_STATE = {
     },
   ],
   proposals: [
+    { from: "ハック", title: "先にメール＋Slackを稼働させて報告漏れをゼロに", detail: "LINEはMessaging API設定に少し時間が要るので、設定即動くメール・Slackを先に有効化すれば、今日から資料請求の取りこぼしを防げます。", at: "今日" },
     { from: "サトル", title: "納品後の定番メニュー「継続プラン」を設計", detail: "受注のたびに月額プランを必ず添える型を作る。3社×3万円で毎月9万円の土台になります。", at: "12:00" },
   ],
 
@@ -286,6 +304,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "今日", who: "ハック", text: "T15：資料請求／送付の自動通知GASが完成！コール状況に「資料請求」「資料送付」が入ると企業名・住所・電話番号をLINE・メール・Slackへ。まず社長の設定待ちです💻" },
     { time: "今日", who: "コトハ", text: "T10：SNS立ち上げキット完成！名前・プロフ・アイコン・初週7投稿を、スマホで番号を返すだけで確定できる形に✍️" },
     { time: "今日", who: "ハック", text: "T9：部活キット3点セット完成！商品設計・GAS一式・note販売ページ。価格は¥1,980/¥2,980の2段構え💻" },
     { time: "今日", who: "アイ", text: "T9（部活キット商品化）とT10（SNS立ち上げ）が同時始動。ハックとコトハが並列で作業中💻" },
