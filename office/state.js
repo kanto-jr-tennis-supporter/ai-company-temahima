@@ -208,7 +208,7 @@ window.AI_STATE = {
       title: "ときわ電設商会様：法務省 入札参加資格申請書＋メール文面作成",
       owner: "ハック",
       status: "review",
-      progress: 97,
+      progress: 95,
       hint: "数値は全て反映完了。あとは工事分割内訳表（社長対応予定）とメール確認だけ",
       cmd: "T12の成果物を見せて",
       log: [
@@ -259,7 +259,7 @@ window.AI_STATE = {
       title: "資料請求／送付の自動通知（アド・クリックス様スプシ → LINE・メール・Slack）",
       owner: "ハック",
       status: "review",
-      progress: 95,
+      progress: 97,
       hint: "既存2本＋通知を1ファイルの完成版に統合済み。Apps Scriptで旧2本→完成版1本に入れ替え、送り先（★）を埋めてメニューから自動通知ON→テスト送信",
       cmd: "T15の入れ替え手順を1つずつ案内して",
       log: [
