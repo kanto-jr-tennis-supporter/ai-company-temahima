@@ -11,11 +11,13 @@
  *   02 報告シート月別更新  updateReportSheet_ ／ 毎日22時 dailyUpdateAll
  *   03 メニュー            onOpen
  *   04 メルマガ送信        sendNewsletterWithConfirm ほか
- *   05 資料送付リスト転記  onEdit（自動）／ syncShiryoSofuAll（一括）
+ *   05 資料送付リスト転記  onEdit（自動）／ syncShiryoSofuAll（一括）※資料送付・資料請求の両方
  *   06 資料請求／送付通知  onEditNotify（自動）／ setupNotifyTrigger ／ testNotify
  *
  *  ■ 設定を触るのは 06 の NOTIFY_CFG（★の箇所）だけ。
- *  ■ 01〜05 は元のスクリプトから動きを一切変えていません。
+ *  ■ 元のスクリプトからの変更は2点だけ：
+ *     ・01 架電ログ：③〜⑤回目の「連絡先」「メール」列を①②と同じ並びに（シート側の並び替えに合わせた）
+ *     ・05 転記：「資料請求」も資料送付リストへ転記（F列に資料送付／資料請求を記入）
  *************************************************/
 
 /*************************************************
@@ -31,9 +33,9 @@ function rebuildCallLog() {
   const rounds = [
     { n:1, caller:10, date:11, time:12, status:13, nextAction:14, nextDate:15, comment:16, contact:17, mail:18 },
     { n:2, caller:19, date:20, time:21, status:22, nextAction:23, nextDate:24, comment:25, contact:26, mail:27 },
-    { n:3, caller:28, date:29, time:30, status:31, nextAction:32, nextDate:33, comment:34, mail:35, contact:36 },
-    { n:4, caller:37, date:38, time:39, status:40, nextAction:41, nextDate:42, comment:43, mail:44, contact:45 },
-    { n:5, caller:46, date:47, time:48, status:49, nextAction:50, nextDate:51, comment:52, mail:53, contact:54 }
+    { n:3, caller:28, date:29, time:30, status:31, nextAction:32, nextDate:33, comment:34, contact:35, mail:36 },
+    { n:4, caller:37, date:38, time:39, status:40, nextAction:41, nextDate:42, comment:43, contact:44, mail:45 },
+    { n:5, caller:46, date:47, time:48, status:49, nextAction:50, nextDate:51, comment:52, contact:53, mail:54 }
   ];
   const output = [];
 
@@ -602,11 +604,11 @@ function findHeaderIndex_(headerRow, candidates) {
 /*************************************************
  * 05_資料送付リスト 自動転記（アド・クリックス様用）
  * リスト（寺社仏閣）・リスト（社福）の「コール状況①〜⑤」に
- * 「資料送付」が入った行を「資料送付リスト」へ転記する。
+ * 「資料送付」または「資料請求」が入った行を「資料送付リスト」へ転記する。
  *  - 自動：onEdit（入力した瞬間に転記）
  *  - 一括：メニュー「コールログ」→「資料送付リストへ一括転記」
  *  - 同じ企業（企業名＋TEL）は重複させず、最新内容で上書き
- *  - E列＝資料送付になった日付、F列＝「資料送付」、G列＝転記元シート名
+ *  - E列＝資料送付／資料請求になった日付、F列＝「資料送付」or「資料請求」（最新の回）、G列＝転記元シート名
  *  - 資料送付リストのA〜D列には書き込まない
  *************************************************/
 
@@ -616,14 +618,14 @@ const SS_CFG = {
     { name: 'リスト（社福）',     category: '社福' }
   ],
   dest: '資料送付リスト',
-  keyword: '資料送付',
+  keywords: ['資料送付', '資料請求'],   // どちらかが入ったら転記
   headerRow: 1,
   fixedHeaders: ['企業名', '住所', '担当者名', '役職', '部署', 'TEL', 'Mail'],
   blockStartHeader: '担当①',   // ここから右（①〜⑤の架電履歴）はまとめて転記
   statusPrefix: 'コール状況',
   destCol: {                   // 資料送付リストの列番号（1始まり）
     sofuDate: 5,               // E：資料送付になった日付
-    label: 6,                  // F：「資料送付」
+    label: 6,                  // F：「資料送付」or「資料請求」
     sourceSheet: 7             // G：転記元シート名
   }
 };
@@ -690,18 +692,22 @@ function collectItems_(sh, src, startRow, numRows) {
   const values = sh.getRange(startRow, 1, numRows, lastCol).getValues();
   const items = [];
   values.forEach(row => {
-    const hit = statusIdx.some(i => String(row[i]).indexOf(SS_CFG.keyword) !== -1);
+    const matchKw = v => SS_CFG.keywords.find(k => String(v).indexOf(k) !== -1);
+    const hit = statusIdx.some(i => matchKw(row[i]));
     if (!hit) return;
 
     const fixed = {};
     SS_CFG.fixedHeaders.forEach((h, j) => { fixed[h] = fixedIdx[j] >= 0 ? row[fixedIdx[j]] : ''; });
     if (String(fixed['企業名']).trim() === '') return;
 
-    // 「資料送付」になった日付（複数回ある場合は一番右＝最新の回）
+    // 「資料送付／資料請求」になった日付と種類（複数回ある場合は一番右＝最新の回）
     let sofuDate = '';
+    let label = '';
     statusIdx.forEach(i => {
-      if (String(row[i]).indexOf(SS_CFG.keyword) !== -1) {
+      const kw = matchKw(row[i]);
+      if (kw) {
         sofuDate = row[i - 2]; // 担当｜日付｜時間｜コール状況 の並び
+        label = kw;
       }
     });
 
@@ -710,6 +716,7 @@ function collectItems_(sh, src, startRow, numRows) {
       fixed: fixed,
       block: row.slice(blockStart),
       sofuDate: sofuDate,
+      label: label,
       sourceSheet: src.name
     });
   });
@@ -760,7 +767,7 @@ function upsertToDest_(items) {
     const out = new Array(width).fill('');
     const put = (col1, v) => { const k = col1 - writeFrom; if (k >= 0 && k < width) out[k] = v; };
     put(C.sofuDate, it.sofuDate);
-    put(C.label, SS_CFG.keyword);
+    put(C.label, it.label);
     put(C.sourceSheet, it.sourceSheet);
     SS_CFG.fixedHeaders.forEach((h, j) => { if (fixedIdx[j] >= 0) put(fixedIdx[j] + 1, it.fixed[h]); });
     const blockLen = Math.min(it.block.length, lastCol - blockStart);
