@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-07-07T15:30:00+09:00",
+  updatedAt: "2026-10-01T09:14:21+09:00",
 
   setup: {
     completed: true,
@@ -265,6 +265,25 @@ window.AI_STATE = {
       log: [{ time: "今日", text: "着手方針が決定。社長の準備（今年のメンバー情報など）が整い次第、開始" }],
       deliverables: []
     },
+    {
+      id: "T15",
+      title: "資料請求／送付の自動通知（アド・クリックス様スプシ → LINE・メール・Slack）",
+      owner: "ハック",
+      status: "review",
+      progress: 90,
+      hint: "コード完成。デスクトップ版で『logs/T15_引き継ぎメモ.md を読んで、T15の続きを画面操作で進めて』と話しかければ再開できます（ログイン・秘密情報の入力は社長の手で）",
+      cmd: "logs/T15_引き継ぎメモ.md を読んで、T15の続きを画面操作で進めて",
+      log: [
+        { time: "今日", text: "設計確定（Q1=資料請求/送付の両方・Q2=LINE未設定・Q3=出し分け・Q4=アド社のみ）。onEdit型GAS本体と手順書を作成" },
+        { time: "今日", text: "メール・Slackは設定即稼働／LINEはMessaging API＋グループID取得後に有効化する2段構え" },
+        { time: "今日", text: "デスクトップ版へ引き継ぎ。スクリプト・手順書を本ブランチに集約し、引き継ぎメモを作成（衝突チェック済：編集監視はonEditでなくonResourceRequestEdit＋インストール型トリガーなので既存onEditと非衝突）" }
+      ],
+      deliverables: [
+        { title: "資料請求通知_GAS.js（本体）", type: "コード", at: "今日", path: "logs/資料請求通知_GAS.js", app: "Visual Studio Code" },
+        { title: "資料請求通知_セットアップ手順.md", type: "ドキュメント", at: "今日", path: "logs/資料請求通知_セットアップ手順.md", app: "Google Chrome" },
+        { title: "T15_引き継ぎメモ.md（デスクトップ版への引き継ぎ）", type: "ドキュメント", at: "今日", path: "logs/T15_引き継ぎメモ.md", app: "Google Chrome" }
+      ]
+    },
   ],
   proposals: [
     { from: "サトル", title: "納品後の定番メニュー「継続プラン」を設計", detail: "受注のたびに月額プランを必ず添える型を作る。3社×3万円で毎月9万円の土台になります。", at: "12:00" },
@@ -286,6 +305,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "00:14", who: "ハック", text: "T15：デスクトップ版への引き継ぎメモを作成。スクリプト・手順書を本ブランチに集約しました" },
     { time: "今日", who: "コトハ", text: "T10：SNS立ち上げキット完成！名前・プロフ・アイコン・初週7投稿を、スマホで番号を返すだけで確定できる形に✍️" },
     { time: "今日", who: "ハック", text: "T9：部活キット3点セット完成！商品設計・GAS一式・note販売ページ。価格は¥1,980/¥2,980の2段構え💻" },
     { time: "今日", who: "アイ", text: "T9（部活キット商品化）とT10（SNS立ち上げ）が同時始動。ハックとコトハが並列で作業中💻" },
