@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-10-01T10:50:00+09:00",
+  updatedAt: "2026-10-01T11:00:00+09:00",
 
   setup: {
     completed: true,
@@ -258,10 +258,10 @@ window.AI_STATE = {
       id: "T15",
       title: "資料請求／送付の自動通知（アド・クリックス様スプシ → LINE・メール・Slack）",
       owner: "ハック",
-      status: "review",
-      progress: 97,
-      hint: "既存2本＋通知を1ファイルの完成版に統合済み。Apps Scriptで旧2本→完成版1本に入れ替え、送り先（★）を埋めてメニューから自動通知ON→テスト送信",
-      cmd: "T15の入れ替え手順を1つずつ案内して",
+      status: "done",
+      progress: 100,
+      hint: "",
+      cmd: "T15の仕組みを見せて",
       log: [
         { time: "今日", text: "設計確定（Q1=資料請求/送付の両方・Q2=LINE未設定・Q3=出し分け・Q4=アド社のみ）。GAS本体と手順書を作成" },
         { time: "今日", text: "メール・Slackは設定即稼働／LINEはMessaging API＋グループID取得後に有効化する2段構え" },
@@ -272,12 +272,28 @@ window.AI_STATE = {
         { time: "今日", text: "キャッチ判定に【資料請求】を追加（社長決定）" },
         { time: "今日", text: "①完了：Apps Scriptを完成版1本（1039行）に入れ替え。次は②送り先の記入" },
         { time: "今日", text: "②メール宛先・③Slack Webhook（アプリ Shiryo Notify）を社長が設定完了。次は④自動通知ON→⑤テスト" },
-        { time: "今日", text: "④自動通知ON・⑤テスト送信成功（メール＋Slack #PJ-アドクリックス）。残りは実シートでの最終確認" }
+        { time: "今日", text: "④自動通知ON・⑤テスト送信成功（メール＋Slack #PJ-アドクリックス）。残りは実シートでの最終確認" },
+        { time: "今日", text: "実シートで最終確認OK（通知・資料請求の転記・二重通知防止の3点）。メール＋Slackで稼働開始。LINEはT16へ" }
       ],
       deliverables: [
         { title: "アドクリックス_GAS完成版.gs（1ファイル統合版）", type: "コード", at: "今日", path: "logs/アドクリックス_GAS/アドクリックス_GAS完成版.gs", app: "Visual Studio Code" },
         { title: "資料請求通知_セットアップ手順.md", type: "ドキュメント", at: "今日", path: "logs/資料請求通知_セットアップ手順.md", app: "Google Chrome" },
         { title: "T15_引き継ぎメモ.md", type: "ドキュメント", at: "今日", path: "logs/T15_引き継ぎメモ.md", app: "Google Chrome" }
+      ]
+    },
+    {
+      id: "T16",
+      title: "資料請求通知のLINE対応（クライアント様グループへ企業名・住所・TELを自動報告）",
+      owner: "ハック",
+      status: "doing",
+      progress: 5,
+      hint: "",
+      cmd: "T16の続きを案内して",
+      log: [
+        { time: "今日", text: "T15から切り出し。コードは対応済み（NOTIFY_CFG.LINE を埋めて enabled:true にするだけ）。まず add one 公式LINEの現状（Lステップ等の連携有無）を確認" }
+      ],
+      deliverables: [
+        { title: "資料請求通知_セットアップ手順.md（STEP6がLINE）", type: "ドキュメント", at: "今日", path: "logs/資料請求通知_セットアップ手順.md", app: "Google Chrome" }
       ]
     },
     {
@@ -300,7 +316,7 @@ window.AI_STATE = {
     { name: "リサ", status: "idle", taskId: "" },
     { name: "コトハ", status: "idle", taskId: "" },
     { name: "サトル", status: "idle", taskId: "" },
-    { name: "ハック", status: "idle", taskId: "" },
+    { name: "ハック", status: "working", taskId: "T16" },
   ],
 
   links: [
@@ -312,6 +328,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "11:00", who: "ハック", text: "T15完了：資料請求・資料送付の自動通知がメール＋Slackで稼働開始。T16（LINE対応）に着手" },
     { time: "10:50", who: "ハック", text: "T15：資料請求通知のテスト送信に成功！メール・Slackに届きました" },
     { time: "10:45", who: "ハック", text: "T15：架電ログ③〜⑤の列修正＋資料請求も転記に対応。入れ替え待ちです" },
     { time: "10:15", who: "ハック", text: "T15：既存GAS2本＋通知を1ファイルの完成版に統合しました" },
