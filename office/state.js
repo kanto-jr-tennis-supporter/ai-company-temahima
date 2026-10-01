@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-10-01T11:30:00+09:00",
+  updatedAt: "2026-10-01T10:40:00+09:00",
 
   setup: {
     completed: true,
@@ -208,7 +208,7 @@ window.AI_STATE = {
       title: "ときわ電設商会様：法務省 入札参加資格申請書＋メール文面作成",
       owner: "ハック",
       status: "review",
-      progress: 95,
+      progress: 97,
       hint: "数値は全て反映完了。あとは工事分割内訳表（社長対応予定）とメール確認だけ",
       cmd: "T12の成果物を見せて",
       log: [
@@ -270,7 +270,8 @@ window.AI_STATE = {
         { time: "今日", text: "既存2本（架電ログ/資料送付転記）と通知を1ファイルに統合。通知の見出し不一致（コール状況①〜⑤・TEL）を修正し、モックで動作確認" },
         { time: "今日", text: "社長の並び替えに合わせ架電ログ③〜⑤の連絡先/メール列を修正。資料請求も資料送付リストへ転記するよう追加（モックで確認）" },
         { time: "今日", text: "キャッチ判定に【資料請求】を追加（社長決定）" },
-        { time: "今日", text: "①完了：Apps Scriptを完成版1本（1039行）に入れ替え。次は②送り先の記入" }
+        { time: "今日", text: "①完了：Apps Scriptを完成版1本（1039行）に入れ替え。次は②送り先の記入" },
+        { time: "今日", text: "②メール宛先・③Slack Webhook（アプリ Shiryo Notify）を社長が設定完了。次は④自動通知ON→⑤テスト" }
       ],
       deliverables: [
         { title: "アドクリックス_GAS完成版.gs（1ファイル統合版）", type: "コード", at: "今日", path: "logs/アドクリックス_GAS/アドクリックス_GAS完成版.gs", app: "Visual Studio Code" },
