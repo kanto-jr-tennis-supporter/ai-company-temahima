@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-10-01T10:40:00+09:00",
+  updatedAt: "2026-10-01T10:50:00+09:00",
 
   setup: {
     completed: true,
@@ -271,7 +271,8 @@ window.AI_STATE = {
         { time: "今日", text: "社長の並び替えに合わせ架電ログ③〜⑤の連絡先/メール列を修正。資料請求も資料送付リストへ転記するよう追加（モックで確認）" },
         { time: "今日", text: "キャッチ判定に【資料請求】を追加（社長決定）" },
         { time: "今日", text: "①完了：Apps Scriptを完成版1本（1039行）に入れ替え。次は②送り先の記入" },
-        { time: "今日", text: "②メール宛先・③Slack Webhook（アプリ Shiryo Notify）を社長が設定完了。次は④自動通知ON→⑤テスト" }
+        { time: "今日", text: "②メール宛先・③Slack Webhook（アプリ Shiryo Notify）を社長が設定完了。次は④自動通知ON→⑤テスト" },
+        { time: "今日", text: "④自動通知ON・⑤テスト送信成功（メール＋Slack #PJ-アドクリックス）。残りは実シートでの最終確認" }
       ],
       deliverables: [
         { title: "アドクリックス_GAS完成版.gs（1ファイル統合版）", type: "コード", at: "今日", path: "logs/アドクリックス_GAS/アドクリックス_GAS完成版.gs", app: "Visual Studio Code" },
@@ -311,6 +312,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "10:50", who: "ハック", text: "T15：資料請求通知のテスト送信に成功！メール・Slackに届きました" },
     { time: "10:45", who: "ハック", text: "T15：架電ログ③〜⑤の列修正＋資料請求も転記に対応。入れ替え待ちです" },
     { time: "10:15", who: "ハック", text: "T15：既存GAS2本＋通知を1ファイルの完成版に統合しました" },
     { time: "09:30", who: "ハック", text: "T15：通知GASの名前かぶり（notifyError_）を解消。貼るだけの状態です" },
