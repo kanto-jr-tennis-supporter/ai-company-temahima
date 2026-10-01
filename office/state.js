@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-10-01T09:30:00+09:00",
+  updatedAt: "2026-10-01T10:15:00+09:00",
 
   setup: {
     completed: true,
@@ -259,17 +259,18 @@ window.AI_STATE = {
       title: "資料請求／送付の自動通知（アド・クリックス様スプシ → LINE・メール・Slack）",
       owner: "ハック",
       status: "review",
-      progress: 92,
-      hint: "コードは貼るだけの状態。スプシの Apps Script に『＋で新規ファイル』として貼り、メール宛先とSlack Webhookを入れて setupTriggerRR → testNotifyRR を実行（ログイン・秘密情報・認可は社長の手で）",
-      cmd: "T15の貼り付け手順を1つずつ案内して",
+      progress: 95,
+      hint: "既存2本＋通知を1ファイルの完成版に統合済み。Apps Scriptで旧2本→完成版1本に入れ替え、送り先（★）を埋めてメニューから自動通知ON→テスト送信",
+      cmd: "T15の入れ替え手順を1つずつ案内して",
       log: [
         { time: "今日", text: "設計確定（Q1=資料請求/送付の両方・Q2=LINE未設定・Q3=出し分け・Q4=アド社のみ）。GAS本体と手順書を作成" },
         { time: "今日", text: "メール・Slackは設定即稼働／LINEはMessaging API＋グループID取得後に有効化する2段構え" },
         { time: "今日", text: "衝突チェック：既存アポ転記GASの notifyError_ と名前かぶりを発見 → 全名前を RR_CONFIG / rr〜 / setupTriggerRR / testNotifyRR に改名して解消" },
-        { time: "今日", text: "手順書STEP1を『既存コードを消さず＋で新規ファイル追加』に修正。残りはスプシへの貼り付け〜テスト送信（画面操作）" }
+        { time: "今日", text: "手順書STEP1を『既存コードを消さず＋で新規ファイル追加』に修正。残りはスプシへの貼り付け〜テスト送信（画面操作）" },
+        { time: "今日", text: "既存2本（架電ログ/資料送付転記）と通知を1ファイルに統合。通知の見出し不一致（コール状況①〜⑤・TEL）を修正し、モックで動作確認" }
       ],
       deliverables: [
-        { title: "資料請求通知_GAS.js（本体・名前かぶり対策済）", type: "コード", at: "今日", path: "logs/資料請求通知_GAS.js", app: "Visual Studio Code" },
+        { title: "アドクリックス_GAS完成版.gs（1ファイル統合版）", type: "コード", at: "今日", path: "logs/アドクリックス_GAS/アドクリックス_GAS完成版.gs", app: "Visual Studio Code" },
         { title: "資料請求通知_セットアップ手順.md", type: "ドキュメント", at: "今日", path: "logs/資料請求通知_セットアップ手順.md", app: "Google Chrome" },
         { title: "T15_引き継ぎメモ.md", type: "ドキュメント", at: "今日", path: "logs/T15_引き継ぎメモ.md", app: "Google Chrome" }
       ]
@@ -306,6 +307,7 @@ window.AI_STATE = {
   ],
 
   activity: [
+    { time: "10:15", who: "ハック", text: "T15：既存GAS2本＋通知を1ファイルの完成版に統合しました" },
     { time: "09:30", who: "ハック", text: "T15：通知GASの名前かぶり（notifyError_）を解消。貼るだけの状態です" },
     { time: "今日", who: "コトハ", text: "T10：SNS立ち上げキット完成！名前・プロフ・アイコン・初週7投稿を、スマホで番号を返すだけで確定できる形に✍️" },
     { time: "今日", who: "ハック", text: "T9：部活キット3点セット完成！商品設計・GAS一式・note販売ページ。価格は¥1,980/¥2,980の2段構え💻" },
