@@ -43,7 +43,7 @@
 //   command   : 一度だけ再生する演出 { id, type: "inauguration"|"meeting"|"founding" } or null
 
 window.AI_STATE = {
-  updatedAt: "2026-10-01T11:00:00+09:00",
+  updatedAt: "2026-10-01T11:30:00+09:00",
 
   setup: {
     completed: true,
@@ -269,7 +269,8 @@ window.AI_STATE = {
         { time: "今日", text: "手順書STEP1を『既存コードを消さず＋で新規ファイル追加』に修正。残りはスプシへの貼り付け〜テスト送信（画面操作）" },
         { time: "今日", text: "既存2本（架電ログ/資料送付転記）と通知を1ファイルに統合。通知の見出し不一致（コール状況①〜⑤・TEL）を修正し、モックで動作確認" },
         { time: "今日", text: "社長の並び替えに合わせ架電ログ③〜⑤の連絡先/メール列を修正。資料請求も資料送付リストへ転記するよう追加（モックで確認）" },
-        { time: "今日", text: "キャッチ判定に【資料請求】を追加（社長決定）" }
+        { time: "今日", text: "キャッチ判定に【資料請求】を追加（社長決定）" },
+        { time: "今日", text: "①完了：Apps Scriptを完成版1本（1039行）に入れ替え。次は②送り先の記入" }
       ],
       deliverables: [
         { title: "アドクリックス_GAS完成版.gs（1ファイル統合版）", type: "コード", at: "今日", path: "logs/アドクリックス_GAS/アドクリックス_GAS完成版.gs", app: "Visual Studio Code" },
